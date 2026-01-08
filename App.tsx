@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, Github, Linkedin, Twitter, Sparkles } from 'lucide-react';
@@ -77,7 +76,7 @@ const Header = () => {
             priority={true}
           />
           <span className="text-2xl font-display font-bold tracking-tight text-white transition-colors uppercase">
-            PH<span className="transition-colors duration-500 group-hover/header:text-accent" style={{ color: 'inherit' }}>IT</span>OPOLIS
+            PH<span className="transition-colors duration-500 group-hover/header:text-accent">IT</span>OPOLIS
           </span>
         </Link>
 
