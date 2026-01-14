@@ -128,7 +128,7 @@ export default function ContactPage() {
                   <label className="text-xs font-bold text-slate-500 uppercase">Message</label>
                   <textarea className="w-full bg-white/80 backdrop-blur-sm border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-accent h-32 text-primary transition-all" placeholder="Tell us about your project..." required />
                 </div>
-                <button className="w-full py-4 bg-accent hover:bg-accent-hover text-primary rounded-xl font-bold flex items-center justify-center group transition-all shadow-lg shadow-accent/20 active:scale-[0.98]">
+                <button className="w-full py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center justify-center group transition-all shadow-lg shadow-accent/20 hover:scale-105 active:scale-95">
                   Send Inquiry
                   <Send size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>

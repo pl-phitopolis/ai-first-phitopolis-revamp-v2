@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, Github, Linkedin, Twitter, Sparkles } from 'lucide-react';
@@ -256,7 +257,7 @@ const AIChatAssistant = () => {
             <button 
               onClick={handleSend}
               disabled={isLoading}
-              className="bg-accent hover:bg-accent-hover p-2 rounded-lg transition-colors text-primary"
+              className="bg-accent hover:bg-accent-hover p-2 rounded-lg transition-all hover:scale-110 active:scale-90 text-primary shadow-sm"
             >
               <ArrowRight size={18} />
             </button>
@@ -265,7 +266,7 @@ const AIChatAssistant = () => {
       ) : (
         <button 
           onClick={() => setIsOpen(true)}
-          className="bg-accent hover:bg-accent-hover w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-accent/20 transition-transform hover:scale-110 active:scale-95"
+          className="bg-accent hover:bg-accent-hover w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-accent/20 transition-all hover:scale-110 active:scale-95"
           aria-label="Open AI Assistant"
         >
           <Sparkles size={28} className="text-primary" />

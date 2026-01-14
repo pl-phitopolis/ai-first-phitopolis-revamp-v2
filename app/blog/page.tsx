@@ -103,7 +103,7 @@ export default function BlogPage() {
           <p className="text-slate-300 mb-8">Subscribe to our monthly newsletter for engineering insights and updates.</p>
           <div className="flex flex-col sm:flex-row gap-4">
             <input className="flex-1 bg-white/10 border border-white/20 rounded-full px-6 py-4 outline-none focus:ring-1 focus:ring-accent text-white placeholder-white/50" placeholder="Email Address" />
-            <button className="px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-all shadow-lg shadow-accent/10">Subscribe</button>
+            <button className="px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-all shadow-lg shadow-accent/20 hover:scale-105 active:scale-95">Subscribe</button>
           </div>
         </div>
       </motion.section>

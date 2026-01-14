@@ -73,15 +73,6 @@ export const TEAM: TeamMember[] = [
     bio: "Kriz is a successful Filipina entrepreneur with a background in corporate real estate, financial services and commodities. Leveraging her extensive network of professional contacts throughout Asia, Kriz helps guide Phitopolis’ growth in the region.",
     credentials: ["Entrepreneur", "Regional Strategy", "Network Growth"],
     image: "https://phitopolis.com/img/testimonials-1.jpg"
-  },
-  {
-    id: "2",
-    name: "Mark Walbaum",
-    role: "CTO and Co-founder",
-    expertise: ["Global Technology", "Infrastructure", "FinTech"],
-    bio: "Mark is an experienced technologist who has held senior roles at Morgan Stanley, Merrill Lynch and JPMorgan. A true global technologist, he has worked on Wall Street, in London, Hong Kong and Manila. Before co-founding Phitopolis, Mark built local technology teams in Manila for Deutsche Bank and Macquarie Bank.",
-    credentials: ["Ex-Morgan Stanley", "Ex-JPMorgan", "Ex-Merrill Lynch"],
-    image: "https://phitopolis.com/img/testimonials-2.jpg"
   }
 ];
 

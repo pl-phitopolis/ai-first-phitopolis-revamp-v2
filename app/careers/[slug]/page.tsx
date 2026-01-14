@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { JOBS } from '../../../constants';
@@ -91,7 +92,7 @@ export default function JobDetail() {
                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Message (Optional)</label>
                    <textarea className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 outline-none focus:ring-1 focus:ring-accent h-24 text-primary" />
                 </div>
-                <button className="w-full py-4 bg-accent hover:bg-accent-hover text-primary rounded-xl font-bold flex items-center justify-center group transition-all shadow-md">
+                <button className="w-full py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center justify-center group transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/20">
                   Submit Application
                   <Send size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>

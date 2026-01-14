@@ -116,24 +116,12 @@ export default function TeamPage() {
         </div>
 
         {/* Engineering DNA Highlights - Scroll Animations Retained */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-            className="p-8 bg-primary text-white rounded-3xl space-y-4 shadow-xl"
-          >
-            <GraduationCap className="text-accent w-10 h-10" />
-            <h3 className="text-xl font-bold">Global Presence</h3>
-            <p className="text-slate-300 text-sm">Experience across global financial hubs including Wall Street, London, Hong Kong, and Manila.</p>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="p-8 bg-slate-50 border border-slate-200 rounded-3xl space-y-4 shadow-sm"
           >
             <Award className="text-primary w-10 h-10" />
@@ -145,7 +133,7 @@ export default function TeamPage() {
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="p-8 bg-slate-50 border border-slate-200 rounded-3xl space-y-4 shadow-sm"
           >
             <Zap className="text-primary w-10 h-10" />
@@ -155,7 +143,7 @@ export default function TeamPage() {
         </div>
 
         {/* Team Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className={`grid grid-cols-1 ${TEAM.length > 1 ? 'lg:grid-cols-2' : 'max-w-4xl mx-auto'} gap-8`}>
           {TEAM.map((member, idx) => (
             <TeamMemberCard key={member.id} member={member} idx={idx} />
           ))}

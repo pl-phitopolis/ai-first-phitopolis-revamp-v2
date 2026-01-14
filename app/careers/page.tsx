@@ -76,7 +76,7 @@ export default function CareersPage() {
                         <span className="flex items-center"><Briefcase size={16} className="mr-2 text-accent" /> Remote Friendly</span>
                       </div>
                     </div>
-                    <button className="px-8 py-3 bg-accent text-primary rounded-xl font-bold hover:bg-accent-hover transition-all shadow-md">
+                    <button className="px-8 py-3 bg-accent text-primary rounded-full font-bold hover:bg-accent-hover transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/20">
                       Apply Now
                     </button>
                   </div>

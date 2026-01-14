@@ -242,7 +242,7 @@ export default function Home() {
                     <h3 className="font-bold text-xl text-primary group-hover:text-primary transition-colors">{job.title}</h3>
                     <p className="text-sm text-slate-500">{job.department} • {job.location}</p>
                   </div>
-                  <div className="px-4 py-2 bg-slate-100 text-primary text-sm font-bold rounded-lg group-hover:bg-accent group-hover:text-primary transition-all">
+                  <div className="px-4 py-2 bg-slate-100 text-primary text-sm font-bold rounded-full group-hover:bg-accent group-hover:text-primary transition-all group-hover:scale-105 active:scale-95">
                     View Position
                   </div>
                 </Link>

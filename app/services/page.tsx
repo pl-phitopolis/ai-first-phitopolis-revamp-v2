@@ -46,7 +46,7 @@ export default function ServicesPage() {
                     </div>
                   ))}
                 </div>
-                <button className="px-6 py-3 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-all flex items-center group shadow-md shadow-accent/20">
+                <button className="px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-all hover:scale-105 active:scale-95 flex items-center group shadow-lg shadow-accent/20">
                   Learn More <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
