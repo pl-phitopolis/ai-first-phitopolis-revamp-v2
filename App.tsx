@@ -7,7 +7,6 @@ import { Menu, X, ArrowRight, Github, Linkedin, Twitter, Sparkles } from 'lucide
 import Home from './app/page.tsx';
 import Services from './app/services/page.tsx';
 import About from './app/about/page.tsx';
-import Team from './app/team/page.tsx';
 import Careers from './app/careers/page.tsx';
 import Blog from './app/blog/page.tsx';
 import Contact from './app/contact/page.tsx';
@@ -58,7 +57,6 @@ const Header = () => {
   const navLinks = [
     { name: 'Services', href: '/services' },
     { name: 'About', href: '/about' },
-    { name: 'Team', href: '/team' },
     { name: 'Careers', href: '/careers' },
     { name: 'Blog', href: '/blog' },
     { name: 'Contact', href: '/contact' },
@@ -161,7 +159,6 @@ const Footer = () => {
             <h4 className="text-accent font-bold mb-6">Company</h4>
             <ul className="space-y-3 text-slate-100 text-sm">
               <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
-              <li><Link to="/team" className="hover:text-accent transition-colors">Our Team</Link></li>
               <li><Link to="/careers" className="hover:text-accent transition-colors">Careers</Link></li>
               <li><Link to="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
             </ul>
@@ -287,7 +284,6 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Services />} />
             <Route path="/about" element={<About />} />
-            <Route path="/team" element={<Team />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/careers/:slug" element={<JobDetail />} />
             <Route path="/blog" element={<Blog />} />

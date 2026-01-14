@@ -64,17 +64,11 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="container mx-auto px-6 text-center relative z-10"
         >
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-8 backdrop-blur-sm">
-            <span className="flex h-2 w-2 rounded-full bg-accent mr-3 animate-pulse"></span>
-            <span className="text-xs font-bold tracking-widest uppercase text-white/90">Available for Q4 2024 Partnerships</span>
-          </div>
-          
           <h1 className="text-5xl md:text-8xl font-display font-bold mb-6 tracking-tight leading-none text-white">
-            Making tomorrow's <br className="hidden md:block" /> technology available today.
+            Make tomorrow's <br className="hidden md:block" /> technology with us!
           </h1>
           <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-            Phitopolis builds elite software for R&D, Data Science, and Full-Stack Engineering. 
-            Founded by industry veterans from the world's leading investment banks.
+            Founded by veterans in finance, we build the data systems of tomorrow.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/services" className="px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center group shadow-lg shadow-accent/30 transition-all hover:scale-105 active:scale-95">
@@ -109,7 +103,7 @@ export default function Home() {
           >
             <div>
               <span className="text-primary font-bold tracking-widest uppercase text-xs">Our Expertise</span>
-              <h2 className="text-4xl md:text-5xl font-display font-bold mt-2 text-primary">What we build</h2>
+              <h2 className="text-4xl md:text-5xl font-display font-bold mt-2 text-primary">Services we offer</h2>
             </div>
             <Link to="/services" className="text-slate-500 hover:text-primary flex items-center text-sm font-medium transition-colors group">
               View all services <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
@@ -169,14 +163,10 @@ export default function Home() {
                 Our leadership team brings decades of experience from Morgan Stanley, JPMorgan, and Deutsche Bank. 
                 We understand the rigors of high-frequency, data-intensive environments.
               </p>
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 gap-8">
                 <div className="space-y-2">
-                  <div className="text-4xl font-display font-bold text-accent">15+</div>
+                  <div className="text-4xl font-display font-bold text-accent">7+</div>
                   <div className="text-sm text-slate-300 uppercase tracking-wide">Years Exp</div>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-4xl font-display font-bold text-accent">50+</div>
-                  <div className="text-sm text-slate-300 uppercase tracking-wide">Projects</div>
                 </div>
               </div>
               <Link to="/about" className="inline-flex items-center text-accent font-bold hover:underline group">

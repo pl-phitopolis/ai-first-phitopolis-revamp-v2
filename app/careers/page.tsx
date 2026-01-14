@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { JOBS } from '../../constants';
@@ -13,14 +12,9 @@ export default function CareersPage() {
       desc: "Industry leading salary and meaningful equity packages."
     },
     {
-      emoji: "🏠",
-      title: "Flexible Work",
-      desc: "Remote-first culture with beautiful hubs for collaboration."
-    },
-    {
       emoji: "📚",
       title: "Learning Budget",
-      desc: "Generous allowance for conferences, books, and courses."
+      desc: "Generous allowance for conferences, certifications, courses, and source materials."
     },
     {
       emoji: "🩺",
@@ -37,8 +31,7 @@ export default function CareersPage() {
           <div className="max-w-3xl">
             <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">Build the future of engineering.</h1>
             <p className="text-xl text-slate-200 leading-relaxed font-light">
-              We are a team of mathematicians, physicists, and engineers building the next generation 
-              of high-performance technology. No bureaucracy, just hard problems.
+              Join our team of mathematicians, physicists, and engineers building the next generation of high-performance technology.
             </p>
           </div>
         </div>
@@ -94,7 +87,7 @@ export default function CareersPage() {
             <h2 className="text-3xl md:text-5xl font-display font-bold text-primary">Perks & Benefits</h2>
             <p className="text-slate-600 mt-4">We take care of our people so they can focus on what they do best.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {BENEFITS.map((benefit, idx) => (
               <motion.div
                 key={idx}

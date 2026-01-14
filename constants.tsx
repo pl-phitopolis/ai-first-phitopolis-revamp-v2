@@ -10,7 +10,7 @@ import {
   Globe,
   Users
 } from 'lucide-react';
-import { ServiceType, Job, TeamMember, BlogPost, Service } from './types';
+import { ServiceType, Job, BlogPost, Service, TeamMember } from './types';
 
 export const SERVICES: Service[] = [
   {
@@ -61,18 +61,6 @@ export const JOBS: Job[] = [
     description: "Drive our machine learning initiatives and architect scalable data pipelines.",
     requirements: ["PhD/Masters in CS or Math", "PyTorch/Tensorflow expertise", "NLP experience"],
     benefits: ["Flexible hours", "Learning budget", "Health Insurance"]
-  }
-];
-
-export const TEAM: TeamMember[] = [
-  {
-    id: "1",
-    name: "Krizel Mangana",
-    role: "CEO and Co-founder",
-    expertise: ["Entrepreneurship", "Financial Services", "Commodities"],
-    bio: "Kriz is a successful Filipina entrepreneur with a background in corporate real estate, financial services and commodities. Leveraging her extensive network of professional contacts throughout Asia, Kriz helps guide Phitopolis’ growth in the region.",
-    credentials: ["Entrepreneur", "Regional Strategy", "Network Growth"],
-    image: "https://phitopolis.com/img/testimonials-1.jpg"
   }
 ];
 
@@ -165,5 +153,25 @@ At first, some of the children were shy, peeking from behind their parents or he
 The highlight of the day was the gift-giving. Each child received a bag filled with essentials like school supplies, toiletries, and snacks. Watching them explore their gifts and express gratitude reminded us why giving back matters. Every laugh, playful gesture, and shared moment made the morning truly rewarding.
 
 This year’s Christmas gift-giving CSR was made possible through the collaboration of Phitopolis volunteers and the local officials of Barangay Pinagsama. Together, we celebrated the season through community, connection, and kindness. Joy in Every Bag truly came to life that morning, reminding us that the holiday season is best celebrated by giving back and sharing joy with others.`
+  }
+];
+
+// Added TEAM constant to resolve missing export error in app/team/page.tsx
+export const TEAM: TeamMember[] = [
+  {
+    id: "1",
+    name: "Mark Walbaum",
+    role: "Chief Technology Officer",
+    bio: "Former Executive Director at Morgan Stanley with 20+ years of experience in distributed systems and high-frequency trading infrastructure.",
+    image: "https://phitopolis.com/img/core-competencies/teamwork-and-leadership.jpg",
+    expertise: ["Low Latency", "Distributed Systems", "FinTech"]
+  },
+  {
+    id: "2",
+    name: "Ben Cilia",
+    role: "Chief Data Officer",
+    bio: "Data visionary specializing in quantitative analytics and machine learning strategies for large-scale financial institutions.",
+    image: "https://phitopolis.com/img/core-competencies/innovation.jpg",
+    expertise: ["Data Science", "ML Ops", "Quant Strategy"]
   }
 ];

@@ -42,12 +42,12 @@ export interface BlogPost {
   contentImages?: string[];
 }
 
+// Added TeamMember interface to resolve missing export error in app/team/page.tsx
 export interface TeamMember {
   id: string;
   name: string;
   role: string;
-  expertise: string[];
   bio: string;
-  credentials: string[];
   image: string;
+  expertise: string[];
 }

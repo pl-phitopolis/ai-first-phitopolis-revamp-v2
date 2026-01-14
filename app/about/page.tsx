@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Target, Eye, Heart, Play, X, Rocket, ShieldCheck, Globe, Building2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
@@ -76,7 +75,7 @@ export default function AboutPage() {
           <div className="max-w-4xl">
             <span className="text-accent font-bold tracking-widest uppercase text-xs">Our Story</span>
             <h1 className="text-5xl md:text-8xl font-display font-bold mt-4 mb-12 tracking-tight text-primary">
-              Bridge the gap between vision and reality.
+              We bridge the gap between vision and reality.
             </h1>
             <p className="text-xl md:text-2xl text-slate-600 leading-relaxed font-light">
               Phitopolis was founded with a single mission: to provide elite-level technology services 
@@ -207,12 +206,6 @@ export default function AboutPage() {
                    and the need for complex R&D—were moving into broader enterprise sectors. Phitopolis was born 
                    to bring that elite expertise to you.
                  </p>
-               </div>
-               <div className="flex items-center space-x-4">
-                  {['MS', 'JPM', 'DB'].map(brand => (
-                    <div key={brand} className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-[10px] text-white font-bold">{brand}</div>
-                  ))}
-                  <span className="text-xs text-slate-400 uppercase tracking-widest font-bold ml-2">Our Heritage</span>
                </div>
              </div>
           </div>
