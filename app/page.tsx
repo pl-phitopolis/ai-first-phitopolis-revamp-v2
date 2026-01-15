@@ -145,7 +145,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-bold mb-4 text-primary">{service.title}</h3>
                   <p className="text-slate-600 text-sm mb-6 leading-relaxed">{service.description}</p>
-                  <ul className="space-y-3 mb-6">
+                  <ul className="space-y-3 mb-8">
                     {service.features.map((f, j) => (
                       <li key={j} className="text-xs text-slate-500 flex items-center">
                         <div className="w-1.5 h-1.5 bg-accent rounded-full mr-2"></div>
@@ -155,7 +155,7 @@ export default function Home() {
                   </ul>
                 </div>
                 {/* Service Card Image */}
-                <div className="absolute bottom-0 left-0 w-full overflow-hidden h-48 mt-auto">
+                <div className="relative mt-auto -mx-8 -mb-8 overflow-hidden h-48">
                   <img 
                     src={[
                       'https://phitopolis.com/img/core-competencies/innovation.jpg',
