@@ -32,30 +32,43 @@ export default function Home() {
         onMouseMove={handleMouseMove}
         className="relative h-[95vh] flex items-center justify-center overflow-hidden bg-primary group"
       >
-        {/* Static & Animated Background Layers (Original) */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[160px] animate-bg-drift-1"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-accent/10 rounded-full blur-[140px] animate-bg-drift-2"></div>
-          <div className="absolute top-[20%] right-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[180px] animate-bg-drift-3"></div>
+        {/* Background Video */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen scale-105"
+          >
+            <source src="attached_assets/generated_videos/hi-tech_blue_digital_connectivity_abstract_video.mp4" type="video/mp4" />
+          </video>
           
-          {/* NEW: Interactive Spotlight Blob */}
-          <motion.div 
-            className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
-            style={{
-              left: spotlightX,
-              top: spotlightY,
-              translateX: '-50%',
-              translateY: '-50%',
-              width: '800px',
-              height: '800px',
-              background: 'radial-gradient(circle, rgba(255,199,44,0.12) 0%, rgba(255,199,44,0) 70%)',
-              filter: 'blur(60px)',
-              zIndex: 1
-            }}
-          />
+          {/* Static & Animated Background Layers */}
+          <div className="absolute inset-0">
+            <div className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[160px] animate-bg-drift-1"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-accent/10 rounded-full blur-[140px] animate-bg-drift-2"></div>
+            <div className="absolute top-[20%] right-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[180px] animate-bg-drift-3"></div>
+            
+            {/* NEW: Interactive Spotlight Blob */}
+            <motion.div 
+              className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
+              style={{
+                left: spotlightX,
+                top: spotlightY,
+                translateX: '-50%',
+                translateY: '-50%',
+                width: '800px',
+                height: '800px',
+                background: 'radial-gradient(circle, rgba(255,199,44,0.12) 0%, rgba(255,199,44,0) 70%)',
+                filter: 'blur(60px)',
+                zIndex: 1
+              }}
+            />
 
-          <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+            <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+          </div>
         </div>
         
         <motion.div 
