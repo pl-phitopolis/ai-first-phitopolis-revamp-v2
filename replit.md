@@ -22,9 +22,13 @@ A React-based company website for Phitopolis, a technology services company foun
 ├── types.ts          # TypeScript type definitions
 ├── vite.config.ts    # Vite configuration
 ├── app/              # Page components
-├── assets/           # Static assets
+├── public/           # Static assets (moved from assets/)
 └── services/         # API services (Gemini)
 ```
+
+## Recent Changes
+- Moved all project assets (videos, images) to the `public/` directory for better serving.
+- Cleaned up duplicate assets and updated application code to reference the new `/public` paths.
 
 ## Running the Project
 - Development: `npm run dev` (runs on port 5000)
