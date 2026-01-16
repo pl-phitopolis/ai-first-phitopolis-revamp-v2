@@ -1,7 +1,7 @@
 # Phitopolis Technology Services
 
 ## Overview
-A React-based company website for Phitopolis, a technology services company founded by veterans in finance that builds data systems. The site includes pages for Services, About, Careers, Blog, and Contact with an AI-powered chat feature using Google's Gemini API.
+A React-based company website for Phitopolis, a technology services company founded by veterans in finance that builds data systems. The site includes pages for Services, About, Careers, Blog, and Contact.
 
 ## Tech Stack
 - **Frontend**: React 19 with TypeScript
@@ -10,7 +10,6 @@ A React-based company website for Phitopolis, a technology services company foun
 - **Routing**: React Router DOM v6
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
-- **AI Integration**: Google Gemini API (@google/genai)
 
 ## Project Structure
 ```
@@ -22,11 +21,12 @@ A React-based company website for Phitopolis, a technology services company foun
 ├── types.ts          # TypeScript type definitions
 ├── vite.config.ts    # Vite configuration
 ├── app/              # Page components
-├── public/           # Static assets (moved from assets/)
-└── services/         # API services (Gemini)
+└── public/           # Static assets (moved from assets/)
 ```
 
 ## Recent Changes
+- Removed Phitopolis AI chatbox and related components.
+- Deleted Google Gemini API service integration.
 - Moved all project assets (videos, images) to the `public/` directory for better serving.
 - Cleaned up duplicate assets and updated application code to reference the new `/public` paths.
 
@@ -34,9 +34,6 @@ A React-based company website for Phitopolis, a technology services company foun
 - Development: `npm run dev` (runs on port 5000)
 - Build: `npm run build` (outputs to dist/)
 - Preview: `npm run preview`
-
-## Environment Variables
-- `GEMINI_API_KEY`: Google Gemini API key for AI chat features
 
 ## Deployment
 Configured for static deployment with Vite build output.

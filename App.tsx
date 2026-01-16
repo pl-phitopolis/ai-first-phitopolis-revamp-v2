@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight, Github, Linkedin, Twitter, Sparkles } from 'lucide-react';
+import { Menu, X, ArrowRight, Github, Linkedin, Twitter } from 'lucide-react';
 
 // Pages
 import Home from './app/page.tsx';
@@ -188,91 +188,6 @@ const Footer = () => {
   );
 };
 
-const AIChatAssistant = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai', content: string }[]>([
-    { role: 'ai', content: 'Hello! I am the Phitopolis Assistant. How can I help you today?' }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    const userMsg = input;
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
-    setIsLoading(true);
-
-    try {
-      const { askPhitopolisAI } = await import('./services/gemini.ts');
-      const aiResponse = await askPhitopolisAI(userMsg);
-      setMessages(prev => [...prev, { role: 'ai', content: aiResponse }]);
-    } catch (err) {
-      setMessages(prev => [...prev, { role: 'ai', content: "I'm having trouble connecting to my brain right now. Please try again." }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed bottom-6 right-6 z-[60]">
-      {isOpen ? (
-        <div className="w-80 md:w-96 bg-white border border-primary/20 rounded-2xl shadow-2xl overflow-hidden animate-slide-up flex flex-col h-[500px]">
-          <div className="bg-primary p-4 flex justify-between items-center text-white">
-            <div className="flex items-center space-x-2">
-              <Sparkles size={18} className="text-accent" />
-              <span className="font-bold text-sm">Phitopolis AI</span>
-            </div>
-            <button onClick={() => setIsOpen(false)} aria-label="Close chat"><X size={20} /></button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3 rounded-xl text-sm ${
-                  m.role === 'user' ? 'bg-primary text-white' : 'bg-white border border-slate-200 text-primary'
-                }`}>
-                  {m.content}
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-slate-200 p-3 rounded-xl animate-pulse text-xs text-slate-400">
-                  Thinking...
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="p-4 border-t border-slate-100 bg-white flex space-x-2">
-            <input 
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-accent outline-none text-primary"
-              placeholder="Ask anything..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            />
-            <button 
-              onClick={handleSend}
-              disabled={isLoading}
-              className="bg-accent hover:bg-accent-hover p-2 rounded-lg transition-all hover:scale-110 active:scale-90 text-primary shadow-sm"
-            >
-              <ArrowRight size={18} />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button 
-          onClick={() => setIsOpen(true)}
-          className="bg-accent hover:bg-accent-hover w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-accent/20 transition-all hover:scale-110 active:scale-95"
-          aria-label="Open AI Assistant"
-        >
-          <Sparkles size={28} className="text-primary" />
-        </button>
-      )}
-    </div>
-  );
-};
-
 export default function App() {
   return (
     <Router>
@@ -292,7 +207,6 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
-        <AIChatAssistant />
       </div>
     </Router>
   );
