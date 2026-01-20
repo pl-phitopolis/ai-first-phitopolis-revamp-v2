@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, Share2 } from 'lucide-react';
 import { apolloClient } from '../../../lib/apollo-client';
 import { GET_BLOG_BY_SLUG } from '../../../lib/graphql/queries';
+import { getAssetUrl } from '../../../lib/utils';
 
 interface BlogPost {
   id: string;
@@ -106,9 +107,7 @@ export default function BlogPostDetail() {
     month: 'long',
     day: 'numeric'
   });
-  const thumbnailUrl = post.thumbnail?.id
-    ? `http://10.43.0.43:8055/assets/${post.thumbnail.id}`
-    : 'https://via.placeholder.com/1200x600?text=Blog+Post';
+  const thumbnailUrl = getAssetUrl(post.thumbnail?.id);
 
   return (
     <div className="bg-white min-h-screen pb-24 text-primary">

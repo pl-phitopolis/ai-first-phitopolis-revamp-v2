@@ -5,6 +5,7 @@ import { Calendar, User } from 'lucide-react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { apolloClient } from '../../lib/apollo-client';
 import { GET_BLOGS } from '../../lib/graphql/queries';
+import { getAssetUrl } from '../../lib/utils';
 
 interface BlogPost {
   id: string;
@@ -99,9 +100,7 @@ export default function BlogPage() {
                 month: 'short',
                 day: 'numeric'
               });
-              const thumbnailUrl = post.thumbnail?.id
-                ? `http://10.43.0.43:8055/assets/${post.thumbnail.id}`
-                : 'https://via.placeholder.com/800x450?text=Blog+Post';
+              const thumbnailUrl = getAssetUrl(post.thumbnail?.id);
 
               return (
                 <motion.div
