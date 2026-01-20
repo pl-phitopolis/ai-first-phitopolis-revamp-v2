@@ -1,5 +1,8 @@
 // Get the base URL for assets
-const ASSETS_BASE_URL = import.meta.env.VITE_ASSETS_URL || 'http://10.43.0.43:8055/assets';
+// Use Vite proxy in development, Netlify function in production
+const ASSETS_BASE_URL = import.meta.env.DEV
+  ? '/assets'
+  : '/.netlify/functions/assets';
 
 export function getAssetUrl(assetId: string | undefined): string {
   if (!assetId) {
