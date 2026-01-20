@@ -31,6 +31,7 @@ export default function BlogPage() {
   const newsletterRef = useRef<HTMLDivElement>(null);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -41,6 +42,12 @@ export default function BlogPage() {
         });
         console.log('Blog data received:', result);
         console.log('Number of blogs:', result.data?.blog?.length || 0);
+
+        if (result.error) {
+          console.error('GraphQL Error:', result.error);
+          setError(`GraphQL Error: ${result.error.message}`);
+        }
+
         if (result.data?.blog) {
           console.log('First blog:', result.data.blog[0]);
           setBlogs(result.data.blog);
@@ -48,6 +55,7 @@ export default function BlogPage() {
       } catch (error: any) {
         console.error('Error fetching blogs:', error);
         console.error('Error details:', error.message, error.networkError);
+        setError(error.message || 'Failed to fetch blog posts');
       } finally {
         setLoading(false);
       }
@@ -85,9 +93,16 @@ export default function BlogPage() {
           <div className="text-center py-12">
             <p className="text-slate-500">Loading blog posts...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500 font-bold mb-2">Error loading blog posts</p>
+            <p className="text-slate-500 text-sm">{error}</p>
+            <p className="text-slate-400 text-xs mt-4">Check browser console for details</p>
+          </div>
         ) : blogs.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-slate-500">No blog posts available at the moment.</p>
+            <p className="text-slate-400 text-xs mt-2">Check browser console for details</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
