@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SERVICES } from '../../constants';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function ServicesPage() {
@@ -46,9 +46,6 @@ export default function ServicesPage() {
                     </div>
                   ))}
                 </div>
-                <button className="px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-all hover:scale-105 active:scale-95 flex items-center group shadow-lg shadow-accent/20">
-                  Learn More <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </button>
               </div>
               <div className="flex-1 w-full bg-slate-100 rounded-3xl aspect-video relative overflow-hidden border border-slate-200 group shadow-lg">
                 <img 
