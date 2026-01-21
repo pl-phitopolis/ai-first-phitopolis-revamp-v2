@@ -60,4 +60,4 @@ const [error, setError] = useState<string | null>(null);
 - Use `.wysiwyg-content` class for rendering HTML content from Directus
 
 ### Routing
-Uses HashRouter (`#/path`) for SPA compatibility. Ensure the web server (nginx/apache) is configured to serve `index.html` for all routes.
+Uses BrowserRouter for clean URLs (`/careers` instead of `/#/careers`). The web server must be configured to serve `index.html` for all routes to support client-side routing.
