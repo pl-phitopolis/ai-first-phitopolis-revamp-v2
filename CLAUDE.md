@@ -13,7 +13,7 @@ npm run preview      # Preview production build
 
 ## Architecture
 
-This is a React SPA for the Phitopolis corporate website, using Vite as the build tool and deployed to Netlify.
+This is a React SPA for the Phitopolis corporate website, using Vite as the build tool and deployed to EC2 at `uat.phitopolis.io`.
 
 ### Key Files
 - `App.tsx` - Main app component with HashRouter, Header, Footer, and all routes
@@ -47,15 +47,10 @@ const [loading, setLoading] = useState(true);
 const [error, setError] = useState<string | null>(null);
 ```
 
-### Backend Proxy
+### Backend Configuration
+- **Directus CMS**: `https://directus.phitopolis.io`
 - **Development**: Vite proxies `/graphql` and `/assets` to Directus (configured in `vite.config.ts`)
-- **Production**: Netlify Functions proxy requests to avoid mixed content issues:
-  - `netlify/functions/graphql.ts` - GraphQL proxy
-  - `netlify/functions/assets.ts` - Asset proxy
-
-Environment variables for Netlify (see `.env.example`):
-- `DIRECTUS_GRAPHQL_URL`
-- `DIRECTUS_ASSETS_URL`
+- **Production**: Frontend connects directly to `https://directus.phitopolis.io`
 
 ### Styling
 - Tailwind CSS loaded via CDN in `index.html`
@@ -65,4 +60,4 @@ Environment variables for Netlify (see `.env.example`):
 - Use `.wysiwyg-content` class for rendering HTML content from Directus
 
 ### Routing
-Uses HashRouter (`#/path`) for Netlify SPA compatibility. The `netlify.toml` has a catch-all redirect to `index.html`.
+Uses HashRouter (`#/path`) for SPA compatibility. Ensure the web server (nginx/apache) is configured to serve `index.html` for all routes.

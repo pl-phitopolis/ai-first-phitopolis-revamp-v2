@@ -11,14 +11,14 @@ export default defineConfig(({ mode }) => {
         allowedHosts: true,
         proxy: {
           '/graphql': {
-            target: 'http://10.43.0.43:8055',
+            target: 'https://directus.phitopolis.io',
             changeOrigin: true,
-            secure: false,
+            secure: true,
           },
           '/assets': {
-            target: 'http://10.43.0.43:8055',
+            target: 'https://directus.phitopolis.io',
             changeOrigin: true,
-            secure: false,
+            secure: true,
           }
         }
       },

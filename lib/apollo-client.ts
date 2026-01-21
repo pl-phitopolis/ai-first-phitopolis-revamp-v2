@@ -1,9 +1,9 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
-// Use Vite proxy in development, Netlify function in production
+// Use Vite proxy in development, Directus directly in production
 const graphqlUri = import.meta.env.DEV
   ? '/graphql'
-  : '/.netlify/functions/graphql';
+  : 'https://directus.phitopolis.io/graphql';
 
 const httpLink = new HttpLink({
   uri: graphqlUri,

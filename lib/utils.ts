@@ -1,8 +1,8 @@
 // Get the base URL for assets
-// Use Vite proxy in development, Netlify function in production
+// Use Vite proxy in development, Directus directly in production
 const ASSETS_BASE_URL = import.meta.env.DEV
   ? '/assets'
-  : '/.netlify/functions/assets';
+  : 'https://directus.phitopolis.io/assets';
 
 export function getAssetUrl(assetId: string | undefined): string {
   if (!assetId) {
