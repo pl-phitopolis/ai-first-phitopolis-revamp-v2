@@ -66,12 +66,12 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-md border-b border-primary-light group/header">
       <nav className="container mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-3 group/brand">
-          <Image 
-            src={LOGO_PATH}
-            alt="Phitopolis Logo" 
+          <Image
+            src="/phitopolis_logo_white.svg"
+            alt="Phitopolis Logo"
             width={40}
             height={40}
-            className="h-10 w-auto object-contain block brightness-0 invert transition-all duration-500 group-hover/header:brightness-100 group-hover/header:invert-0" 
+            className="h-10 w-auto object-contain"
             priority={true}
           />
           <span className="text-2xl font-display font-bold tracking-tight text-white transition-colors uppercase">

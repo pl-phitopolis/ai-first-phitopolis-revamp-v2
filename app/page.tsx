@@ -737,7 +737,9 @@ export default function Home() {
           </div>
           <div className="mt-12">
             <Link to="/careers" className="text-primary hover:text-accent font-bold transition-all underline decoration-accent underline-offset-4">
-              View all {careers.length} opening{careers.length !== 1 ? 's' : ''}
+              {careers.length > 0
+                ? `View all ${careers.length} opening${careers.length !== 1 ? 's' : ''}`
+                : 'View careers page'}
             </Link>
           </div>
         </div>
