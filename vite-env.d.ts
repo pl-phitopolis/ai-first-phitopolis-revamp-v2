@@ -4,8 +4,7 @@ interface ImportMetaEnv {
   readonly DEV: boolean;
   readonly PROD: boolean;
   readonly MODE: string;
-  readonly VITE_GRAPHQL_URL?: string;
-  readonly VITE_ASSETS_URL?: string;
+  readonly VITE_DIRECTUS_URL?: string;
 }
 
 interface ImportMeta {
