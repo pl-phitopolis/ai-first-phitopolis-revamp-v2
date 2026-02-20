@@ -244,9 +244,14 @@ const CredentialCard = ({
 
   return (
     <motion.div
-      className="flex items-center space-x-4 p-4 bg-primary/50 border border-white/10 rounded-xl hover:bg-primary/70 hover:border-accent/30 transition-all duration-300 cursor-default overflow-hidden"
+      className="flex items-center space-x-4 p-4 bg-primary/50 border border-white/10 rounded-xl hover:bg-primary/70 hover:border-accent/30 focus-within:bg-primary/70 focus-within:border-accent/30 transition-all duration-300 cursor-default overflow-hidden outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
+      tabIndex={0}
+      role="group"
+      aria-label={`${title}: ${description}`}
       whileHover={{ scale: 1.02, x: 5 }}
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
@@ -325,15 +330,37 @@ export default function Home() {
 
     fetchCareers();
   }, []);
-  
-  // Motion values for interactive spotlight
+
+  // Motion values for interactive spotlight (desktop)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Smooth spring physics
+  // Motion values for gyroscope parallax (mobile)
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+
   const springConfig = { damping: 30, stiffness: 150 };
   const spotlightX = useSpring(mouseX, springConfig);
   const spotlightY = useSpring(mouseY, springConfig);
+  const gyroX = useSpring(tiltX, { damping: 40, stiffness: 100 });
+  const gyroY = useSpring(tiltY, { damping: 40, stiffness: 100 });
+
+  // Device orientation listener for mobile parallax
+  useEffect(() => {
+    const isTouchDevice = 'ontouchstart' in window;
+    if (!isTouchDevice) return;
+
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      const gamma = e.gamma || 0; // left/right tilt (-90 to 90)
+      const beta = e.beta || 0;   // front/back tilt (-180 to 180)
+      // Map to a subtle pixel offset (max ~15px)
+      tiltX.set(gamma * 0.4);
+      tiltY.set((beta - 45) * 0.3); // center around 45deg (typical holding angle)
+    };
+
+    window.addEventListener('deviceorientation', handleOrientation, { passive: true } as any);
+    return () => window.removeEventListener('deviceorientation', handleOrientation);
+  }, [tiltX, tiltY]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!sectionRef.current) return;
@@ -351,7 +378,7 @@ export default function Home() {
         className="relative h-[95vh] flex items-center justify-center overflow-hidden bg-primary group"
       >
         {/* Background Video */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden bg-primary">
           <video 
             autoPlay 
             loop 
@@ -364,9 +391,9 @@ export default function Home() {
           
           {/* Static & Animated Background Layers */}
           <div className="absolute inset-0">
-            <div className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[160px] animate-bg-drift-1"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-accent/10 rounded-full blur-[140px] animate-bg-drift-2"></div>
-            <div className="absolute top-[20%] right-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[180px] animate-bg-drift-3"></div>
+            <motion.div className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[160px] animate-bg-drift-1" style={{ x: gyroX, y: gyroY }} />
+            <motion.div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-accent/10 rounded-full blur-[140px] animate-bg-drift-2" style={{ x: gyroX, y: gyroY }} />
+            <motion.div className="absolute top-[20%] right-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[180px] animate-bg-drift-3" style={{ x: gyroX, y: gyroY }} />
             
             {/* NEW: Interactive Spotlight Blob */}
             <motion.div 

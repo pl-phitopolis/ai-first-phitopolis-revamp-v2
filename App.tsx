@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight, Github, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight, Github, Linkedin, Twitter } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // Pages
 import Home from './app/page.tsx';
@@ -12,6 +13,8 @@ import Blog from './app/blog/page.tsx';
 import Contact from './app/contact/page.tsx';
 import JobDetail from './app/careers/[slug]/page.tsx';
 import BlogPostDetail from './app/blog/[slug]/page.tsx';
+import NotFound from './app/not-found/page.tsx';
+import MobileNavigation from './components/MobileNavigation.tsx';
 
 // Updated to use the requested external logo image
 const LOGO_PATH = 'https://phitopolis.com/img/phitopolis-logo.png';
@@ -51,7 +54,6 @@ const Image = ({ src, alt, width, height, className, priority, style }: {
 );
 
 const Header = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
   const navLinks = [
@@ -84,37 +86,22 @@ const Header = () => {
             <Link
               key={link.name}
               to={link.href}
-              className={`text-sm font-medium transition-colors hover:text-accent ${
+              className={`relative text-sm font-medium transition-colors hover:text-accent pb-1 ${
                 location.pathname === link.href ? 'text-accent' : 'text-slate-100'
               }`}
             >
               {link.name}
+              {location.pathname === link.href && (
+                <motion.div
+                  layoutId="navbar-indicator"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-full"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
             </Link>
           ))}
         </div>
-
-        <button 
-          className="md:hidden p-2 text-white"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </nav>
-
-      {isOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-primary border-b border-primary-light p-6 space-y-4 animate-fade-in">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.href}
-              onClick={() => setIsOpen(false)}
-              className="block text-lg font-medium text-white hover:text-accent"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </div>
-      )}
     </header>
   );
 };
@@ -204,9 +191,11 @@ export default function App() {
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPostDetail />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
         <Footer />
+        <MobileNavigation />
       </div>
     </Router>
   );
