@@ -1,8 +1,0 @@
-{
-  "name": "Phitopolis Technology Services",
-  "description": "A modern technology services company specializing in R&D, data science, and full-stack development. Making tomorrow's technology available today.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
