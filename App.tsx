@@ -1,8 +1,8 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ArrowRight, Github, Linkedin, Twitter } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Pages
 import Home from './app/page.tsx';
@@ -18,6 +18,44 @@ import MobileNavigation from './components/MobileNavigation.tsx';
 
 // Updated to use the requested external logo image
 const LOGO_PATH = 'https://phitopolis.com/img/phitopolis-logo.png';
+
+const LoadingScreen = ({ isVisible }: { isVisible: boolean }) => (
+  <AnimatePresence>
+    {isVisible && (
+      <motion.div
+        initial={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5, ease: 'easeInOut' }}
+        className="fixed inset-0 z-[200] bg-primary flex flex-col items-center justify-center gap-5"
+      >
+        <motion.img
+          src="/phitopolis_logo_white.svg"
+          alt="Phitopolis"
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="h-14 w-auto"
+        />
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="text-white font-display font-bold text-2xl tracking-tight"
+        >
+          PH<span className="text-accent">IT</span>OPOLIS
+        </motion.p>
+        <div className="w-40 h-[2px] bg-white/15 rounded-full overflow-hidden mt-1">
+          <motion.div
+            initial={{ x: '-100%' }}
+            animate={{ x: '0%' }}
+            transition={{ duration: 1.6, ease: 'easeInOut' }}
+            className="h-full w-full bg-accent rounded-full"
+          />
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 
 /**
  * ScrollToTop Component: Resets scroll position on route change
@@ -176,8 +214,16 @@ const Footer = () => {
 };
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 2000);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <Router>
+      <LoadingScreen isVisible={isLoading} />
       <ScrollToTop />
       <div className="min-h-screen flex flex-col bg-white">
         <Header />

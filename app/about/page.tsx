@@ -221,28 +221,31 @@ export default function AboutPage() {
           </div>
 
           <div className="relative">
-            {/* Timeline Background Line (Visible only on Large screens where grid is 1 row) */}
-            <div className="hidden lg:block absolute top-1/2 left-0 w-full h-[1px] bg-slate-100 -translate-y-1/2 z-0" />
+            {/* Timeline Background Line (Large screens only, positioned at top of card area) */}
+            <div className="hidden lg:block absolute top-6 left-0 w-full h-[1px] bg-slate-100 z-0" />
 
             {/* Grid Container - No scrolling needed */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 relative z-10">
               {JOURNEY_DATA.map((item, i) => (
-                <motion.div 
+                <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="relative"
+                  className="relative lg:flex lg:flex-col"
                 >
-                  {/* Visual Node on the line (Desktop only) */}
-                  <div className="hidden lg:block absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-white border-2 border-primary -translate-y-1/2 -translate-x-1/2 z-20">
+                  {/* Visual Node on the line (Desktop only) - sits above the card */}
+                  <div className="hidden lg:block absolute top-6 left-1/2 w-4 h-4 rounded-full bg-white border-2 border-primary -translate-y-1/2 -translate-x-1/2 z-20">
                     {item.current && <div className="absolute inset-0 rounded-full bg-accent animate-ping" />}
                   </div>
 
+                  {/* Spacer to push card below the dot (large screens only) */}
+                  <div className="hidden lg:block h-14" />
+
                   {/* Milestone Card */}
-                  <div 
-                    className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-20px_rgba(10,42,102,0.1)] transition-all duration-500 group h-full flex flex-col justify-between"
+                  <div
+                    className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-20px_rgba(10,42,102,0.1)] transition-all duration-500 group lg:flex-1 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-4">
