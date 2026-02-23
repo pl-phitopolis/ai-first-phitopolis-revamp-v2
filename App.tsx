@@ -221,6 +221,11 @@ export default function App() {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = isLoading ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isLoading]);
+
   return (
     <Router>
       <LoadingScreen isVisible={isLoading} />
