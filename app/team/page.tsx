@@ -1,10 +1,12 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { TEAM } from '../../constants';
-import { Linkedin, ExternalLink, Award, GraduationCap, Zap } from 'lucide-react';
+import { Linkedin, ExternalLink, Award, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { TeamMember } from '../../types';
+import TextScramble from '../../components/TextScramble';
+import MagneticWrapper from '../../components/MagneticWrapper';
 
 // Fixed Type: Explicitly defining props interface and including key to resolve list rendering TS error
 interface TeamMemberCardProps {
@@ -15,31 +17,47 @@ interface TeamMemberCardProps {
 
 const TeamMemberCard = ({ member, idx }: TeamMemberCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  
-  // Motion values for cursor tracking
+
+  // Motion values for cursor-tracking blob
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-
-  // Smooth spring physics for the blob
   const springConfig = { damping: 25, stiffness: 150 };
   const blobX = useSpring(mouseX, springConfig);
   const blobY = useSpring(mouseY, springConfig);
+
+  // Motion values for 3D tilt
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const rX = useSpring(rotateX, { stiffness: 280, damping: 28 });
+  const rY = useSpring(rotateY, { stiffness: 280, damping: 28 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    rotateX.set(-(y - 0.5) * 8);
+    rotateY.set((x - 0.5) * 8);
+  };
+
+  const handleMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
   };
 
   return (
-    <motion.div 
+    <div style={{ perspective: '1000px' }}>
+    <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: idx * 0.1 }}
+      style={{ rotateX: rX, rotateY: rY }}
       className="group relative p-8 bg-slate-50 border border-slate-200 rounded-3xl hover:border-accent/50 hover:shadow-2xl transition-all flex flex-col md:flex-row gap-8 overflow-hidden"
     >
       {/* Interactive Background Blob */}
@@ -80,11 +98,16 @@ const TeamMemberCard = ({ member, idx }: TeamMemberCardProps) => {
         </div>
       </div>
     </motion.div>
+    </div>
   );
 };
 
 export default function TeamPage() {
   const ctaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    document.title = 'Our Team | Phitopolis';
+  }, []);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const springConfig = { damping: 30, stiffness: 150 };
@@ -107,7 +130,7 @@ export default function TeamPage() {
             The Collective
           </span>
           <h1 className="text-5xl md:text-7xl font-display font-bold mt-4 mb-8 text-primary">
-            Meet the practitioners.
+            <TextScramble text="Meet the practitioners." />
           </h1>
           <p className="text-xl text-slate-600 font-light leading-relaxed">
             At Phitopolis, caliber is our only currency. We are a team of global technologists and entrepreneurs 
@@ -174,9 +197,12 @@ export default function TeamPage() {
           <p className="text-slate-200 mb-8 max-w-xl mx-auto relative z-10">
             We're always looking for brilliant minds who obsess over building the next generation of financial and enterprise technology.
           </p>
-          <Link to="/careers" className="inline-block px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/20 relative z-10">
-            View Career Opportunities
-          </Link>
+          <MagneticWrapper>
+            <Link to="/careers" className="relative overflow-hidden inline-flex px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-colors hover:scale-105 active:scale-95 shadow-lg shadow-accent/20 z-10">
+              <span className="shimmer-sweep" aria-hidden="true" />
+              <span className="relative z-10">View Career Opportunities</span>
+            </Link>
+          </MagneticWrapper>
         </div>
       </section>
     </div>

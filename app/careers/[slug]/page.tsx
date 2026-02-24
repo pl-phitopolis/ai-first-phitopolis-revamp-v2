@@ -50,6 +50,7 @@ export default function JobDetail() {
 
         if (result.data.careers && result.data.careers.length > 0) {
           setJob(result.data.careers[0]);
+          document.title = `${result.data.careers[0].job_title} | Phitopolis`;
         } else {
           setNotFound(true);
         }

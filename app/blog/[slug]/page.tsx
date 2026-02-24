@@ -59,6 +59,7 @@ export default function BlogPostDetail() {
           console.log('Blog found:', result.data.blog[0]);
           console.log('Blog thumbnail:', result.data.blog[0].thumbnail);
           setPost(result.data.blog[0]);
+          document.title = `${result.data.blog[0].title} | Phitopolis`;
         } else {
           console.log('No blog found for slug:', slug);
           console.log('Result data:', result.data);
