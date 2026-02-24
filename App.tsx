@@ -28,28 +28,26 @@ const LoadingScreen = ({ isVisible }: { isVisible: boolean }) => (
         transition={{ duration: 0.5, ease: 'easeInOut' }}
         className="fixed inset-0 z-[200] bg-primary flex flex-col items-center justify-center gap-5"
       >
-        <motion.img
-          src="/phitopolis_logo_white.svg"
-          alt="Phitopolis"
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="h-14 w-auto"
-        />
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="text-white font-display font-bold text-2xl tracking-tight"
-        >
-          PH<span className="text-accent">IT</span>OPOLIS
-        </motion.p>
-        <div className="w-40 h-[2px] bg-white/15 rounded-full overflow-hidden mt-1">
+        <div className="relative flex items-center justify-center">
+          {/* Rotating glow ring */}
           <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: '0%' }}
-            transition={{ duration: 1.6, ease: 'easeInOut' }}
-            className="h-full w-full bg-accent rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="absolute w-24 h-24 border-t-2 border-r-2 border-accent/40 rounded-full"
+          />
+          <motion.div
+            animate={{ rotate: -360 }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            className="absolute w-28 h-28 border-b-2 border-l-2 border-white/10 rounded-full"
+          />
+
+          <motion.img
+            src="/phitopolis_logo_white.svg"
+            alt="Phitopolis"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="h-10 w-auto relative z-10"
           />
         </div>
       </motion.div>
@@ -80,12 +78,12 @@ const Image = ({ src, alt, width, height, className, priority, style }: {
   priority?: boolean;
   style?: React.CSSProperties;
 }) => (
-  <img 
-    src={src} 
-    alt={alt} 
-    width={width} 
-    height={height} 
-    className={className} 
+  <img
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    className={className}
     style={style}
     loading={priority ? "eager" : "lazy"}
   />
@@ -124,9 +122,8 @@ const Header = () => {
             <Link
               key={link.name}
               to={link.href}
-              className={`relative text-sm font-medium transition-colors hover:text-accent pb-1 ${
-                location.pathname === link.href ? 'text-accent' : 'text-slate-100'
-              }`}
+              className={`relative text-sm font-medium transition-colors hover:text-accent pb-1 ${location.pathname === link.href ? 'text-accent' : 'text-slate-100'
+                }`}
             >
               {link.name}
               {location.pathname === link.href && (
@@ -151,12 +148,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <Image 
+              <Image
                 src={LOGO_PATH}
-                alt="Phitopolis Official Logo" 
+                alt="Phitopolis Official Logo"
                 width={32}
                 height={32}
-                className="h-8 w-auto object-contain block brightness-0 invert" 
+                className="h-8 w-auto object-contain block brightness-0 invert"
               />
               <span className="text-xl font-display font-bold tracking-tight">Phitopolis</span>
             </div>
@@ -169,7 +166,7 @@ const Footer = () => {
               <Twitter size={20} className="text-white hover:text-accent cursor-pointer transition-colors" />
             </div>
           </div>
-          
+
           <div>
             <h4 className="text-accent font-bold mb-6">Services</h4>
             <ul className="space-y-3 text-slate-100 text-sm">
@@ -191,16 +188,13 @@ const Footer = () => {
 
           <div>
             <h4 className="text-accent font-bold mb-6">Contact</h4>
-            <ul className="space-y-3 text-slate-100 text-sm">
-              <li>info@phitopolis.com</li>
-              <li>27/F Ecotower Building</li>
-              <li>32nd St. cor. 9th Avenue</li>
-              <li>Bonifacio Global City, Taguig</li>
-              <li>Philippines, 1634</li>
-            </ul>
+            <div className="text-slate-100 text-sm space-y-2">
+              <p>info@phitopolis.com</p>
+              <p className="leading-snug">27/F Ecotower Building, 32nd St. cor. 9th Avenue, Bonifacio Global City, Taguig, Philippines, 1634</p>
+            </div>
           </div>
         </div>
-        
+
         <div className="mt-16 pt-8 border-t border-primary-light flex flex-col md:flex-row justify-between items-center text-slate-300 text-xs gap-4">
           <p>© 2024 Phitopolis Private Limited. All rights reserved.</p>
           <div className="flex space-x-6">
