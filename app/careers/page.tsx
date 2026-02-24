@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import TextScramble from "../../components/TextScramble";
 import {
   Clock, Briefcase, Building2, MapPin,
   ChevronLeft, ChevronRight, ChevronDown,
@@ -239,6 +240,10 @@ export default function CareersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    document.title = 'Careers | Phitopolis';
+  }, []);
+
   // Slack-like filter state: each key maps to an array of selected values
   const [activeFilters, setActiveFilters] = useState<Record<CareerFilterKey, string[]>>({
     job_type: [],
@@ -346,7 +351,7 @@ export default function CareersPage() {
       <section className="py-24 bg-primary text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">Build the future of engineering.</h1>
+            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6"><TextScramble text="Build the future of engineering." /></h1>
             <p className="text-xl text-slate-200 leading-relaxed font-light">
               Join our team of mathematicians, physicists, and engineers building the next generation of high-performance technology.
             </p>

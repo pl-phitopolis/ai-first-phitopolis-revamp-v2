@@ -72,6 +72,22 @@
         0%, 100% { opacity: 1; }
         50% { opacity: 0; }
       }
+      @keyframes shimmer-sweep {
+        from { left: -70%; }
+        to   { left: 160%; }
+      }
+      .shimmer-sweep {
+        position: absolute;
+        top: 0;
+        left: -70%;
+        width: 55%;
+        height: 100%;
+        background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.32) 50%, transparent 100%);
+        transform: skewX(-18deg);
+        animation: shimmer-sweep 2.8s ease-in-out infinite;
+        pointer-events: none;
+        border-radius: inherit;
+      }
       .snap-carousel::-webkit-scrollbar {
         display: none;
       }

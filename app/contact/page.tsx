@@ -1,10 +1,15 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Mail, MapPin, Send } from 'lucide-react';
+import TextScramble from '../../components/TextScramble';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export default function ContactPage() {
   const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    document.title = 'Contact Us | Phitopolis';
+  }, []);
 
   // Motion values for interactive glow
   const mouseX = useMotionValue(0);
@@ -29,7 +34,7 @@ export default function ContactPage() {
           <div className="space-y-12">
             {/* Header - Static (No animation) */}
             <div>
-              <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 text-primary">Let's talk tech.</h1>
+              <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 text-primary"><TextScramble text="Let's talk tech." /></h1>
               <p className="text-xl text-slate-600 font-light leading-relaxed">
                 Whether you have a complex R&D challenge or want to scale your data capabilities,
                 our team is ready to assist.
@@ -128,9 +133,12 @@ export default function ContactPage() {
                   <label className="text-xs font-bold text-slate-500 uppercase">Message</label>
                   <textarea className="w-full bg-white/80 backdrop-blur-sm border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-accent h-32 text-primary transition-all" placeholder="Tell us about your project..." required />
                 </div>
-                <button className="w-full py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center justify-center group transition-all shadow-lg shadow-accent/20 hover:scale-105 active:scale-95">
-                  Send Inquiry
-                  <Send size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                <button className="relative overflow-hidden w-full py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center justify-center group transition-colors shadow-lg shadow-accent/20 hover:scale-105 active:scale-95">
+                  <span className="shimmer-sweep" aria-hidden="true" />
+                  <span className="relative z-10 flex items-center">
+                    Send Inquiry
+                    <Send size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </button>
               </form>
             </div>

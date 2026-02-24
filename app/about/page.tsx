@@ -1,9 +1,14 @@
-import React, { useState, useRef } from 'react';
-import { Target, Eye, Heart, Play, X, Rocket, ShieldCheck, Globe, Building2, ArrowRight } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Target, Eye, Heart, Play, X, Rocket, ShieldCheck, Globe, Building2, Cpu, Zap } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
+import TextScramble from '../../components/TextScramble';
 
 export default function AboutPage() {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = 'About Us | Phitopolis';
+  }, []);
   
   // Interactive spotlight logic for the Founder's Story section
   const founderSectionRef = useRef<HTMLDivElement>(null);
@@ -40,29 +45,41 @@ export default function AboutPage() {
   ];
 
   const JOURNEY_DATA = [
-    { 
-      year: '2021', 
-      title: 'Inception', 
+    {
+      year: '2021',
+      title: 'Inception',
       desc: 'Phitopolis founded with a core team of quant engineers.',
       icon: <Rocket className="text-accent" />
     },
-    { 
-      year: '2022', 
-      title: 'Growth', 
+    {
+      year: '2022',
+      title: 'Growth',
       desc: 'Strategic partnerships with global investment banks.',
       icon: <ShieldCheck className="text-accent" />
     },
-    { 
-      year: '2023', 
-      title: 'Delivery', 
+    {
+      year: '2023',
+      title: 'Delivery',
       desc: 'Scaling operations across multiple global time zones.',
       icon: <Globe className="text-accent" />
     },
-    { 
-      year: '2024', 
-      title: 'Ready', 
+    {
+      year: '2024',
+      title: 'Ready',
       desc: 'Pioneering next-gen AI infrastructures in NYC.',
-      icon: <Building2 className="text-accent" />,
+      icon: <Building2 className="text-accent" />
+    },
+    {
+      year: '2025',
+      title: 'Evolved',
+      desc: 'Modernized infrastructure and expanded R&D capabilities.',
+      icon: <Cpu className="text-accent" />
+    },
+    {
+      year: '2026',
+      title: 'Frontier',
+      desc: 'Leading the frontier in AI-first engineering solutions.',
+      icon: <Zap className="text-accent" />,
       current: true
     }
   ];
@@ -75,7 +92,7 @@ export default function AboutPage() {
           <div className="max-w-4xl">
             <span className="text-accent font-bold tracking-widest uppercase text-xs">Our Story</span>
             <h1 className="text-5xl md:text-8xl font-display font-bold mt-4 mb-12 tracking-tight text-primary">
-              We bridge the gap between vision and reality.
+              <TextScramble text="We bridge the gap between vision and reality." />
             </h1>
             <p className="text-xl md:text-2xl text-slate-600 leading-relaxed font-light">
               Phitopolis was founded with a single mission: to provide elite-level technology services 
@@ -221,11 +238,11 @@ export default function AboutPage() {
           </div>
 
           <div className="relative">
-            {/* Timeline Background Line (Large screens only, positioned at top of card area) */}
-            <div className="hidden lg:block absolute top-6 left-0 w-full h-[1px] bg-slate-100 z-0" />
+            {/* Timeline Background Line (XL screens only, positioned at top of card area) */}
+            <div className="hidden xl:block absolute top-6 left-0 w-full h-[1px] bg-slate-100 z-0" />
 
             {/* Grid Container - No scrolling needed */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 relative z-10">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-8 relative z-10">
               {JOURNEY_DATA.map((item, i) => (
                 <motion.div
                   key={i}
@@ -235,13 +252,13 @@ export default function AboutPage() {
                   transition={{ delay: i * 0.1 }}
                   className="relative lg:flex lg:flex-col"
                 >
-                  {/* Visual Node on the line (Desktop only) - sits above the card */}
-                  <div className="hidden lg:block absolute top-6 left-1/2 w-4 h-4 rounded-full bg-white border-2 border-primary -translate-y-1/2 -translate-x-1/2 z-20">
+                  {/* Visual Node on the line (XL Desktop only) - sits above the card */}
+                  <div className="hidden xl:block absolute top-6 left-1/2 w-4 h-4 rounded-full bg-white border-2 border-primary -translate-y-1/2 -translate-x-1/2 z-20">
                     {item.current && <div className="absolute inset-0 rounded-full bg-accent animate-ping" />}
                   </div>
 
-                  {/* Spacer to push card below the dot (large screens only) */}
-                  <div className="hidden lg:block h-14" />
+                  {/* Spacer to push card below the dot (XL screens only) */}
+                  <div className="hidden xl:block h-14" />
 
                   {/* Milestone Card */}
                   <div

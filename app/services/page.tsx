@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SERVICES } from '../../constants';
 import { CheckCircle2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import TextScramble from '../../components/TextScramble';
 
 // Terminal typing overlay component
 function DataStreamOverlay({ story, isVisible }: { story: string; isVisible: boolean }) {
@@ -83,8 +84,68 @@ function DataStreamOverlay({ story, isVisible }: { story: string; isVisible: boo
   );
 }
 
+interface ServiceImagePanelProps {
+  service: typeof import('../../constants').SERVICES[number];
+  index: number;
+  activeIndex: number | null;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  onClick: () => void;
+}
+
+function ServiceImagePanel({ service, index, activeIndex, onMouseEnter, onMouseLeave, onClick }: ServiceImagePanelProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const rX = useSpring(rotateX, { stiffness: 280, damping: 28 });
+  const rY = useSpring(rotateY, { stiffness: 280, damping: 28 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    rotateX.set(-(y - 0.5) * 10);
+    rotateY.set((x - 0.5) * 10);
+  };
+
+  const handleMouseLeaveAll = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+    onMouseLeave();
+  };
+
+  const isActive = activeIndex === index;
+
+  return (
+    <div style={{ perspective: '1000px' }} className="flex-1 w-full">
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={handleMouseLeaveAll}
+        onClick={onClick}
+        style={{ rotateX: rX, rotateY: rY }}
+        className="w-full bg-slate-100 rounded-3xl aspect-video relative overflow-hidden border border-slate-200 group shadow-lg cursor-pointer"
+      >
+        <img
+          src={service.image}
+          alt={service.title}
+          className={`w-full h-full object-cover transition-all duration-500 ${isActive ? 'scale-110 grayscale' : 'scale-100'}`}
+        />
+        <div className={`absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent transition-opacity duration-300 ${isActive ? 'opacity-0' : 'opacity-100'}`} />
+        <DataStreamOverlay story={service.story} isVisible={isActive} />
+      </motion.div>
+    </div>
+  );
+}
+
 export default function ServicesPage() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    document.title = 'Services | Phitopolis';
+  }, []);
 
   return (
     <div className="bg-white min-h-screen text-primary overflow-x-hidden">
@@ -92,7 +153,7 @@ export default function ServicesPage() {
         <div className="max-w-3xl mb-24">
           <span className="text-accent font-bold tracking-widest uppercase text-xs">Capabilities</span>
           <h1 className="text-5xl md:text-7xl font-display font-bold mt-4 mb-8 text-primary">
-            Technical excellence at every layer.
+            <TextScramble text="Technical excellence at every layer." />
           </h1>
           <p className="text-xl text-slate-600 leading-relaxed font-light">
             Phitopolis combines deep domain knowledge in finance and technology with modern engineering practices
@@ -128,24 +189,14 @@ export default function ServicesPage() {
                   ))}
                 </div>
               </div>
-              <div
-                className="flex-1 w-full bg-slate-100 rounded-3xl aspect-video relative overflow-hidden border border-slate-200 group shadow-lg cursor-pointer"
+              <ServiceImagePanel
+                service={service}
+                index={i}
+                activeIndex={activeIndex}
                 onMouseEnter={() => setActiveIndex(i)}
                 onMouseLeave={() => setActiveIndex(null)}
                 onClick={() => setActiveIndex(activeIndex === i ? null : i)}
-              >
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className={`w-full h-full object-cover transition-all duration-500 ${
-                    activeIndex === i ? 'scale-110 grayscale' : 'scale-100'
-                  }`}
-                />
-                <div className={`absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent transition-opacity duration-300 ${
-                  activeIndex === i ? 'opacity-0' : 'opacity-100'
-                }`}></div>
-                <DataStreamOverlay story={service.story} isVisible={activeIndex === i} />
-              </div>
+              />
             </motion.div>
           ))}
         </div>

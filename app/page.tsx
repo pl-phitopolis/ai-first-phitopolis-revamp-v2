@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
+import MagneticWrapper from '../components/MagneticWrapper';
 import { ArrowRight, ChevronRight, Zap, Shield, TrendingUp, Hexagon, Circle, Triangle } from 'lucide-react';
 import { SERVICES } from '../constants.tsx';
 import { apolloClient } from '../lib/apollo-client';
@@ -298,6 +299,83 @@ const CredentialCard = ({
   );
 };
 
+interface HomeSvcCardProps {
+  service: typeof SERVICES[number];
+  i: number;
+  key?: React.Key;
+}
+
+function HomeSvcCard({ service, i }: HomeSvcCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const rX = useSpring(rotateX, { stiffness: 280, damping: 28 });
+  const rY = useSpring(rotateY, { stiffness: 280, damping: 28 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    rotateX.set(-(y - 0.5) * 9);
+    rotateY.set((x - 0.5) * 9);
+  };
+
+  const handleMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+  };
+
+  const images = [
+    'https://phitopolis.com/img/core-competencies/innovation.jpg',
+    'https://phitopolis.com/img/core-competencies/technical-excellence.jpg',
+    'https://phitopolis.com/img/core-competencies/proactive-communication.jpg',
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-10%' }}
+      transition={{ duration: 0.8, delay: i * 0.15, ease: [0.21, 1.02, 0.47, 0.98] }}
+      style={{ perspective: '900px' }}
+    >
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ rotateX: rX, rotateY: rY }}
+        className="p-8 bg-slate-50 border border-slate-200 rounded-2xl group relative overflow-hidden hover:shadow-xl flex flex-col h-full transition-shadow duration-300"
+      >
+        <div className="absolute inset-0 bg-accent/5 group-hover:bg-accent/10 transition-colors duration-500" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-accent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative z-10 flex flex-col h-full">
+          <div className="mb-6 text-primary transform transition-transform group-hover:scale-110 duration-500">
+            {React.cloneElement(service.icon as React.ReactElement<any>, { className: 'w-8 h-8 text-primary' })}
+          </div>
+          <h3 className="text-xl font-bold mb-4 text-primary">{service.title}</h3>
+          <p className="text-slate-600 text-sm mb-6 leading-relaxed">{service.description}</p>
+          <ul className="space-y-3 mb-8 flex-grow">
+            {service.features.map((f, j) => (
+              <li key={j} className="text-xs text-slate-500 flex items-center">
+                <div className="w-1.5 h-1.5 bg-accent rounded-full mr-2" />
+                {f}
+              </li>
+            ))}
+          </ul>
+          <div className="relative mt-auto -mx-8 -mb-8 overflow-hidden h-48">
+            <img
+              src={images[i % 3]}
+              alt={service.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 interface Career {
   id: string;
   job_title: string;
@@ -315,6 +393,10 @@ interface CareersData {
 export default function Home() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [careers, setCareers] = useState<Career[]>([]);
+
+  useEffect(() => {
+    document.title = 'Phitopolis | AI-First Engineering Solutions';
+  }, []);
 
   useEffect(() => {
     const fetchCareers = async () => {
@@ -423,16 +505,21 @@ export default function Home() {
           className="container mx-auto px-6 text-center relative z-10"
         >
           <h1 className="text-5xl md:text-8xl font-display font-bold mb-6 tracking-tight leading-none text-white">
-            Make tomorrow's <br className="hidden md:block" /> technology with us!
+            Make tomorrow's technology with us!
           </h1>
           <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
             Founded by veterans in finance, we build the data systems of tomorrow.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/services" className="px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center group shadow-lg shadow-accent/30 transition-all hover:scale-105 active:scale-95">
-              Explore Services
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            <MagneticWrapper>
+              <Link to="/services" className="relative overflow-hidden px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center group shadow-lg shadow-accent/30 transition-colors hover:scale-105 active:scale-95">
+                <span className="shimmer-sweep" aria-hidden="true" />
+                <span className="relative z-10 flex items-center">
+                  Explore Services
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Link>
+            </MagneticWrapper>
             <Link to="/careers" className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full font-bold border border-white/30 transition-all hover:scale-105 active:scale-95">
               Join the Team
             </Link>
@@ -470,48 +557,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
             {SERVICES.map((service, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ 
-                  duration: 0.8, 
-                  delay: i * 0.15,
-                  ease: [0.21, 1.02, 0.47, 0.98] 
-                }}
-                className="p-8 bg-slate-50 border border-slate-200 rounded-2xl group relative overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1 flex flex-col h-full"
-              >
-                <div className="absolute inset-0 bg-accent/5 group-hover:bg-accent/10 transition-colors duration-500"></div>
-                <div className="absolute top-0 left-0 w-full h-1 bg-accent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="mb-6 text-primary transform transition-transform group-hover:scale-110 duration-500">
-                    {React.cloneElement(service.icon as React.ReactElement<any>, { className: "w-8 h-8 text-primary" })}
-                  </div>
-                  <h3 className="text-xl font-bold mb-4 text-primary">{service.title}</h3>
-                  <p className="text-slate-600 text-sm mb-6 leading-relaxed">{service.description}</p>
-                  <ul className="space-y-3 mb-8 flex-grow">
-                    {service.features.map((f, j) => (
-                      <li key={j} className="text-xs text-slate-500 flex items-center">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full mr-2"></div>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  {/* Service Card Image moved inside relative z-10 for consistent bottom alignment */}
-                  <div className="relative mt-auto -mx-8 -mb-8 overflow-hidden h-48">
-                    <img 
-                      src={[
-                        'https://phitopolis.com/img/core-competencies/innovation.jpg',
-                        'https://phitopolis.com/img/core-competencies/technical-excellence.jpg',
-                        'https://phitopolis.com/img/core-competencies/proactive-communication.jpg'
-                      ][i % 3]} 
-                      alt={service.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  </div>
-                </div>
-              </motion.div>
+              <HomeSvcCard key={i} service={service} i={i} />
             ))}
           </div>
         </div>
