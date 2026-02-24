@@ -5,7 +5,7 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export default function ContactPage() {
   const cardRef = useRef<HTMLDivElement>(null);
-  
+
   // Motion values for interactive glow
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -31,14 +31,14 @@ export default function ContactPage() {
             <div>
               <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 text-primary">Let's talk tech.</h1>
               <p className="text-xl text-slate-600 font-light leading-relaxed">
-                Whether you have a complex R&D challenge or want to scale your data capabilities, 
+                Whether you have a complex R&D challenge or want to scale your data capabilities,
                 our team is ready to assist.
               </p>
             </div>
 
             <div className="space-y-8">
               {/* Email - Slides from left to right */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -50,12 +50,12 @@ export default function ContactPage() {
                 <div>
                   <h4 className="font-bold text-lg mb-1 text-primary">Email</h4>
                   <p className="text-slate-600">info@phitopolis.com</p>
-                  <p className="text-slate-400 text-sm mt-1">We typically respond within 12 hours.</p>
+
                 </div>
               </motion.div>
 
               {/* Office - Slides from left to right with delay */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
@@ -72,14 +72,14 @@ export default function ContactPage() {
                     Bonifacio Global City, Taguig<br />
                     Philippines, 1634
                   </p>
-                  <p className="text-slate-400 text-sm mt-1">Visit by appointment only.</p>
+
                 </div>
               </motion.div>
             </div>
           </div>
 
           {/* Interactive Form Card - Slides from right to left */}
-          <motion.div 
+          <motion.div
             ref={cardRef}
             onMouseMove={handleMouseMove}
             initial={{ opacity: 0, x: 50 }}
@@ -88,7 +88,7 @@ export default function ContactPage() {
             className="group relative bg-slate-50 p-8 md:p-12 rounded-3xl border border-slate-200 shadow-xl overflow-hidden"
           >
             {/* Interactive spotlight blob */}
-            <motion.div 
+            <motion.div
               className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0"
               style={{
                 left: blobX,
