@@ -392,11 +392,22 @@ interface CareersData {
 
 export default function Home() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [careers, setCareers] = useState<Career[]>([]);
   const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     document.title = 'Phitopolis | AI-First Engineering Solutions';
+  }, []);
+
+  // If the video is already cached/ready when the component mounts,
+  // onCanPlay won't fire — so we check readyState immediately.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.readyState >= 2) {
+      setVideoReady(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -463,6 +474,7 @@ export default function Home() {
         {/* Background Video */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden bg-primary">
           <video
+            ref={videoRef}
             autoPlay
             loop
             muted

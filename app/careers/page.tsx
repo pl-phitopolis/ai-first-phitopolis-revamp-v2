@@ -31,16 +31,6 @@ const FILTER_CONFIG: Array<{ key: CareerFilterKey; label: string; icon: React.Re
   { key: "department", label: "DEPARTMENT", icon: <Building2 size={14} /> },
 ];
 
-const DEPARTMENT_OPTIONS = [
-  "Engineering",
-  "Design",
-  "Marketing",
-  "Sales",
-  "Operations",
-  "Human Resources",
-  "Finance",
-  "Product",
-];
 
 const BENEFITS = [
   { emoji: "💰", title: "Competitive Pay", desc: "Industry leading salary and meaningful equity packages." },
@@ -298,7 +288,7 @@ export default function CareersPage() {
 
   const filterOptions: Record<CareerFilterKey, string[]> = {
     job_type: Array.from<string>(new Set(careers.map((c) => c.job_type).filter((v): v is string => !!v))).sort(),
-    department: DEPARTMENT_OPTIONS,
+    department: Array.from<string>(new Set(careers.map((c) => c.department).filter((v): v is string => !!v))).sort(),
   };
 
   const toggleValue = (key: CareerFilterKey, value: string) => {
