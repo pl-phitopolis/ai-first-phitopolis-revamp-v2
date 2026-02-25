@@ -18,6 +18,17 @@ export default function NotFound() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="relative z-10 text-center px-6"
       >
+        {/* Terminal-style error label */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="font-mono text-sm text-accent/70 mb-6 tracking-widest uppercase"
+        >
+          <span className="animate-pulse mr-2">▋</span>
+          SYSTEM ERROR: PAGE_NOT_FOUND
+        </motion.p>
+
         <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-4">
           Page not found.
         </h1>
@@ -29,7 +40,7 @@ export default function NotFound() {
           className="inline-flex items-center px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/30"
         >
           <ArrowLeft className="mr-2" size={18} />
-          Back to Home
+          Return to Base
         </Link>
       </motion.div>
     </div>

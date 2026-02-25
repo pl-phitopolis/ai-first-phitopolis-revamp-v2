@@ -161,9 +161,15 @@ const Footer = () => {
               Making tomorrow's technology available today. Elite engineering for data-intensive challenges.
             </p>
             <div className="flex space-x-4">
-              <Github size={20} className="text-white hover:text-accent cursor-pointer transition-colors" />
-              <Linkedin size={20} className="text-white hover:text-accent cursor-pointer transition-colors" />
-              <Twitter size={20} className="text-white hover:text-accent cursor-pointer transition-colors" />
+              <a href="#" aria-label="Phitopolis on GitHub" className="text-white hover:text-accent transition-colors">
+                <Github size={20} />
+              </a>
+              <a href="#" aria-label="Phitopolis on LinkedIn" className="text-white hover:text-accent transition-colors">
+                <Linkedin size={20} />
+              </a>
+              <a href="#" aria-label="Phitopolis on Twitter" className="text-white hover:text-accent transition-colors">
+                <Twitter size={20} />
+              </a>
             </div>
           </div>
 
@@ -207,6 +213,36 @@ const Footer = () => {
   );
 };
 
+const PageTransition = ({ children }: { children: React.ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -8 }}
+    transition={{ duration: 0.25, ease: 'easeOut' }}
+  >
+    {children}
+  </motion.div>
+);
+
+const AppRoutes = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+        <Route path="/services" element={<PageTransition><Services /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
+        <Route path="/careers/:slug" element={<PageTransition><JobDetail /></PageTransition>} />
+        <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
+        <Route path="/blog/:slug" element={<PageTransition><BlogPostDetail /></PageTransition>} />
+        <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -227,17 +263,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <main className="flex-grow pt-16">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/careers/:slug" element={<JobDetail />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPostDetail />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </main>
         <Footer />
         <MobileNavigation />

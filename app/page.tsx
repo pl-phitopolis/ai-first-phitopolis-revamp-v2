@@ -393,6 +393,7 @@ interface CareersData {
 export default function Home() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [careers, setCareers] = useState<Career[]>([]);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     document.title = 'Phitopolis | AI-First Engineering Solutions';
@@ -461,12 +462,14 @@ export default function Home() {
       >
         {/* Background Video */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden bg-primary">
-          <video 
-            autoPlay 
-            loop 
-            muted 
+          <video
+            autoPlay
+            loop
+            muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen scale-105"
+            poster="/hero-poster.jpg"
+            onCanPlay={() => setVideoReady(true)}
+            className={`absolute inset-0 w-full h-full object-cover mix-blend-screen scale-105 transition-opacity duration-1000 ${videoReady ? 'opacity-40' : 'opacity-0'}`}
           >
             <source src="/hi-tech_blue_digital_connectivity_abstract_video.mp4" type="video/mp4" />
           </video>
