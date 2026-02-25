@@ -58,19 +58,24 @@ const TextScramble: React.FC<TextScrambleProps> = ({ text, className = '' }) => 
   }, [isInView]);
 
   return (
-    <span ref={ref} className={className}>
-      {chars.map((item, i) =>
-        item.char === ' ' ? (
-          <React.Fragment key={i}>{' '}</React.Fragment>
-        ) : (
-          <span
-            key={i}
-            style={item.final ? {} : { color: 'rgba(255, 199, 44, 0.65)', fontFamily: 'monospace' }}
-          >
-            {item.char}
-          </span>
-        )
-      )}
+    <span ref={ref} className={className} style={{ display: 'block', position: 'relative', overflow: 'hidden' }}>
+      {/* Renders the real text invisibly so the element always holds correct dimensions */}
+      <span style={{ visibility: 'hidden' }} aria-hidden="true">{text}</span>
+      {/* Animated characters sit on top without affecting layout */}
+      <span style={{ position: 'absolute', inset: 0 }}>
+        {chars.map((item, i) =>
+          item.char === ' ' ? (
+            <React.Fragment key={i}>{' '}</React.Fragment>
+          ) : (
+            <span
+              key={i}
+              style={item.final ? {} : { color: 'rgba(255, 199, 44, 0.65)' }}
+            >
+              {item.char}
+            </span>
+          )
+        )}
+      </span>
     </span>
   );
 };

@@ -28,17 +28,17 @@ export default function AboutPage() {
 
   const PHILOSOPHY = [
     {
-      icon: <Target size={24} className="text-primary" />,
+      icon: <Target size={26} />,
       title: "Mission",
       desc: "To build high-performance systems that make massive datasets actionable, empowering our clients to stay ahead in competitive markets."
     },
     {
-      icon: <Eye size={24} className="text-primary" />,
+      icon: <Eye size={26} />,
       title: "Vision",
       desc: "To be the global benchmark for elite R&D and data science services, recognized for our technical depth and proven outcomes."
     },
     {
-      icon: <Heart size={24} className="text-primary" />,
+      icon: <Heart size={26} />,
       title: "Values",
       desc: "Radical transparency, technical integrity, and a relentless pursuit of performance. We value depth over breadth."
     }
@@ -87,8 +87,8 @@ export default function AboutPage() {
   return (
     <div className="bg-white min-h-screen text-primary">
       {/* Hero */}
-      <section className="py-24 border-b border-slate-100">
-        <div className="container mx-auto px-6">
+      <section className="min-h-screen flex items-center border-b border-slate-100">
+        <div className="container mx-auto px-6 py-32">
           <div className="max-w-4xl">
             <span className="text-accent font-bold tracking-widest uppercase text-xs">Our Story</span>
             <h1 className="text-5xl md:text-8xl font-display font-bold mt-4 mb-12 tracking-tight text-primary">
@@ -102,27 +102,63 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Philosophy */}
-      <section className="py-24 bg-slate-50">
+      {/* Mission / Vision / Values */}
+      <section className="py-32 bg-primary text-white overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+
+          {/* Section header */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-20"
+          >
+            <span className="text-accent font-bold tracking-widest uppercase text-xs">What Drives Us</span>
+            <h2 className="text-4xl md:text-6xl font-display font-bold mt-4 leading-tight">
+              Built on a clear<br />philosophy.
+            </h2>
+          </motion.div>
+
+          {/* Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/10">
             {PHILOSOPHY.map((item, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="space-y-4"
+                transition={{ duration: 0.7, delay: i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="relative p-10 md:p-12 group overflow-hidden hover:bg-white/[0.03] transition-colors duration-500"
               >
-                <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center text-primary mb-6">
-                  {item.icon}
+                {/* Large background number */}
+                <div className="absolute -top-2 -right-2 text-[140px] font-black text-white/[0.04] font-display leading-none select-none pointer-events-none">
+                  {String(i + 1).padStart(2, '0')}
                 </div>
-                <h3 className="text-2xl font-bold text-primary">{item.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+
+                <div className="relative z-10 space-y-6">
+                  {/* Icon */}
+                  <div className="w-14 h-14 bg-accent/10 border border-accent/20 rounded-2xl flex items-center justify-center text-accent group-hover:bg-accent/20 group-hover:border-accent/40 transition-all duration-300">
+                    {item.icon}
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-bold">{item.title}</h3>
+                  <p className="text-white/55 leading-relaxed text-lg">{item.desc}</p>
+                </div>
+
+                {/* Accent line reveal */}
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, delay: i * 0.15 + 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  style={{ transformOrigin: 'left center' }}
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-accent to-accent/10"
+                />
               </motion.div>
             ))}
           </div>
+
         </div>
       </section>
 

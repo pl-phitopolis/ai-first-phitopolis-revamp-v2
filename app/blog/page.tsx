@@ -154,9 +154,6 @@ function SlackFilterDropdown({
               <span className="text-xs font-bold text-white uppercase tracking-wide">
                 {activeField?.label}
               </span>
-              <span className="ml-1 text-[10px] text-white/40 border border-white/20 rounded px-1.5 py-0.5 flex items-center gap-1 cursor-default">
-                includes <ChevronDown size={9} />
-              </span>
             </div>
 
             {/* Value search */}
