@@ -442,7 +442,7 @@ export default function BlogPage() {
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.85 }}
                           transition={{ duration: 0.15 }}
-                          className="flex items-center gap-1 pl-3 pr-1.5 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold cursor-pointer hover:bg-primary/90 transition-colors"
+                          className="flex items-center gap-1 pl-3 pr-1.5 py-2 rounded-lg bg-primary text-white text-xs font-semibold cursor-pointer hover:bg-primary/90 transition-colors"
                           onClick={() => handlePillClick(c.key)}
                         >
                           <span className="opacity-70 mr-0.5">{c.label}:</span>
@@ -482,7 +482,7 @@ export default function BlogPage() {
                     <select
                       value={itemsPerPage}
                       onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                      className="border border-slate-200 rounded-lg px-2 py-1 text-[10px] text-slate-600 bg-white hover:border-primary focus:outline-none transition-colors cursor-pointer"
+                      className="border border-slate-200 rounded-lg px-2 py-2 text-[10px] text-slate-600 bg-white hover:border-primary focus:outline-none transition-colors cursor-pointer"
                     >
                       {[3, 5, 10, 25].map((n) => (
                         <option key={n} value={n}>{n}</option>

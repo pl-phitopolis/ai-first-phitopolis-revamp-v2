@@ -13,7 +13,7 @@ const TextScramble: React.FC<TextScrambleProps> = ({ text, className = '' }) => 
   const isInView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-60px 0px' });
 
   const [chars, setChars] = useState(() =>
-    text.split('').map(c => ({ char: CHARS[0], final: c === ' ' || c === "'" || c === '.' || c === ',' || c === '!' || c === '?' }))
+    text.split('').map(c => ({ char: CHARS[0], final: c === ' ' || c === "'" }))
   );
 
   const hasAnimated = useRef(false);
@@ -37,7 +37,7 @@ const TextScramble: React.FC<TextScrambleProps> = ({ text, className = '' }) => 
     const animate = () => {
       frame++;
       const updated = queue.map(({ char, endFrame }) => {
-        const isSpecial = char === ' ' || char === "'" || char === '.' || char === ',' || char === '!' || char === '?';
+        const isSpecial = char === ' ' || char === "'";
         if (isSpecial) return { char, final: true };
         if (frame >= endFrame) return { char, final: true };
         return { char: CHARS[Math.floor(Math.random() * CHARS.length)], final: false };

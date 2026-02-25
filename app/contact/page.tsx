@@ -77,6 +77,7 @@ export default function ContactPage() {
                     Bonifacio Global City, Taguig<br />
                     Philippines, 1634
                   </p>
+                  <p className="text-slate-400 text-sm mt-2">Visit by appointment only</p>
 
                 </div>
               </motion.div>
