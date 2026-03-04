@@ -13,7 +13,7 @@ const TextScramble: React.FC<TextScrambleProps> = ({ text, className = '' }) => 
   const isInView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-60px 0px' });
 
   const [chars, setChars] = useState(() =>
-    text.split('').map(c => ({ char: CHARS[0], final: c === ' ' || c === "'" }))
+    text.split('').map(c => ({ char: CHARS[0], final: c === ' ' }))
   );
 
   const hasAnimated = useRef(false);
@@ -24,7 +24,7 @@ const TextScramble: React.FC<TextScrambleProps> = ({ text, className = '' }) => 
     hasAnimated.current = true;
 
     const letters = text.split('');
-    const totalFrames = Math.max(55, letters.length * 2.5);
+    const totalFrames = Math.max(100, letters.length * 5);
     let frame = 0;
 
     const queue = letters.map((c, i) => ({
@@ -37,7 +37,7 @@ const TextScramble: React.FC<TextScrambleProps> = ({ text, className = '' }) => 
     const animate = () => {
       frame++;
       const updated = queue.map(({ char, endFrame }) => {
-        const isSpecial = char === ' ' || char === "'";
+        const isSpecial = char === ' ';
         if (isSpecial) return { char, final: true };
         if (frame >= endFrame) return { char, final: true };
         return { char: CHARS[Math.floor(Math.random() * CHARS.length)], final: false };
@@ -58,7 +58,7 @@ const TextScramble: React.FC<TextScrambleProps> = ({ text, className = '' }) => 
   }, [isInView]);
 
   return (
-    <span ref={ref} className={className} style={{ display: 'block', position: 'relative', overflow: 'hidden' }}>
+    <span ref={ref} className={className} style={{ display: 'block', position: 'relative', overflow: 'visible', paddingBottom: '0.25em' }}>
       {/* Renders the real text invisibly so the element always holds correct dimensions */}
       <span style={{ visibility: 'hidden' }} aria-hidden="true">{text}</span>
       {/* Animated characters sit on top without affecting layout */}

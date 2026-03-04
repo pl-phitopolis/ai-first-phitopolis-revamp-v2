@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import MagneticWrapper from '../components/MagneticWrapper';
+import TextScramble from '../components/TextScramble';
 import { ArrowRight, ChevronRight, Zap, Shield, TrendingUp, Hexagon, Circle, Triangle } from 'lucide-react';
 import { SERVICES } from '../constants.tsx';
 import { apolloClient } from '../lib/apollo-client';
@@ -520,7 +521,7 @@ export default function Home() {
           className="container mx-auto px-6 text-center relative z-10"
         >
           <h1 className="text-5xl md:text-8xl font-display font-bold mb-6 tracking-tight leading-none text-white">
-            Make tomorrow's technology with us!
+            <TextScramble text="Make tomorrow's technology with us!" />
           </h1>
           <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
             Founded by veterans in finance, we build the data systems of tomorrow.

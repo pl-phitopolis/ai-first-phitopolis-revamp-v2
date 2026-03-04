@@ -364,7 +364,7 @@ export default function BlogPage() {
         {/* Header */}
         <div className="max-w-3xl mb-16">
           <span className="text-accent font-bold tracking-widest uppercase text-xs">Insights</span>
-          <h1 className="text-5xl md:text-7xl font-display font-bold mt-4 mb-8 text-primary"><TextScramble text="Technical perspectives." /></h1>
+          <h1 className="text-5xl md:text-7xl font-display font-bold mt-4 mb-8 text-primary whitespace-nowrap"><TextScramble text="Technical perspectives." /></h1>
           <p className="text-xl text-slate-600 font-light">Deep dives into FinTech, ML, and the future of distributed systems.</p>
         </div>
 

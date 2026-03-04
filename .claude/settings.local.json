@@ -3,7 +3,8 @@
     "allow": [
       "Bash(grep:*)",
       "Bash(find:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Read(//home/codewilling/ph.patrick.laxamana/.gemini/antigravity/brain/eca7d137-3ab7-463e-85cc-f35c94973bf4/**)"
     ]
   }
 }
