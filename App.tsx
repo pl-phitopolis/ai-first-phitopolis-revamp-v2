@@ -15,6 +15,7 @@ import JobDetail from './app/careers/[slug]/page.tsx';
 import BlogPostDetail from './app/blog/[slug]/page.tsx';
 import NotFound from './app/not-found/page.tsx';
 import MobileNavigation from './components/MobileNavigation.tsx';
+import AIDayPage from './app/ai-day/page.tsx';
 
 // Updated to use the requested external logo image
 const LOGO_PATH = 'https://phitopolis.com/img/phitopolis-logo.png';
@@ -237,16 +238,37 @@ const AppRoutes = () => {
         <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
         <Route path="/blog/:slug" element={<PageTransition><BlogPostDetail /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+        <Route path="/ai-day" element={<AIDayPage />} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
   );
 };
 
+// Conditionally renders Header/Footer — bypassed for /ai-day
+const AppLayout = () => {
+  const location = useLocation();
+  const isAIDay = location.pathname === '/ai-day';
+
+  return (
+    <div className={isAIDay ? '' : 'min-h-screen flex flex-col bg-white'}>
+      {!isAIDay && <Header />}
+      <main className={isAIDay ? '' : 'flex-grow pt-16'}>
+        <AppRoutes />
+      </main>
+      {!isAIDay && <Footer />}
+      {!isAIDay && <MobileNavigation />}
+    </div>
+  );
+};
+
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  // Skip the global preloader on /ai-day — that page has its own.
+  const isAIDayRoute = window.location.pathname === '/ai-day';
+  const [isLoading, setIsLoading] = useState(!isAIDayRoute);
 
   useEffect(() => {
+    if (isAIDayRoute) return;
     const t = setTimeout(() => setIsLoading(false), 2000);
     return () => clearTimeout(t);
   }, []);
@@ -260,14 +282,7 @@ export default function App() {
     <Router>
       <LoadingScreen isVisible={isLoading} />
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header />
-        <main className="flex-grow pt-16">
-          <AppRoutes />
-        </main>
-        <Footer />
-        <MobileNavigation />
-      </div>
+      <AppLayout />
     </Router>
   );
 }
