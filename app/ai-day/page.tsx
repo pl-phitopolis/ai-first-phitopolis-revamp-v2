@@ -254,6 +254,7 @@ const CustomCursor = () => {
 const ALL_SECTION_IDS = [
   'sec-hero', 'sec-statement', 'sec-vision',
   'sec-services', 'sec-techstack', 'sec-stats', 'sec-process', 'sec-people',
+  'sec-timeline',
   'sec-showcase', 'sec-closing',
 ];
 
@@ -264,6 +265,7 @@ const IRIS_SECTIONS: Record<string, { n: string; title: string }> = {
   'sec-stats':     { n: '04', title: 'Impact'       },
   'sec-process':   { n: '05', title: 'Process'      },
   'sec-people':    { n: '06', title: 'Our People'   },
+  'sec-timeline':  { n: '07', title: 'Our Journey'   },
   'sec-showcase':  { n: '07', title: 'Projects'     },
   'sec-closing':   { n: '08', title: "Let's Build"  },
 };
@@ -305,7 +307,7 @@ const SectionTransition = () => {
     const tallTracker = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) activeId.current = e.target.id; });
     }, { threshold: 0.05 });
-    ['sec-services', 'sec-process', 'sec-people', 'sec-showcase'].forEach(id => {
+    ['sec-services', 'sec-process', 'sec-people', 'sec-timeline', 'sec-showcase'].forEach(id => {
       const el = document.getElementById(id);
       if (el) tallTracker.observe(el);
     });
@@ -325,7 +327,7 @@ const SectionTransition = () => {
     };
 
     // Sections taller than 100vh that need scroll-through before transitioning
-    const TALL_SECTIONS = new Set(['sec-services', 'sec-process', 'sec-people', 'sec-showcase']);
+    const TALL_SECTIONS = new Set(['sec-services', 'sec-process', 'sec-people', 'sec-timeline', 'sec-showcase']);
 
     // Sections where natural browser scroll is used to cross the boundary (both directions)
     const FREE_SCROLL_PAIRS = new Set(['sec-hero', 'sec-vision', 'sec-services']);
@@ -468,11 +470,12 @@ const FLOAT_SECTIONS = [
   { id: 'sec-hero',      label: 'Intro' },
   { id: 'sec-statement', label: 'Statement' },
   { id: 'sec-vision',    label: 'Vision' },
-  { id: 'sec-services',   label: 'Services'  },
-  { id: 'sec-techstack',  label: 'Tech Stack' },
-  { id: 'sec-stats',      label: 'Impact' },
+  { id: 'sec-services',  label: 'Services'  },
+  { id: 'sec-techstack', label: 'Tech Stack' },
+  { id: 'sec-stats',     label: 'Impact' },
   { id: 'sec-process',   label: 'Process' },
   { id: 'sec-people',    label: 'People' },
+  { id: 'sec-timeline',  label: '2021–2026' },
   { id: 'sec-showcase',  label: 'Projects' },
 ];
 
@@ -2316,6 +2319,274 @@ const OurPeople = () => {
   );
 };
 
+// ── CHAPTERS ──────────────────────────────────────────────────────────────────
+const CHAPTERS = [
+  { num: '2021', id: 'sec-ch1', tag: 'The Beginning', title: '2021', sub: 'Where it all started',                color: '#FFC72C',
+    body: 'Placeholder — content covering Phitopolis\'s founding year will live here. The vision, the first team members, and the early decisions that set the direction for everything that followed.' },
+  { num: '2022', id: 'sec-ch2', tag: 'Taking Shape',  title: '2022', sub: 'Building the foundation',             color: '#60A5FA',
+    body: 'Placeholder — content covering 2022\'s milestones will live here. Early client engagements, team growth, and the first solutions that proved the model worked.' },
+  { num: '2023', id: 'sec-ch3', tag: 'Momentum',      title: '2023', sub: 'Accelerating the mission',            color: '#34D399',
+    body: 'Placeholder — content covering 2023\'s growth will live here. Expanded capabilities, deeper partnerships, and the projects that put Phitopolis on the map.' },
+  { num: '2024', id: 'sec-ch4', tag: 'Scaling Up',    title: '2024', sub: 'Reaching new heights',                color: '#A78BFA',
+    body: 'Placeholder — content covering 2024\'s expansion will live here. Larger engagements, new service lines, and a growing team aligned around AI-first delivery.' },
+  { num: '2025', id: 'sec-ch5', tag: 'Full Stride',   title: '2025', sub: 'Operating at full capacity',          color: '#F59E0B',
+    body: 'Placeholder — content covering 2025\'s achievements will live here. Flagship deployments, measurable client impact, and the refinement of what makes Phitopolis different.' },
+  { num: '2026', id: 'sec-ch6', tag: 'AI Day',        title: '2026', sub: 'Five years in, the work continues',   color: '#F472B6',
+    body: 'Placeholder — content covering where Phitopolis stands today will live here. Five years of learning, shipping, and building — and a clear view of what comes next.' },
+];
+
+const ChapterGroup = () => {
+  const containerRef  = useRef<HTMLElement>(null);
+  const trackRef      = useRef<HTMLDivElement>(null);
+  const panelRefs     = useRef<(HTMLDivElement | null)[]>([]);
+  const textRefs      = useRef<(HTMLDivElement | null)[]>([]);
+  const imgRefs       = useRef<(HTMLDivElement | null)[]>([]);
+  const progressRef   = useRef<HTMLDivElement>(null);
+  const dotRefs       = useRef<(HTMLDivElement | null)[]>([]);
+  const yearLabelRef  = useRef<HTMLDivElement>(null);
+  const isMobile      = useIsMobile();
+  const N = CHAPTERS.length;
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // ── Initial states — panels 1-5 start hidden off-right ───────────────
+      for (let i = 1; i < N; i++) {
+        gsap.set(textRefs.current[i], { x: 80, opacity: 0 });
+        gsap.set(imgRefs.current[i],  { x: 60, opacity: 0, scale: 0.9 });
+      }
+      gsap.set(dotRefs.current[0], { backgroundColor: CHAPTERS[0].color, scale: 1.5 });
+      gsap.set(progressRef.current, { scaleX: 0, transformOrigin: 'left center' });
+
+      // ── Main timeline — drives horizontal track + all content ────────────
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.5,
+          invalidateOnRefresh: true,
+        },
+        defaults: { ease: 'none' },
+      });
+
+      // Horizontal track slides left
+      tl.to(trackRef.current, {
+        x: () => -(trackRef.current!.scrollWidth - window.innerWidth),
+        duration: 1,
+      }, 0);
+
+      // Progress bar grows with scroll
+      tl.to(progressRef.current, { scaleX: 1, duration: 1 }, 0);
+
+      // Per-panel: text + image enter/exit + dot activation
+      CHAPTERS.forEach((ch, i) => {
+        const c  = i / (N - 1);  // center position: 0, 0.2, 0.4, 0.6, 0.8, 1
+        const eD = 0.08;          // enter duration fraction
+        const xD = 0.08;          // exit duration fraction
+
+        // Text: slide in from right (skip first — already visible)
+        if (i > 0) {
+          tl.to(textRefs.current[i], { x: 0, opacity: 1, duration: eD }, c - eD);
+        }
+        // Text: slide out to left (skip last — stays visible)
+        if (i < N - 1) {
+          tl.to(textRefs.current[i], { x: -80, opacity: 0, duration: xD }, c + 0.04);
+        }
+
+        // Image: scale + fade in
+        if (i > 0) {
+          tl.to(imgRefs.current[i], { x: 0, opacity: 1, scale: 1, duration: eD * 1.2 }, c - eD * 1.1);
+        }
+        // Image: scale + fade out
+        if (i < N - 1) {
+          tl.to(imgRefs.current[i], { x: -60, opacity: 0, scale: 0.9, duration: xD }, c + 0.05);
+        }
+
+        // Year label updates (immediate snap at panel center)
+        if (i > 0) {
+          tl.to(yearLabelRef.current, { opacity: 0, duration: 0.02 }, c - 0.03);
+          tl.call(() => {
+            if (yearLabelRef.current) yearLabelRef.current.textContent = ch.num;
+          }, [], c - 0.01);
+          tl.to(yearLabelRef.current, { opacity: 1, duration: 0.02 }, c);
+        }
+
+        // Dots: illuminate active, dim previous
+        if (i > 0) {
+          tl.to(dotRefs.current[i],     { backgroundColor: ch.color, scale: 1.5, duration: 0.04 }, c - 0.02);
+          tl.to(dotRefs.current[i - 1], { backgroundColor: 'rgba(255,255,255,0.12)', scale: 1, duration: 0.04 }, c - 0.02);
+        }
+      });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="sec-timeline" ref={containerRef}
+      style={{ height: '700vh', position: 'relative', background: C.charcoal }}
+    >
+      <SectionTag name="our journey" />
+
+      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+        {/* Top/bottom edge fades */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 4, pointerEvents: 'none', background: `linear-gradient(to bottom, ${C.charcoal} 0%, transparent 5%, transparent 92%, ${C.charcoal} 100%)` }} />
+
+        {/* ── Horizontal track ─────────────────────────────────────────────── */}
+        <div ref={trackRef} style={{
+          display: 'flex',
+          width: `${N * 100}vw`,
+          height: '100%',
+          willChange: 'transform',
+        }}>
+          {CHAPTERS.map((ch, i) => (
+            <div key={ch.id} ref={el => { panelRefs.current[i] = el; }}
+              style={{
+                width: '100vw', height: '100%', flexShrink: 0, position: 'relative',
+                display: 'flex', alignItems: 'center',
+                padding: isMobile ? '80px 24px 120px' : `0 clamp(48px, 6vw, 96px)`,
+                overflow: 'hidden',
+              }}
+            >
+              {/* Per-panel ambient glow */}
+              <div style={{
+                position: 'absolute', width: '58vw', height: '58vw', borderRadius: '50%',
+                background: `radial-gradient(circle, ${ch.color}0B 0%, transparent 68%)`,
+                right: '-8vw', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none',
+              }} />
+
+              {/* ── Content row ───────────────────────────────────────────── */}
+              <div style={{
+                width: '100%', maxWidth: 1400, margin: '0 auto',
+                display: 'flex', flexDirection: isMobile ? 'column' : 'row',
+                alignItems: 'center', gap: isMobile ? 44 : 'clamp(48px, 7vw, 88px)',
+                position: 'relative', zIndex: 1,
+              }}>
+                {/* Text block */}
+                <div ref={el => { textRefs.current[i] = el; }}
+                  style={{ flex: '0 0 auto', width: isMobile ? '100%' : '44%' }}
+                >
+                  {/* Ghost year */}
+                  <div style={{
+                    fontFamily: 'Outfit, sans-serif', fontWeight: 900,
+                    fontSize: 'clamp(3.5rem, 9vw, 7rem)', color: `${ch.color}10`,
+                    lineHeight: 1, letterSpacing: '-0.05em', marginBottom: -4, userSelect: 'none',
+                  }}>
+                    {ch.num}
+                  </div>
+                  <Badge n={ch.num} label={ch.tag} />
+                  <div style={{ overflow: 'hidden', marginTop: 4 }}>
+                    <h2 style={{
+                      fontFamily: 'Outfit, sans-serif', fontWeight: 900,
+                      fontSize: 'clamp(2.4rem, 4.8vw, 4.2rem)', color: C.base,
+                      letterSpacing: '-0.03em', lineHeight: 1.05, margin: 0, textTransform: 'lowercase',
+                    }}>
+                      {ch.title}
+                    </h2>
+                  </div>
+                  <p style={{
+                    fontFamily: 'Outfit, sans-serif', fontWeight: 600,
+                    fontSize: 'clamp(0.9rem, 1.3vw, 1.1rem)', color: ch.color,
+                    margin: '16px 0 0', letterSpacing: '-0.01em',
+                  }}>
+                    {ch.sub}
+                  </p>
+                  <p style={{
+                    fontFamily: 'Inter, sans-serif', fontSize: 'clamp(0.8rem, 1vw, 0.92rem)',
+                    color: 'rgba(255,255,255,0.36)', lineHeight: 1.9, margin: '18px 0 0', maxWidth: 440,
+                  }}>
+                    {ch.body}
+                  </p>
+                </div>
+
+                {/* Image placeholder */}
+                <div ref={el => { imgRefs.current[i] = el; }}
+                  style={{
+                    flex: 1, minHeight: isMobile ? 220 : 'clamp(300px, 40vh, 480px)',
+                    borderRadius: 24, border: `1px dashed ${ch.color}28`,
+                    background: `linear-gradient(135deg, ${ch.color}06 0%, transparent 55%)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'relative', overflow: 'hidden', willChange: 'transform',
+                  }}
+                >
+                  {(['tl', 'tr', 'bl', 'br'] as const).map(corner => (
+                    <div key={corner} style={{
+                      position: 'absolute', width: 22, height: 22,
+                      ...(corner.includes('t') ? { top: 18 } : { bottom: 18 }),
+                      ...(corner.includes('l') ? { left: 18 } : { right: 18 }),
+                      borderTop:    corner.includes('t') ? `1.5px solid ${ch.color}50` : 'none',
+                      borderBottom: corner.includes('b') ? `1.5px solid ${ch.color}50` : 'none',
+                      borderLeft:   corner.includes('l') ? `1.5px solid ${ch.color}50` : 'none',
+                      borderRight:  corner.includes('r') ? `1.5px solid ${ch.color}50` : 'none',
+                    }} />
+                  ))}
+                  <div style={{ textAlign: 'center', pointerEvents: 'none' }}>
+                    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style={{ opacity: 0.2 }}>
+                      <circle cx="26" cy="26" r="11" stroke={ch.color} strokeWidth="1" strokeDasharray="3 4" />
+                      <line x1="26" y1="2"  x2="26" y2="15" stroke={ch.color} strokeWidth="1" />
+                      <line x1="26" y1="37" x2="26" y2="50" stroke={ch.color} strokeWidth="1" />
+                      <line x1="2"  y1="26" x2="15" y2="26" stroke={ch.color} strokeWidth="1" />
+                      <line x1="37" y1="26" x2="50" y2="26" stroke={ch.color} strokeWidth="1" />
+                    </svg>
+                    <p style={{
+                      fontFamily: 'Inter, sans-serif', fontSize: 9, letterSpacing: '0.28em',
+                      textTransform: 'uppercase', color: ch.color, opacity: 0.28, marginTop: 12,
+                    }}>
+                      asset pending
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Bottom timeline nav ──────────────────────────────────────────── */}
+        <div style={{
+          position: 'absolute', bottom: 32, left: 0, right: 0, zIndex: 10,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+          pointerEvents: 'none',
+        }}>
+          {/* Active year label */}
+          <div ref={yearLabelRef} style={{
+            fontFamily: 'Outfit, sans-serif', fontWeight: 800,
+            fontSize: isMobile ? '0.9rem' : '1.05rem', color: 'rgba(255,255,255,0.55)',
+            letterSpacing: '0.06em', marginBottom: 4,
+          }}>
+            {CHAPTERS[0].num}
+          </div>
+
+          {/* Year dots */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 18 : 32 }}>
+            {CHAPTERS.map((ch, i) => (
+              <div key={ch.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+                <div ref={el => { dotRefs.current[i] = el; }}
+                  style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.12)', flexShrink: 0 }}
+                />
+                {!isMobile && (
+                  <span style={{
+                    fontFamily: 'Outfit, sans-serif', fontSize: 8, color: 'rgba(255,255,255,0.22)',
+                    letterSpacing: '0.08em',
+                  }}>
+                    {ch.num}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Progress track */}
+          <div style={{
+            width: isMobile ? 180 : 280, height: 1,
+            background: 'rgba(255,255,255,0.08)', borderRadius: 1, overflow: 'hidden',
+          }}>
+            <div ref={progressRef} style={{ height: '100%', background: 'rgba(255,255,255,0.28)', transformOrigin: 'left center' }} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Showcase = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef(null);
@@ -2559,6 +2830,7 @@ export default function AIDayPage() {
         <Stats />
         <Process />
         <OurPeople />
+        <ChapterGroup />
         <Showcase />
         <Closing />
       </div>
