@@ -189,11 +189,30 @@ const CustomCursor = () => {
   const sx = useSpring(mx, { stiffness: 600, damping: 36 });
   const sy = useSpring(my, { stiffness: 600, damping: 36 });
   const [variant, setVariant] = useState<'default' | 'hover' | 'drag'>('default');
+  const [onLight, setOnLight] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
     if (isMobile) return;
-    const onMove = (e: MouseEvent) => { mx.set(e.clientX); my.set(e.clientY); };
+    const onMove = (e: MouseEvent) => {
+      mx.set(e.clientX); my.set(e.clientY);
+      // detect background under cursor
+      const els = document.elementsFromPoint(e.clientX, e.clientY);
+      let light = false;
+      for (const el of els) {
+        const bg = getComputedStyle(el).backgroundColor;
+        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+          // parse rgb values
+          const m = bg.match(/\d+/g);
+          if (m) {
+            const brightness = (parseInt(m[0]) * 299 + parseInt(m[1]) * 587 + parseInt(m[2]) * 114) / 1000;
+            light = brightness > 160;
+          }
+          break;
+        }
+      }
+      setOnLight(light);
+    };
     const setHover = () => setVariant('hover');
     const setDefault = () => setVariant('default');
     const setDrag = () => setVariant('drag');
@@ -211,6 +230,8 @@ const CustomCursor = () => {
 
   if (isMobile) return null;
 
+  const cursorColor = onLight ? C.charcoal : C.accent;
+
   return (
     <>
       {/* Main dot — instant tracking, no delay */}
@@ -219,7 +240,7 @@ const CustomCursor = () => {
           width:   variant === 'hover' ? 14 : 7,
           height:  variant === 'hover' ? 14 : 7,
           opacity: variant === 'drag'  ? 0  : 1,
-          background: variant === 'hover' ? C.charcoal : C.accent,
+          background: cursorColor,
         }}
         transition={{ duration: 0.12 }}
         style={{ position: 'fixed', left: mx, top: my, x: '-50%', y: '-50%', borderRadius: '50%', zIndex: 10000, pointerEvents: 'none' }}
@@ -252,8 +273,8 @@ const CustomCursor = () => {
 
 // ── IRIS SECTION TRANSITION ───────────────────────────────────────────────────
 const ALL_SECTION_IDS = [
-  'sec-hero', 'sec-statement', 'sec-vision',
-  'sec-services', 'sec-techstack', 'sec-stats', 'sec-process', 'sec-people',
+  'sec-hero', 'sec-statement', 'sec-process', 'sec-vision',
+  'sec-services', 'sec-techstack', 'sec-stats', 'sec-people',
   'sec-timeline',
   'sec-showcase', 'sec-closing',
 ];
@@ -271,6 +292,9 @@ const IRIS_SECTIONS: Record<string, { n: string; title: string }> = {
 };
 
 const SectionTransition = () => {
+  // TEMPORARILY DISABLED — remove this early return to restore
+  return null;
+
   const [iris, setIris] = useState<{ key: number; n: string; title: string } | null>(null);
   const locked    = useRef(false);
   const activeId  = useRef('sec-hero');
@@ -330,9 +354,9 @@ const SectionTransition = () => {
     const TALL_SECTIONS = new Set(['sec-services', 'sec-process', 'sec-people', 'sec-timeline', 'sec-showcase']);
 
     // Sections where natural browser scroll is used to cross the boundary (both directions)
-    const FREE_SCROLL_PAIRS = new Set(['sec-hero', 'sec-vision', 'sec-services']);
+    const FREE_SCROLL_PAIRS = new Set(['sec-hero', 'sec-vision', 'sec-services', 'sec-techstack']);
     // Sections where only upward scroll is natural (preserves iris going down)
-    const FREE_SCROLL_UP_SECTIONS = new Set(['sec-statement', 'sec-techstack']);
+    const FREE_SCROLL_UP_SECTIONS = new Set(['sec-statement']);
 
     // Wheel — pass through tall sections mid-scroll; intercept at boundaries
     const onWheel = (e: WheelEvent) => {
@@ -475,9 +499,11 @@ const FloatingString = ({ years, scrollProgressRef }: { years: string[]; scrollP
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let raf: number;
-    let t = 0;
     let rawCursorY = window.innerHeight / 2;
-    let smoothCursorY = window.innerHeight / 2;
+    let springY   = window.innerHeight / 2;
+    let springVel = 0;
+    let idlePhase     = 0;
+    let lastMoveTime  = performance.now();
 
     // Ring buffer
     const HISTORY = 180;
@@ -491,7 +517,7 @@ const FloatingString = ({ years, scrollProgressRef }: { years: string[]; scrollP
     const smoothProgresses = new Float32Array(N).fill(1);
     const entryTimes = new Array<number>(N).fill(-1); // -1 = not entered yet
 
-    const onMouseMove = (e: MouseEvent) => { rawCursorY = e.clientY; };
+    const onMouseMove = (e: MouseEvent) => { rawCursorY = e.clientY; lastMoveTime = performance.now(); };
     window.addEventListener('mousemove', onMouseMove);
 
     const resize = () => {
@@ -509,22 +535,26 @@ const FloatingString = ({ years, scrollProgressRef }: { years: string[]; scrollP
       const iA     = (histHead - 1 - dFloor     + HISTORY * 4) % HISTORY;
       const iB     = (histHead - 1 - dFloor - 1 + HISTORY * 4) % HISTORY;
       const disp   = cursorHistory[iA] * (1 - dFrac) + cursorHistory[iB] * dFrac;
-      const env    = Math.sqrt(Math.max(0, tp)) * Math.sin(tp * Math.PI * 0.95 + 0.08);
-      const w1     = Math.sin(tp * Math.PI * 2.2 + t * 0.9) * 12;
-      const w2     = Math.sin(tp * Math.PI * 4.7 + t * 1.6) * 5;
-      const dr     = Math.sin(t * 0.25 - tp * 1.2) * 4;
       const taper  = 0.2 + 0.8 * tp;
-      return centerY + disp * taper + (w1 + w2 + dr) * env;
+      return centerY + disp * taper;
     };
 
     const draw = () => {
       const w = canvas.offsetWidth;
       const h = canvas.offsetHeight;
       ctx.clearRect(0, 0, w, h);
-      t += 0.007;
 
-      smoothCursorY += (rawCursorY - smoothCursorY) * 0.08;
-      const displace = (smoothCursorY - window.innerHeight / 2) / (window.innerHeight / 2) * h * 0.42;
+      // Idle oscillation: fades in after 0.8s of no cursor movement
+      const idleElapsed = performance.now() - lastMoveTime;
+      const idleFactor  = Math.min(1, Math.max(0, (idleElapsed - 800) / 600));
+      idlePhase += 0.022; // oscillation speed
+      const idleOffset = Math.sin(idlePhase) * 100 * idleFactor;
+
+      // Spring physics — follows cursor + idle bob
+      springVel += (rawCursorY + idleOffset - springY) * 0.055;
+      springVel *= 0.82;
+      springY   += springVel;
+      const displace = (springY - window.innerHeight / 2) / (window.innerHeight / 2) * h * 0.42;
       cursorHistory[histHead] = displace;
       histHead = (histHead + 1) % HISTORY;
 
@@ -547,12 +577,8 @@ const FloatingString = ({ years, scrollProgressRef }: { years: string[]; scrollP
         const idxA   = (histHead - 1 - dFloor     + HISTORY * 4) % HISTORY;
         const idxB   = (histHead - 1 - dFloor - 1 + HISTORY * 4) % HISTORY;
         const cDisp  = cursorHistory[idxA] * (1 - dFrac) + cursorHistory[idxB] * dFrac;
-        const wave1  = Math.sin(progress * Math.PI * 2.2 + t * 0.9) * 12;
-        const wave2  = Math.sin(progress * Math.PI * 4.7 + t * 1.6) * 5;
-        const drift  = Math.sin(t * 0.25 - progress * 1.2) * 4;
-        const env    = Math.sqrt(progress) * Math.sin(progress * Math.PI * 0.95 + 0.08);
         const taper  = 0.2 + 0.8 * progress;
-        lastY = centerY + cDisp * taper + (wave1 + wave2 + drift) * env;
+        lastY = centerY + cDisp * taper;
         ctx.lineTo(x, lastY);
       }
       ctx.strokeStyle = 'rgba(255,255,255,0.22)';
@@ -639,12 +665,12 @@ const FloatingString = ({ years, scrollProgressRef }: { years: string[]; scrollP
 // ── FLOATING SECTION NAV ──────────────────────────────────────────────────────
 const FLOAT_SECTIONS = [
   { id: 'sec-hero',      label: 'Intro' },
-  { id: 'sec-statement', label: 'Statement' },
+  { id: 'sec-statement', label: 'Story' },
+  { id: 'sec-process',   label: 'Values' },
   { id: 'sec-vision',    label: 'Vision' },
   { id: 'sec-services',  label: 'Services'  },
   { id: 'sec-techstack', label: 'Tech Stack' },
   { id: 'sec-stats',     label: 'Impact' },
-  { id: 'sec-process',   label: 'Process' },
   { id: 'sec-people',    label: 'People' },
   { id: 'sec-timeline',  label: '2021–2026' },
   { id: 'sec-showcase',  label: 'Projects' },
@@ -652,26 +678,51 @@ const FLOAT_SECTIONS = [
 
 const FloatNav = () => {
   const [active, setActive] = useState('sec-hero');
+  const [onLight, setOnLight] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   useEffect(() => {
     if (isMobile) return;
-    const onScroll = () => {
+    const update = () => {
       const mid = window.scrollY + window.innerHeight * 0.45;
       let cur = FLOAT_SECTIONS[0].id;
       for (const s of FLOAT_SECTIONS) { const el = document.getElementById(s.id); if (el && el.offsetTop <= mid) cur = s.id; }
       setActive(cur);
+      // detect background brightness behind nav dots
+      if (navRef.current) {
+        const rect = navRef.current.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        const els = document.elementsFromPoint(x, y);
+        let light = false;
+        for (const el of els) {
+          if (el === navRef.current || navRef.current.contains(el)) continue;
+          const bg = getComputedStyle(el).backgroundColor;
+          if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+            const m = bg.match(/\d+/g);
+            if (m) {
+              const brightness = (parseInt(m[0]) * 299 + parseInt(m[1]) * 587 + parseInt(m[2]) * 114) / 1000;
+              light = brightness > 160;
+            }
+            break;
+          }
+        }
+        setOnLight(light);
+      }
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+    return () => window.removeEventListener('scroll', update);
   }, [isMobile]);
   if (isMobile) return null;
+  const activeColor = onLight ? C.charcoal : C.accent;
+  const inactiveColor = onLight ? 'rgba(10,42,102,0.25)' : 'rgba(255,199,44,0.28)';
   return (
-    <div style={{ position: 'fixed', right: 28, top: '50%', transform: 'translateY(-50%)', zIndex: 100, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+    <div ref={navRef} style={{ position: 'fixed', right: 28, top: '50%', transform: 'translateY(-50%)', zIndex: 100, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
       {FLOAT_SECTIONS.map(s => (
         <motion.button key={s.id} onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' })}
           whileHover={{ scale: 1.6 }} title={s.label}
-          style={{ width: active === s.id ? 10 : 6, height: active === s.id ? 10 : 6, borderRadius: '50%', background: active === s.id ? C.accent : 'rgba(255,199,44,0.28)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.3s' }}
+          style={{ width: active === s.id ? 10 : 6, height: active === s.id ? 10 : 6, borderRadius: '50%', background: active === s.id ? activeColor : inactiveColor, border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.3s' }}
         />
       ))}
     </div>
@@ -905,14 +956,37 @@ const MarqueeTrack = ({ items, basePPS = 90, reverse = false }: { items: string[
   );
 };
 
-const MarqueeSection = () => (
-  <div style={{ background: C.accent, padding: '20px 0', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 14, position: 'relative' }}>
-    <SectionTag name="marquee" dark />
-    <div style={{ height: 24 }} />
-    <MarqueeTrack items={MARQUEE_ROW1} basePPS={85} />
-    <MarqueeTrack items={MARQUEE_ROW2} basePPS={70} reverse />
-  </div>
-);
+const MarqueeSection = () => {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const bandRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!bandRef.current || !wrapRef.current) return;
+    gsap.set(bandRef.current, { scale: 2, rotate: -3 });
+    const tl = gsap.to(bandRef.current, {
+      scale: 1.25,
+      rotate: -3,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: wrapRef.current,
+        start: 'top 60%',
+        end: 'top 20%',
+        scrub: 0.6,
+      },
+    });
+    return () => { tl.scrollTrigger?.kill(); };
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ position: 'relative', zIndex: 10, background: `linear-gradient(to bottom, ${C.base} 50%, ${C.charcoal} 50%)` }}>
+      <div ref={bandRef} style={{ background: C.accent, padding: '48px 0', display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', transformOrigin: 'center center' }}>
+        <SectionTag name="marquee" dark />
+        <MarqueeTrack items={MARQUEE_ROW1} basePPS={85} />
+        <MarqueeTrack items={MARQUEE_ROW2} basePPS={70} reverse />
+      </div>
+    </div>
+  );
+};
 
 // ── TECH STACK MARQUEE ────────────────────────────────────────────────────────
 const CAT_COLORS: Record<string, string> = {
@@ -1659,46 +1733,206 @@ const Hero = ({ ready }: { ready: boolean }) => {
   );
 };
 
+// ── SCROLL-DRIVEN LETTER HEADING ─────────────────────────────────────────────
+const HEADING_FONT: React.CSSProperties = {
+  fontFamily: 'Outfit, sans-serif', fontWeight: 900,
+  fontSize: 'clamp(2.4rem, 5.5vw, 5rem)', letterSpacing: '-0.03em', lineHeight: 1.15,
+};
+
+const ScrollLetterHeading = ({ triggerRef }: { triggerRef: React.RefObject<HTMLElement | null> }) => {
+  const line1Ref = useRef<HTMLDivElement>(null);
+  const line2Ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!line1Ref.current || !line2Ref.current || !triggerRef.current) return;
+    const chars1 = line1Ref.current.querySelectorAll<HTMLSpanElement>('.sl-char');
+    const chars2 = line2Ref.current.querySelectorAll<HTMLSpanElement>('.sl-char');
+
+    // Line 1: filled → outline (staggered per letter, sharp snap)
+    gsap.set(chars1, { webkitTextStroke: `2px ${C.charcoal}`, webkitTextFillColor: C.charcoal });
+    const st1 = { trigger: triggerRef.current, start: 'top 70%', end: 'top top', scrub: 0.4 };
+    const tl1 = gsap.timeline({ scrollTrigger: st1 });
+    chars1.forEach((ch, i) => {
+      const pos = i / chars1.length;
+      tl1.set(ch, { webkitTextFillColor: 'transparent' }, pos);
+    });
+
+    // Line 2: outline → filled (staggered per letter, sharp snap)
+    gsap.set(chars2, { webkitTextStroke: `2px ${C.charcoal}`, webkitTextFillColor: 'transparent' });
+    const st2 = { trigger: triggerRef.current, start: 'top 70%', end: 'top top', scrub: 0.4 };
+    const tl2 = gsap.timeline({ scrollTrigger: st2 });
+    chars2.forEach((ch, i) => {
+      const pos = i / chars2.length;
+      tl2.set(ch, { webkitTextFillColor: C.charcoal }, pos);
+    });
+
+    return () => { tl1.scrollTrigger?.kill(); tl2.scrollTrigger?.kill(); };
+  }, [triggerRef]);
+
+  const renderChars = (text: string, uppercase?: boolean) =>
+    text.split('').map((ch, i) => (
+      <span key={i} className="sl-char" style={{ ...HEADING_FONT, textTransform: uppercase ? 'uppercase' : 'lowercase', display: ch === ' ' ? 'inline' : 'inline-block' }}>
+        {ch === ' ' ? '\u00A0' : ch}
+      </span>
+    ));
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1em' }}>
+      <div ref={line1Ref} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {renderChars('what do you look for in')}
+      </div>
+      <div ref={line2Ref} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {renderChars('an ')}
+        {renderChars('IT', true)}
+        {renderChars(' partner?')}
+      </div>
+    </div>
+  );
+};
+
 // ── FULL-BLEED STATEMENT ──────────────────────────────────────────────────────
+const CONCERN_MAP: { section: string; keywords: string[] }[] = [
+  { section: 'sec-services',  keywords: ['data', 'analytics', 'software', 'development', 'application', 'service', 'solution', 'build', 'ai', 'machine learning', 'ml', 'research', 'support', 'help', 'assist'] },
+  { section: 'sec-techstack', keywords: ['tech', 'technology', 'stack', 'tools', 'framework', 'infrastructure', 'cloud', 'aws', 'react', 'python', 'language'] },
+  { section: 'sec-process',   keywords: ['process', 'methodology', 'agile', 'workflow', 'delivery', 'how', 'approach', 'quality'] },
+  { section: 'sec-people',    keywords: ['team', 'people', 'talent', 'engineer', 'developer', 'staff', 'hire', 'expertise', 'who'] },
+  { section: 'sec-stats',     keywords: ['impact', 'results', 'numbers', 'statistics', 'performance', 'track record', 'proven'] },
+  { section: 'sec-showcase',  keywords: ['project', 'portfolio', 'work', 'case study', 'example', 'client', 'showcase'] },
+  { section: 'sec-timeline',  keywords: ['history', 'journey', 'founded', 'when', 'timeline', 'story', 'growth'] },
+  { section: 'sec-vision',    keywords: ['vision', 'mission', 'goal', 'future', 'why', 'purpose'] },
+];
+
+const PLACEHOLDER_PROMPTS = [
+  'I need help with data analytics...',
+  'Tell me about your team...',
+  'What technologies do you use?',
+  'How does your process work?',
+  'Show me your track record...',
+];
+
 const Statement = () => {
   const ref = useRef(null);
   const sRef = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: '-15%' });
   const { scrollYProgress } = useScroll({ target: sRef, offset: ['start end', 'end start'] });
   const blobY = useTransform(scrollYProgress, [0, 1], [60, -60]);
-  const textY  = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const textY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+
+  const [query, setQuery] = useState('');
+  const [focused, setFocused] = useState(false);
+  const [placeholderIdx, setPlaceholderIdx] = useState(0);
+
+  // Cycle placeholder text
+  useEffect(() => {
+    if (focused || query) return;
+    const id = setInterval(() => setPlaceholderIdx(i => (i + 1) % PLACEHOLDER_PROMPTS.length), 3000);
+    return () => clearInterval(id);
+  }, [focused, query]);
+
+  const handleSubmit = () => {
+    if (!query.trim()) return;
+    const input = query.toLowerCase();
+    let best = 'sec-vision';
+    let bestScore = 0;
+    for (const { section, keywords } of CONCERN_MAP) {
+      let score = 0;
+      for (const kw of keywords) {
+        if (input.includes(kw)) score += kw.includes(' ') ? 3 : 1;
+      }
+      if (score > bestScore) { bestScore = score; best = section; }
+    }
+    document.getElementById(best)?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <section id="sec-statement" ref={sRef} style={{ background: C.base, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center' }}>
-      <SectionTag name="statement" />
-      {/* Parallax background blob */}
+      <SectionTag name="story" />
+      {/* Parallax background blobs */}
       <motion.div style={{ position: 'absolute', left: '-8%', top: '10%', width: 400, height: 400, borderRadius: '50%', background: `radial-gradient(circle, ${C.accent}16 0%, transparent 70%)`, filter: 'blur(70px)', y: blobY, pointerEvents: 'none' }} />
       <motion.div style={{ position: 'absolute', right: '-4%', bottom: '8%', width: 280, height: 280, borderRadius: '50%', background: `radial-gradient(circle, ${C.accent}10 0%, transparent 70%)`, filter: 'blur(60px)', y: blobY, pointerEvents: 'none' }} />
 
-      <motion.div ref={ref} style={{ maxWidth: 1200, margin: '0 auto', width: '100%', position: 'relative', y: textY }}>
+      <motion.div ref={ref} style={{ maxWidth: 900, margin: '0 auto', width: '100%', position: 'relative', y: textY, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         {/* Section label */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.7 }}
-          style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 56 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 48 }}
         >
           <div style={{ width: 40, height: 1, background: C.accent }} />
-          <span style={{ color: C.muted, fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>manifesto</span>
+          <span style={{ color: C.muted, fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>our story</span>
         </motion.div>
 
-        <SplitHeading outline="ai is not" solid="the future." inView={inView} color={C.charcoal} fontSize="clamp(3.2rem, 8.5vw, 9rem)" />
-        <div style={{ marginTop: '0.1em' }}>
-          <SplitHeading outline="it's" solid="the present." inView={inView} color={C.accent} fontSize="clamp(3.2rem, 8.5vw, 9rem)" delay={0.28} />
-        </div>
+        {/* Origin paragraph */}
+        <motion.p initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: 0.2 }}
+          style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(0.95rem, 1.3vw, 1.1rem)', color: '#777', lineHeight: 1.9, maxWidth: 700, marginBottom: 56 }}
+        >
+          Phitopolis was built in response to the demand of our partners in the Financial Investment Industry. They needed exacting and powerful technological solutions and harnessed the top talent in the Philippines via Phitopolis.
+        </motion.p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0 48px', marginTop: 64, alignItems: 'start' }}>
-          <motion.div initial={{ scaleY: 0 }} animate={inView ? { scaleY: 1 } : {}} transition={{ duration: 0.8, delay: 0.6, ease: [0.76, 0, 0.24, 1] }}
-            style={{ width: 1, height: 80, background: C.accent, transformOrigin: 'top', marginTop: 4 }}
-          />
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: 0.7 }}
-            style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(1rem, 1.4vw, 1.15rem)', color: '#777', lineHeight: 1.9, maxWidth: 540 }}
+        {/* Large heading — scroll-driven per-letter fill↔outline */}
+        <ScrollLetterHeading triggerRef={sRef} />
+
+        {/* AI textbox */}
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: 0.6 }}
+          style={{ width: '100%', maxWidth: 580, marginTop: 48 }}
+        >
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: 'white', borderRadius: 14,
+            border: `1.5px solid ${focused ? C.accent : 'rgba(10,42,102,0.12)'}`,
+            boxShadow: focused ? `0 0 0 4px ${C.accent}18` : '0 2px 12px rgba(10,42,102,0.06)',
+            padding: '14px 18px',
+            transition: 'border-color 0.25s, box-shadow 0.25s',
+          }}>
+            {/* Sparkle icon */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: 0.4 }}>
+              <path d="M12 2L14.09 8.26L20 9.27L15.55 13.97L16.91 20L12 16.9L7.09 20L8.45 13.97L4 9.27L9.91 8.26L12 2Z" fill={C.accent} />
+            </svg>
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }}
+              placeholder={PLACEHOLDER_PROMPTS[placeholderIdx]}
+              style={{
+                flex: 1, border: 'none', outline: 'none', background: 'transparent',
+                fontFamily: 'Inter, sans-serif', fontSize: '0.95rem', color: C.charcoal,
+                letterSpacing: '0.01em',
+              }}
+            />
+            <button
+              onClick={handleSubmit}
+              style={{
+                flexShrink: 0, width: 34, height: 34, borderRadius: 10,
+                background: C.accent, border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'transform 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.08)')}
+              onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke={C.charcoal} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Bottom scroll prompt */}
+        <motion.div initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.7, delay: 0.9 }}
+          style={{ marginTop: 56, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}
+        >
+          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.8rem', color: C.muted, letterSpacing: '0.04em' }}>
+            Or scroll down to learn more about Phitopolis
+          </span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           >
-            we built phitopolis to close the gap between research and production — because the teams that move fastest win.
-          </motion.p>
-        </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9L12 15L18 9" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.div>
+        </motion.div>
       </motion.div>
     </section>
   );
@@ -1764,9 +1998,9 @@ const SCROLL_ITEMS = [
   },
   {
     image: 'https://phitopolis.com/img/core-competencies/proactive-communication.jpg',
-    label: '03 / Eng',
-    title: 'Full-Stack Engineering',
-    desc:  'Building resilient, scalable, and high-performance applications for the modern web.',
+    label: '03 / Support',
+    title: 'Support',
+    desc:  'Dedicated end-to-end assistance — from onboarding and troubleshooting to continuous optimization and maintenance.',
   },
 ];
 
@@ -1791,9 +2025,9 @@ const ServicesScrollStory = () => {
     const ctx = gsap.context(() => {
       // Set initial states before ScrollTrigger takes over
       gsap.set(headingRef.current,  { transformOrigin: '50% 0%' });
-      gsap.set(img1Ref.current,     { scale: 0.08, x: '23vw', y: '77vh', transformOrigin: '0% 0%', willChange: 'transform' });
-      gsap.set(img2Ref.current,     { opacity: 0, scale: 0.22, x: '46vw', y: '69vh', transformOrigin: '0% 0%', willChange: 'transform' });
-      gsap.set(img3Ref.current,     { opacity: 0, scale: 0.22, x: '46vw', y: '69vh', transformOrigin: '0% 0%', willChange: 'transform' });
+      gsap.set(img1Ref.current,     { scale: 0.08, x: '23vw', y: '77vh', transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.08 });
+      gsap.set(img2Ref.current,     { opacity: 0, scale: 0.22, x: '46vw', y: '69vh', transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.22 });
+      gsap.set(img3Ref.current,     { opacity: 0, scale: 0.22, x: '46vw', y: '69vh', transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.22 });
       gsap.set(cap1Ref.current,     { opacity: 0 });
       gsap.set(cap2Ref.current,     { opacity: 0 });
       gsap.set(cap3Ref.current,     { opacity: 0 });
@@ -1812,8 +2046,8 @@ const ServicesScrollStory = () => {
       tl.to(headingRef.current, { opacity: 0, scale: 0.4, y: '-6vh', duration: 0.11 }, 0.15);
 
       // ── Image 1: tiny → full → thumbnail → fade ───────────────────────────────
-      tl.to(img1Ref.current,   { scale: 1, x: '0vw', y: '0vh', duration: 0.22 }, 0);
-      tl.to(img1Ref.current,   { scale: 0.22, x: '-11vw', duration: 0.20 }, 0.38);
+      tl.to(img1Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.22 }, 0);
+      tl.to(img1Ref.current,   { scale: 0.22, x: '-11vw', borderRadius: 20 / 0.22, duration: 0.20 }, 0.38);
       tl.to(img1Ref.current,   { opacity: 0, duration: 0.15 }, 0.75);
 
       // ── Caption 1 ─────────────────────────────────────────────────────────────
@@ -1822,8 +2056,8 @@ const ServicesScrollStory = () => {
 
       // ── Image 2: appears → full → thumbnail ───────────────────────────────────
       tl.to(img2Ref.current,   { opacity: 1, duration: 0.08 }, 0.33);
-      tl.to(img2Ref.current,   { scale: 1, x: '0vw', y: '0vh', duration: 0.20 }, 0.38);
-      tl.to(img2Ref.current,   { scale: 0.22, x: '-11vw', duration: 0.15 }, 0.75);
+      tl.to(img2Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.20 }, 0.38);
+      tl.to(img2Ref.current,   { scale: 0.22, x: '-11vw', borderRadius: 20 / 0.22, duration: 0.15 }, 0.75);
 
       // ── Caption 2 ─────────────────────────────────────────────────────────────
       tl.to(cap2Ref.current,   { opacity: 1, duration: 0.08 }, 0.62);
@@ -1831,7 +2065,7 @@ const ServicesScrollStory = () => {
 
       // ── Image 3: appears small → grows to full ────────────────────────────────
       tl.to(img3Ref.current,   { opacity: 1, duration: 0.08 }, 0.48);
-      tl.to(img3Ref.current,   { scale: 1, x: '0vw', y: '0vh', duration: 0.21 }, 0.75);
+      tl.to(img3Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.21 }, 0.75);
 
       // ── Caption 3 ─────────────────────────────────────────────────────────────
       tl.to(cap3Ref.current,   { opacity: 1, duration: 0.08 }, 0.88);
@@ -1850,11 +2084,11 @@ const ServicesScrollStory = () => {
     top: '6vh', left: '25vw',
     width: '44vw', height: '88vh',
     willChange: 'transform',
+    overflow: 'hidden', borderRadius: 20,
   };
 
   const imgInnerStyle: React.CSSProperties = {
     width: '100%', height: '100%',
-    overflow: 'hidden', borderRadius: 20,
     position: 'relative',
   };
 
@@ -1927,39 +2161,45 @@ const ServicesScrollStory = () => {
 // ── 05 PROCESS + SERVICE WHEEL ────────────────────────────────────────────────
 const PHASES = [
   {
-    num: '01', label: 'Machine\nLearning',
-    sub: 'supervised, unsupervised, and reinforcement learning tailored for financial and enterprise contexts.',
+    num: '01', label: 'Integrity',
+    sub: 'We operate with unwavering honesty and transparency in every interaction, ensuring our word is our bond. Builds a foundation of trust and predictability — clients can rely on truthful reporting and ethical decision-making, reducing risk and ensuring long-term partnership stability.',
     color: C.accent, glow: '#FFC72C',
   },
   {
-    num: '02', label: 'Data\nInfrastructure',
-    sub: 'scalable pipelines, real-time streaming, and warehouse architecture built for speed at scale.',
+    num: '02', label: 'Accountability',
+    sub: 'We take full ownership of our commitments and results, standing behind the quality of our output without excuses. Ensures reliability and peace of mind — by owning both successes and challenges, we provide a dependable partner who proactively manages outcomes to meet project milestones.',
     color: '#4A90D9', glow: '#4A90D9',
   },
   {
-    num: '03', label: 'Human-AI\nSynergy',
-    sub: 'human-in-the-loop workflows that keep domain experts at the center of every AI decision.',
+    num: '03', label: 'Forward Thinking',
+    sub: 'We don\'t just solve today\'s problems; we anticipate tomorrow\'s challenges through innovation and strategic planning. Clients gain a competitive edge by leveraging our proactive approach to technology and market trends, ensuring their business remains resilient and scalable.',
     color: '#A78BFA', glow: '#A78BFA',
+  },
+  {
+    num: '04', label: 'Excellence',
+    sub: 'In everything we do — we set the highest standards for performance, continuously refining our processes to deliver superior quality. Our commitment to excellence translates to reduced errors, higher efficiency, and a final product that exceeds expectations, maximizing the client\'s return on investment.',
+    color: '#2ECC71', glow: '#2ECC71',
   },
 ];
 
 // Transition windows: [enter-start, enter-end, exit-start, exit-end]
 const PHASE_WIN = [
-  [0.04, 0.14, 0.36, 0.44],
-  [0.44, 0.54, 0.66, 0.74],
-  [0.74, 0.84, 0.96, 1.00],
+  [0.03, 0.11, 0.24, 0.30],
+  [0.30, 0.38, 0.49, 0.55],
+  [0.55, 0.63, 0.74, 0.80],
+  [0.80, 0.88, 0.96, 1.00],
 ];
 
 const Process = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   // per-phase refs
-  const phaseRefs   = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
-  const labelRefs   = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
-  const numRefs     = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
-  const descRefs    = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
-  const orbRefs     = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
-  const stepRefs    = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
-  const stepDotRefs = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
+  const phaseRefs   = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
+  const labelRefs   = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
+  const numRefs     = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
+  const descRefs    = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
+  const orbRefs     = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
+  const stepRefs    = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
+  const stepDotRefs = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
   const badgeRef    = useRef<HTMLDivElement>(null);
   const headRef     = useRef<HTMLDivElement>(null);
   const lineRef     = useRef<HTMLDivElement>(null);
@@ -2030,24 +2270,31 @@ const Process = () => {
   const isMobile = useIsMobile();
 
   return (
-    <section id="sec-process" ref={containerRef} style={{ background: C.base, height: '520vh', position: 'relative' }}>
+    <section id="sec-process" ref={containerRef} style={{ background: C.base, height: '680vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden', display: 'flex' }}>
-        <SectionTag name="process" />
+        <SectionTag name="values" />
 
         {/* ── Left rail ─────────────────────────────────────────────────── */}
         <div style={{ width: isMobile ? 80 : 'clamp(200px, 22vw, 280px)', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: isMobile ? '0 0 0 24px' : '0 0 0 48px', position: 'relative', zIndex: 3 }}>
-          <div ref={badgeRef}>
-            <Badge n="05" label="The Process" />
-          </div>
+          <div ref={badgeRef} />
 
           {/* Step list */}
           <div style={{ marginTop: 36, position: 'relative' }}>
             {/* Growing vertical line */}
-            <div ref={lineRef} style={{ position: 'absolute', left: 9, top: 16, bottom: 16, width: 1, background: `linear-gradient(to bottom, ${C.accent}, #4A90D9, #A78BFA)`, borderRadius: 1, transformOrigin: 'top' }} />
+            <div ref={lineRef} style={{ position: 'absolute', left: 9, top: 16, bottom: 16, width: 1, background: `linear-gradient(to bottom, ${C.accent}, #4A90D9, #A78BFA, #2ECC71)`, borderRadius: 1, transformOrigin: 'top' }} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {PHASES.map((ph, i) => (
-                <div key={i} ref={stepRefs[i]} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0' }}>
+                <div key={i} ref={stepRefs[i]}
+                  onClick={() => {
+                    if (!containerRef.current) return;
+                    const sectionTop = containerRef.current.offsetTop;
+                    const sectionHeight = containerRef.current.offsetHeight - window.innerHeight;
+                    const midPoint = (PHASE_WIN[i][0] + PHASE_WIN[i][1]) / 2;
+                    window.scrollTo({ top: sectionTop + sectionHeight * midPoint, behavior: 'smooth' });
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0', cursor: 'pointer' }}
+                >
                   <div ref={stepDotRefs[i]} style={{ width: 18, height: 18, borderRadius: '50%', border: `1.5px solid ${ph.color}`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: ph.color }} />
                   </div>
@@ -2068,10 +2315,10 @@ const Process = () => {
           {/* Section heading — fades out as phases take over */}
           <div ref={headRef} style={{ position: 'absolute', top: '10%', left: isMobile ? 24 : 48, zIndex: 3, pointerEvents: 'none' }}>
             <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', WebkitTextStroke: `2px ${C.charcoal}`, WebkitTextFillColor: 'transparent', display: 'block' }}>
-              human-in-the-loop
+              phitopolis is
             </span>
             <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', color: C.charcoal, display: 'block' }}>
-              R&D
+              rooted in values
             </span>
           </div>
 
@@ -2089,15 +2336,9 @@ const Process = () => {
 
               {/* Phase content */}
               <div style={{ position: 'relative', zIndex: 1 }}>
-                {/* Phase number chip */}
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 28 }}>
-                  <div style={{ width: 32, height: 1.5, background: ph.color, borderRadius: 1 }} />
-                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ph.color }}>phase {ph.num}</span>
-                </div>
-
                 {/* Label — clip-path curtain reveal */}
                 <div ref={labelRefs[i]} style={{ overflow: 'visible', marginBottom: 24 }}>
-                  <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? 'clamp(2.4rem, 10vw, 4rem)' : 'clamp(3.5rem, 7vw, 7.5rem)', letterSpacing: '-0.04em', lineHeight: 1.0, textTransform: 'lowercase', color: C.charcoal, margin: 0, whiteSpace: 'pre-line' }}>
+                  <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? 'clamp(2.4rem, 10vw, 4rem)' : 'clamp(3.5rem, 7vw, 7.5rem)', letterSpacing: '-0.04em', lineHeight: 1.15, textTransform: 'lowercase', color: C.charcoal, margin: 0, whiteSpace: 'pre-line' }}>
                     {ph.label}
                   </h2>
                 </div>
@@ -3007,12 +3248,12 @@ export default function AIDayPage() {
         <FloatNav />
         <Hero ready={ready} />
         <Statement />
+        <Process />
         <Vision />
         <MarqueeSection />
         <ServicesScrollStory />
         <TechStack />
         <Stats />
-        <Process />
         <OurPeople />
         <ChapterGroup />
         <Showcase />
