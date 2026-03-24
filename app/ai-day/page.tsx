@@ -667,13 +667,14 @@ const FLOAT_SECTIONS = [
   { id: 'sec-hero',      label: 'Intro' },
   { id: 'sec-statement', label: 'Story' },
   { id: 'sec-process',   label: 'Values' },
-  { id: 'sec-vision',    label: 'Vision' },
-  { id: 'sec-services',  label: 'Services'  },
+  { id: 'sec-services',  label: 'Services' },
   { id: 'sec-techstack', label: 'Tech Stack' },
   { id: 'sec-stats',     label: 'Impact' },
   { id: 'sec-people',    label: 'People' },
+  { id: 'sec-vision',    label: 'Vision' },
   { id: 'sec-timeline',  label: '2021–2026' },
   { id: 'sec-showcase',  label: 'Projects' },
+  { id: 'sec-end',       label: 'End' },
 ];
 
 const FloatNav = () => {
@@ -996,25 +997,17 @@ const CAT_COLORS: Record<string, string> = {
   data:  '#34D399',
 };
 
-// Simple Icons slugs — https://simpleicons.org
+// Simple Icons slugs — https://simpleicons.org (verified working)
 const SI: Record<string, string> = {
-  'OpenAI':            'openai',
   'Anthropic Claude':  'anthropic',
   'LangChain':         'langchain',
-  'LlamaIndex':        'llamaindex',
   'Hugging Face':      'huggingface',
   'PyTorch':           'pytorch',
   'TensorFlow':        'tensorflow',
   'Ollama':            'ollama',
   'CrewAI':            'crewai',
-  'DALL·E':            'openai',
-  'Whisper':           'openai',
-  'Stable Diffusion':  'stablediffusion',
   'MLflow':            'mlflow',
   'Weights & Biases':  'weightsandbiases',
-  'Pinecone':          'pinecone',
-  'Weaviate':          'weaviate',
-  'Qdrant':            'qdrant',
   'scikit-learn':      'scikitlearn',
   'Python':            'python',
   'FastAPI':           'fastapi',
@@ -1027,8 +1020,6 @@ const SI: Record<string, string> = {
   'Docker':            'docker',
   'Kubernetes':        'kubernetes',
   'Terraform':         'terraform',
-  'AWS':               'amazonaws',
-  'Azure':             'microsoftazure',
   'GCP':               'googlecloud',
   'Nginx':             'nginx',
   'Prometheus':        'prometheus',
@@ -1039,18 +1030,15 @@ const SI: Record<string, string> = {
   'Kafka':             'apachekafka',
   'Snowflake':         'snowflake',
   'Apache Spark':      'apachespark',
-  'dbt':               'dbt',
   'Airflow':           'apacheairflow',
 };
 
 const TECH_ROW1 = [
-  { name: 'OpenAI', cat: 'ai' }, { name: 'Anthropic Claude', cat: 'ai' },
-  { name: 'LangChain', cat: 'ai' }, { name: 'LlamaIndex', cat: 'ai' },
+  { name: 'Anthropic Claude', cat: 'ai' }, { name: 'LangChain', cat: 'ai' },
   { name: 'Hugging Face', cat: 'ai' }, { name: 'PyTorch', cat: 'ai' },
   { name: 'TensorFlow', cat: 'ai' }, { name: 'Ollama', cat: 'ai' },
-  { name: 'CrewAI', cat: 'ai' }, { name: 'DALL·E', cat: 'ai' },
-  { name: 'Whisper', cat: 'ai' }, { name: 'Stable Diffusion', cat: 'ai' },
-  { name: 'MLflow', cat: 'ai' }, { name: 'Weights & Biases', cat: 'ai' },
+  { name: 'CrewAI', cat: 'ai' }, { name: 'MLflow', cat: 'ai' },
+  { name: 'Weights & Biases', cat: 'ai' },
 ];
 
 const TECH_ROW2 = [
@@ -1059,28 +1047,26 @@ const TECH_ROW2 = [
   { name: 'TypeScript', cat: 'dev' }, { name: 'Next.js', cat: 'dev' },
   { name: 'GraphQL', cat: 'dev' }, { name: 'Celery', cat: 'dev' },
   { name: 'Docker', cat: 'infra' }, { name: 'Kubernetes', cat: 'infra' },
-  { name: 'Terraform', cat: 'infra' }, { name: 'AWS', cat: 'infra' },
-  { name: 'Azure', cat: 'infra' }, { name: 'GCP', cat: 'infra' },
+  { name: 'Terraform', cat: 'infra' }, { name: 'GCP', cat: 'infra' },
   { name: 'Nginx', cat: 'infra' }, { name: 'Prometheus', cat: 'infra' },
 ];
 
 const TECH_ROW3 = [
-  { name: 'Pinecone', cat: 'ai' }, { name: 'Weaviate', cat: 'ai' },
-  { name: 'Qdrant', cat: 'ai' }, { name: 'scikit-learn', cat: 'ai' },
+  { name: 'scikit-learn', cat: 'ai' },
   { name: 'Grafana', cat: 'infra' }, { name: 'PostgreSQL', cat: 'data' },
   { name: 'Redis', cat: 'data' }, { name: 'MongoDB', cat: 'data' },
   { name: 'Kafka', cat: 'data' }, { name: 'Snowflake', cat: 'data' },
-  { name: 'Apache Spark', cat: 'data' }, { name: 'dbt', cat: 'data' },
-  { name: 'Airflow', cat: 'data' },
+  { name: 'Apache Spark', cat: 'data' }, { name: 'Airflow', cat: 'data' },
 ];
 
 // Individual item — flat logo + text, no pill container
-const TechPill = React.memo(({ tech }: { tech: { name: string; cat: string } }) => {
+const TechPill = React.memo(({ tech, activeCat }: { tech: { name: string; cat: string }; activeCat: string | null }) => {
   const slug = SI[tech.name];
   const [imgOk, setImgOk] = useState(true);
   const showLogo = slug && imgOk;
+  const dimmed = activeCat !== null && tech.cat !== activeCat;
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 20, flexShrink: 0, padding: '0 48px' }}>
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 20, flexShrink: 0, padding: '0 48px', opacity: dimmed ? 0.12 : 1, filter: dimmed ? 'grayscale(1)' : 'none', transition: 'opacity 0.35s ease, filter 0.35s ease' }}>
       {showLogo ? (
         <img
           src={`https://cdn.simpleicons.org/${slug}`}
@@ -1107,7 +1093,7 @@ const TechPill = React.memo(({ tech }: { tech: { name: string; cat: string } }) 
   );
 });
 
-const TechMarqueeTrack = ({ items, basePPS = 55, reverse = false }: { items: { name: string; cat: string }[]; basePPS?: number; reverse?: boolean }) => {
+const TechMarqueeTrack = ({ items, basePPS = 55, reverse = false, activeCat = null }: { items: { name: string; cat: string }[]; basePPS?: number; reverse?: boolean; activeCat?: string | null }) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const xPos = useRef(0);
   const { scrollY } = useScroll();
@@ -1130,7 +1116,7 @@ const TechMarqueeTrack = ({ items, basePPS = 55, reverse = false }: { items: { n
   return (
     <div style={{ overflow: 'hidden' }}>
       <div ref={trackRef} style={{ display: 'flex', alignItems: 'center', gap: 10, willChange: 'transform', paddingRight: 10 }}>
-        {doubled.map((tech, i) => <TechPill key={i} tech={tech} />)}
+        {doubled.map((tech, i) => <TechPill key={i} tech={tech} activeCat={activeCat} />)}
       </div>
     </div>
   );
@@ -1139,6 +1125,7 @@ const TechMarqueeTrack = ({ items, basePPS = 55, reverse = false }: { items: { n
 const TechStack = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
+  const [activeCat, setActiveCat] = useState<string | null>(null);
   return (
     <section id="sec-techstack" ref={ref} style={{ background: C.base, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 0', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <SectionTag name="tech stack" />
@@ -1166,19 +1153,20 @@ const TechStack = () => {
             style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 36, flexWrap: 'wrap' }}
           >
             {Object.entries({ 'AI / ML': 'ai', 'Languages & Frameworks': 'dev', 'Cloud & Infra': 'infra', 'Data & Storage': 'data' }).map(([label, cat]) => (
-              <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                <div style={{ width: 7, height: 7, borderRadius: '50%', background: CAT_COLORS[cat] }} />
-                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: C.muted, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500 }}>{label}</span>
-              </div>
+              <button key={cat} onClick={() => setActiveCat(prev => prev === cat ? null : cat)}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0' }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: activeCat === cat ? CAT_COLORS[cat] : (activeCat ? 'rgba(0,0,0,0.2)' : CAT_COLORS[cat]), transition: 'background 0.3s' }} />
+                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: activeCat === cat ? CAT_COLORS[cat] : (activeCat ? 'rgba(0,0,0,0.3)' : C.muted), letterSpacing: '0.1em', textTransform: 'uppercase' as const, fontWeight: activeCat === cat ? 700 : 500, transition: 'color 0.3s' }}>{label}</span>
+              </button>
             ))}
           </motion.div>
         </div>
       </div>
       {/* Three scrolling rows — full bleed, no horizontal padding */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
-        <TechMarqueeTrack items={TECH_ROW1} basePPS={28} />
-        <TechMarqueeTrack items={TECH_ROW2} basePPS={22} reverse />
-        <TechMarqueeTrack items={TECH_ROW3} basePPS={34} />
+        <TechMarqueeTrack items={TECH_ROW1} basePPS={28} activeCat={activeCat} />
+        <TechMarqueeTrack items={TECH_ROW2} basePPS={22} reverse activeCat={activeCat} />
+        <TechMarqueeTrack items={TECH_ROW3} basePPS={34} activeCat={activeCat} />
       </div>
     </section>
   );
@@ -1992,15 +1980,15 @@ const SCROLL_ITEMS = [
   },
   {
     image: 'https://phitopolis.com/img/core-competencies/technical-excellence.jpg',
-    label: '02 / Data',
-    title: 'Data Science',
-    desc:  'Extracting actionable insights from vast datasets through ML and statistical modeling.',
+    label: '02 / Engineering',
+    title: 'Data & Software Engineering',
+    desc:  'Building the full stack — from data pipelines and ML infrastructure to production-grade applications and APIs.',
   },
   {
     image: 'https://phitopolis.com/img/core-competencies/proactive-communication.jpg',
-    label: '03 / Support',
-    title: 'Support',
-    desc:  'Dedicated end-to-end assistance — from onboarding and troubleshooting to continuous optimization and maintenance.',
+    label: '03 / Operations',
+    title: 'Support & Operations',
+    desc:  'Dedicated end-to-end assistance — from onboarding and troubleshooting to AI-powered operations and continuous optimization.',
   },
 ];
 
@@ -2162,22 +2150,26 @@ const ServicesScrollStory = () => {
 const PHASES = [
   {
     num: '01', label: 'Integrity',
-    sub: 'We operate with unwavering honesty and transparency in every interaction, ensuring our word is our bond. Builds a foundation of trust and predictability — clients can rely on truthful reporting and ethical decision-making, reducing risk and ensuring long-term partnership stability.',
+    definition: 'We operate with unwavering honesty and transparency in every interaction, ensuring our word is our bond.',
+    valueToClient: 'Builds a foundation of trust and predictability — clients can rely on truthful reporting and ethical decision-making, reducing risk and ensuring long-term partnership stability.',
     color: C.accent, glow: '#FFC72C',
   },
   {
     num: '02', label: 'Accountability',
-    sub: 'We take full ownership of our commitments and results, standing behind the quality of our output without excuses. Ensures reliability and peace of mind — by owning both successes and challenges, we provide a dependable partner who proactively manages outcomes to meet project milestones.',
+    definition: 'We take full ownership of our commitments and results, standing behind the quality of our output without excuses.',
+    valueToClient: 'Ensures reliability and peace of mind — by owning both successes and challenges, we provide a dependable partner who proactively manages outcomes to meet project milestones.',
     color: '#4A90D9', glow: '#4A90D9',
   },
   {
     num: '03', label: 'Forward Thinking',
-    sub: 'We don\'t just solve today\'s problems; we anticipate tomorrow\'s challenges through innovation and strategic planning. Clients gain a competitive edge by leveraging our proactive approach to technology and market trends, ensuring their business remains resilient and scalable.',
+    definition: 'We don\'t just solve today\'s problems; we anticipate tomorrow\'s challenges through innovation and strategic planning.',
+    valueToClient: 'Clients gain a competitive edge by leveraging our proactive approach to technology and market trends, ensuring their business remains resilient and scalable.',
     color: '#A78BFA', glow: '#A78BFA',
   },
   {
     num: '04', label: 'Excellence',
-    sub: 'In everything we do — we set the highest standards for performance, continuously refining our processes to deliver superior quality. Our commitment to excellence translates to reduced errors, higher efficiency, and a final product that exceeds expectations, maximizing the client\'s return on investment.',
+    definition: 'In everything we do — we set the highest standards for performance, continuously refining our processes to deliver superior quality.',
+    valueToClient: 'Our commitment to excellence translates to reduced errors, higher efficiency, and a final product that exceeds expectations, maximizing the client\'s return on investment.',
     color: '#2ECC71', glow: '#2ECC71',
   },
 ];
@@ -2345,11 +2337,17 @@ const Process = () => {
 
                 {/* Description */}
                 <div ref={descRefs[i]} style={{ maxWidth: 480 }}>
-                  <p style={{ fontFamily: 'Inter, sans-serif', fontSize: isMobile ? '0.85rem' : '1rem', color: 'rgba(10,14,26,0.55)', lineHeight: 1.8, margin: 0 }}>
-                    {ph.sub}
+                  <p style={{ fontFamily: 'Inter, sans-serif', fontSize: isMobile ? '0.85rem' : '1rem', color: 'rgba(10,14,26,0.72)', lineHeight: 1.8, margin: 0 }}>
+                    {ph.definition}
                   </p>
+                  <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid rgba(10,14,26,0.08)' }}>
+                    <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: ph.color }}>Value to Client</span>
+                    <p style={{ fontFamily: 'Inter, sans-serif', fontSize: isMobile ? '0.78rem' : '0.88rem', color: 'rgba(10,14,26,0.5)', lineHeight: 1.85, margin: '8px 0 0' }}>
+                      {ph.valueToClient}
+                    </p>
+                  </div>
                   {/* Accent underline */}
-                  <div style={{ marginTop: 24, width: 48, height: 2, background: ph.color, borderRadius: 1 }} />
+                  <div style={{ marginTop: 20, width: 48, height: 2, background: ph.color, borderRadius: 1 }} />
                 </div>
               </div>
             </div>
@@ -2414,237 +2412,114 @@ const ShowCard = ({ card, index, isActive = true, fullWidth = false }: { card: t
   );
 };
 
-// ── OUR PEOPLE ────────────────────────────────────────────────────────────────
-const DEPT_COLORS: Record<string, string> = {
-  AI:      '#FFC72C',
-  Data:    '#34D399',
-  Eng:     '#A78BFA',
-  Infra:   '#60A5FA',
-  Arch:    '#F59E0B',
-  Product: '#F472B6',
-  Design:  '#4ADE80',
-};
+// ── OUR PEOPLE — HR Demographics ──────────────────────────────────────────────
+type SchoolItem = { name: string; abbr: string; note: string; logo: string };
+type CourseItem = { name: string; pct: number; color: string };
+type CertItem   = { name: string; sub: string; logo: string | null };
+type HRSlide =
+  | { id: string; type: 'schools';  heading: string; sub: string; color: string; items: SchoolItem[] }
+  | { id: string; type: 'courses';  heading: string; sub: string; color: string; items: CourseItem[] }
+  | { id: string; type: 'certs';    heading: string; sub: string; color: string; items: CertItem[]   };
 
-const PEOPLE = [
-  { id: '01', role: 'AI / ML Engineer',      dept: 'AI',      desc: 'Trains, fine-tunes and deploys production ML models end-to-end',           skills: ['PyTorch', 'LangChain', 'MLflow'] },
-  { id: '02', role: 'Research Scientist',     dept: 'AI',      desc: 'Pushes the frontier of applied AI — model architecture and novel methods',  skills: ['Transformers', 'CUDA', 'W&B'] },
-  { id: '03', role: 'Data Scientist',         dept: 'Data',    desc: 'Extracts strategic signals from complex, high-volume datasets',             skills: ['Python', 'SQL', 'Spark'] },
-  { id: '04', role: 'Data Engineer',          dept: 'Data',    desc: 'Architects the reliable data infrastructure everything runs on',            skills: ['Airflow', 'dbt', 'Kafka'] },
-  { id: '05', role: 'Backend Engineer',       dept: 'Eng',     desc: 'Designs fast, resilient APIs and distributed services at scale',            skills: ['FastAPI', 'Redis', 'PostgreSQL'] },
-  { id: '06', role: 'Frontend Engineer',      dept: 'Eng',     desc: 'Crafts high-performance, animated and accessible web interfaces',           skills: ['React', 'TypeScript', 'CSS'] },
-  { id: '07', role: 'DevOps Engineer',        dept: 'Infra',   desc: 'Keeps cloud infrastructure secure, reliable and infinitely scalable',       skills: ['Kubernetes', 'Terraform', 'AWS'] },
-  { id: '08', role: 'Solutions Architect',    dept: 'Arch',    desc: 'Designs end-to-end system blueprints aligned to business goals',            skills: ['System Design', 'AWS', 'APIs'] },
-  { id: '09', role: 'Security Engineer',      dept: 'Infra',   desc: 'Hardens every layer of the stack against evolving threats',                 skills: ['IAM', 'SAST', 'Zero Trust'] },
-  { id: '10', role: 'Product Manager',        dept: 'Product', desc: 'Bridges technical vision with real user needs and measurable impact',       skills: ['Roadmapping', 'OKRs', 'Discovery'] },
-  { id: '11', role: 'UX Designer',            dept: 'Design',  desc: 'Makes complex AI-powered systems feel human and effortless to use',         skills: ['Figma', 'Prototyping', 'Research'] },
-  { id: '12', role: 'Technical Lead',         dept: 'Eng',     desc: 'Elevates entire teams through architecture ownership and mentorship',        skills: ['Architecture', 'Mentoring', 'Git'] },
+const HR_SLIDES: HRSlide[] = [
+  {
+    id: '01', type: 'schools', color: '#FFC72C',
+    heading: 'Schools & Education',
+    sub: 'Recruiting from the top universities in the Philippines and Asia',
+    items: [
+      { name: 'University of the Philippines',  abbr: 'UP',    note: 'Engineering · CS · Math',      logo: '/logos/schools/up.svg' },
+      { name: 'Ateneo de Manila University',    abbr: 'ADMU',  note: 'CS · Management Science',      logo: '/logos/schools/admu.svg' },
+      { name: 'De La Salle University',         abbr: 'DLSU',  note: 'Engineering · IT · Finance',   logo: '/logos/schools/dlsu.svg' },
+      { name: 'Mapúa University',               abbr: 'Mapúa', note: 'Computer Engineering',         logo: '/logos/schools/mapua.svg' },
+      { name: 'University of Santo Tomas',      abbr: 'UST',   note: 'Accountancy · IT',             logo: '/logos/schools/ust.svg' },
+      { name: 'FEU Tech / PUP',                 abbr: 'FEU',   note: 'Engineering · Technology',     logo: '/logos/schools/feu.svg' },
+    ],
+  },
+  {
+    id: '02', type: 'courses', color: '#A78BFA',
+    heading: 'Courses & Disciplines',
+    sub: 'A multi-disciplined team covering every layer of the stack',
+    items: [
+      { name: 'Computer Science',         pct: 32, color: '#A78BFA' },
+      { name: 'Engineering',              pct: 27, color: '#60A5FA' },
+      { name: 'Mathematics & Statistics', pct: 18, color: '#34D399' },
+      { name: 'Information Technology',   pct: 14, color: '#FFC72C' },
+      { name: 'Business & Finance',       pct:  9, color: '#F472B6' },
+    ],
+  },
+  {
+    id: '03', type: 'certs', color: '#34D399',
+    heading: 'Certifications',
+    sub: 'And many more — continuously levelling up',
+    items: [
+      { name: 'AWS Certified',    sub: 'Solutions Architect · ML Specialty', logo: '/logos/certs/aws.svg' },
+      { name: 'Red Hat (RHCSA)', sub: 'Linux System Administrator',          logo: '/logos/certs/redhat.svg' },
+      { name: 'ITIL',            sub: 'Foundation & Practitioner',           logo: '/logos/certs/itil.svg' },
+      { name: 'PMP',             sub: 'Project Management Professional',     logo: '/logos/certs/pmp.svg' },
+      { name: 'Six Sigma',       sub: 'Green Belt & Black Belt',             logo: '/logos/certs/sixsigma.svg' },
+      { name: 'ISO 27001',       sub: 'Lead Implementer & Internal Auditor', logo: '/logos/certs/iso27001.svg' },
+      { name: 'CFA / CPA',       sub: 'Finance & Accounting Professionals',  logo: '/logos/certs/cfa.svg' },
+    ],
+  },
 ];
 
-const PAIRS = [
-  [PEOPLE[0],  PEOPLE[1]],
-  [PEOPLE[2],  PEOPLE[3]],
-  [PEOPLE[4],  PEOPLE[5]],
-  [PEOPLE[6],  PEOPLE[7]],
-  [PEOPLE[8],  PEOPLE[9]],
-  [PEOPLE[10], PEOPLE[11]],
-] as const;
-
-const PAIR_WIN = [
-  [0.04, 0.09, 0.16, 0.21],
-  [0.21, 0.26, 0.33, 0.38],
-  [0.38, 0.43, 0.50, 0.55],
-  [0.55, 0.60, 0.67, 0.72],
-  [0.72, 0.77, 0.84, 0.89],
-  [0.89, 0.94, 0.98, 1.00],
+const HR_WIN = [
+  [0.05, 0.15, 0.32, 0.40],
+  [0.40, 0.50, 0.67, 0.75],
+  [0.75, 0.85, 0.96, 1.00],
 ];
-
-const RolePairCard = ({ person, isMobile }: { person: typeof PEOPLE[0]; isMobile: boolean }) => {
-  const c = DEPT_COLORS[person.dept];
-  return (
-    <div style={{ background: 'rgba(10,42,102,0.26)', backdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,0.07)', borderLeft: `3px solid ${c}`, borderRadius: 20, padding: isMobile ? '18px 20px' : '26px 36px', width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: isMobile ? 8 : 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 10, color: c, letterSpacing: '0.3em' }}>{person.id}</span>
-          <h3 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: isMobile ? '1.05rem' : 'clamp(1.3rem, 2.2vw, 1.85rem)', color: '#fff', letterSpacing: '-0.02em', margin: 0, lineHeight: 1.1 }}>{person.role}</h3>
-        </div>
-        <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 9, fontWeight: 600, color: c, background: `${c}1A`, padding: '4px 10px', borderRadius: 100, letterSpacing: '0.12em', textTransform: 'uppercase', flexShrink: 0, alignSelf: 'center' }}>{person.dept}</span>
-      </div>
-      {!isMobile && (
-        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', color: 'rgba(255,255,255,0.48)', lineHeight: 1.8, margin: '0 0 14px 0' }}>{person.desc}</p>
-      )}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        {person.skills.map(s => (
-          <span key={s} style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 100, padding: '3px 10px' }}>{s}</span>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// kept for legacy mobile usage - not rendered in new layout
-const RoleRow = React.memo(({ person, index, inView }: { person: typeof PEOPLE[0]; index: number; inView: boolean }) => {
-  const [hovered, setHovered] = useState(false);
-  const isMobile = useIsMobile();
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -24 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ delay: 0.25 + index * 0.045, duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '36px 1fr' : '44px 1fr 2fr auto',
-        alignItems: 'center',
-        gap: isMobile ? '0 16px' : '0 32px',
-        padding: isMobile ? '14px 16px' : '15px 28px',
-        borderTop: '1px solid rgba(255,255,255,0.09)',
-        position: 'relative',
-        background: hovered ? 'rgba(255,199,44,0.08)' : 'rgba(10,42,102,0.18)',
-        backdropFilter: 'blur(6px)',
-        transition: 'background 0.28s ease',
-        cursor: 'default',
-      }}
-    >
-      {/* Left accent bar */}
-      <div style={{
-        position: 'absolute', left: 0, top: 0, bottom: 0, width: 2,
-        background: DEPT_COLORS[person.dept],
-        transform: hovered ? 'scaleY(1)' : 'scaleY(0)',
-        transformOrigin: 'top',
-        transition: 'transform 0.28s ease',
-      }} />
-
-      {/* Number */}
-      <span style={{
-        fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 10,
-        letterSpacing: '0.25em',
-        color: DEPT_COLORS[person.dept],
-        transition: 'color 0.28s',
-      }}>
-        {person.id}
-      </span>
-
-      {/* Role + dept badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-        <span style={{
-          fontFamily: 'Outfit, sans-serif', fontWeight: 700,
-          fontSize: isMobile ? '0.9rem' : '1rem',
-          color: '#fff',
-          letterSpacing: '-0.01em', transition: 'color 0.28s', whiteSpace: 'nowrap',
-        }}>
-          {person.role}
-        </span>
-        <span style={{
-          fontFamily: 'Inter, sans-serif', fontSize: 9, fontWeight: 600,
-          color: DEPT_COLORS[person.dept],
-          background: `${DEPT_COLORS[person.dept]}1A`,
-          padding: '2px 8px', borderRadius: 100,
-          letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}>
-          {person.dept}
-        </span>
-      </div>
-
-      {/* Description — hidden on mobile */}
-      {!isMobile && (
-        <span style={{
-          fontFamily: 'Inter, sans-serif', fontSize: '0.78rem',
-          color: 'rgba(255,255,255,0.55)',
-          lineHeight: 1.55, transition: 'color 0.28s',
-        }}>
-          {person.desc}
-        </span>
-      )}
-
-      {/* Skill tags — hidden on mobile */}
-      {!isMobile && (
-        <div style={{ display: 'flex', gap: 5, justifyContent: 'flex-end', flexShrink: 0 }}>
-          {person.skills.map(s => (
-            <span key={s} style={{
-              fontFamily: 'Inter, sans-serif', fontSize: 10,
-              color: 'rgba(255,255,255,0.6)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              borderRadius: 100, padding: '3px 10px', whiteSpace: 'nowrap',
-              transition: 'all 0.28s',
-            }}>
-              {s}
-            </span>
-          ))}
-        </div>
-      )}
-    </motion.div>
-  );
-});
 
 const OurPeople = () => {
-  const sRef    = useRef<HTMLElement>(null);
-  const bgRef   = useRef<HTMLDivElement>(null);
+  const sRef     = useRef<HTMLElement>(null);
+  const bgRef    = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
   const headRef  = useRef<HTMLDivElement>(null);
   const lineRef  = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  const pairRefs  = useRef<(HTMLDivElement | null)[]>([]);
-  const role1Refs = useRef<(HTMLDivElement | null)[]>([]);
-  const role2Refs = useRef<(HTMLDivElement | null)[]>([]);
-  const ghostRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const dotRefs   = useRef<(HTMLDivElement | null)[]>([]);
+  const slideRefs   = useRef<(HTMLDivElement | null)[]>([]);
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const ghostRefs   = useRef<(HTMLDivElement | null)[]>([]);
+  const dotRefs     = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // ── Background parallax ──────────────────────────────────────────────
       gsap.fromTo(bgRef.current, { y: '-8%' }, {
         y: '8%', ease: 'none',
         scrollTrigger: { trigger: sRef.current, start: 'top bottom', end: 'bottom top', scrub: 1.2 },
       });
 
-      // ── Main scroll timeline ─────────────────────────────────────────────
       const tl = gsap.timeline({
         scrollTrigger: { trigger: sRef.current, start: 'top top', end: 'bottom bottom', scrub: 1.8 },
         defaults: { ease: 'none' },
       });
 
-      // Entry
       gsap.set([badgeRef.current, headRef.current], { y: 52, opacity: 0 });
       tl.to(badgeRef.current, { y: 0, opacity: 1, duration: 0.04 }, 0);
       tl.to(headRef.current,  { y: 0, opacity: 1, duration: 0.04 }, 0.015);
-
-      // Progress line grows top → bottom over entire scroll
       gsap.set(lineRef.current, { scaleY: 0, transformOrigin: 'top center' });
       tl.to(lineRef.current, { scaleY: 1, duration: 0.92 }, 0.04);
 
-      // ── Per-pair animations ──────────────────────────────────────────────
-      PAIRS.forEach((pair, i) => {
-        const [es, ee, xs, xe] = PAIR_WIN[i];
+      HR_SLIDES.forEach((slide, i) => {
+        const [es, ee, xs, xe] = HR_WIN[i];
         const eD = ee - es;
         const xD = xe - xs;
-        const pairColor = DEPT_COLORS[pair[0].dept];
 
-        gsap.set(pairRefs.current[i],  { opacity: 0 });
-        gsap.set(role1Refs.current[i], { x: -60, opacity: 0 });
-        gsap.set(role2Refs.current[i], { x:  60, opacity: 0 });
-        gsap.set(ghostRefs.current[i], { scale: 1.22, opacity: 0 });
-        gsap.set(dotRefs.current[i * 2],     { backgroundColor: 'rgba(255,255,255,0.1)', scale: 0.65 });
-        gsap.set(dotRefs.current[i * 2 + 1], { backgroundColor: 'rgba(255,255,255,0.1)', scale: 0.65 });
+        gsap.set(slideRefs.current[i],   { opacity: 0 });
+        gsap.set(contentRefs.current[i], { x: -60, opacity: 0 });
+        gsap.set(ghostRefs.current[i],   { scale: 1.22, opacity: 0 });
+        gsap.set(dotRefs.current[i],     { backgroundColor: 'rgba(255,255,255,0.1)', scale: 0.65 });
 
-        // Enter
-        tl.to(pairRefs.current[i],  { opacity: 1, duration: eD * 0.2 }, es);
-        tl.to(ghostRefs.current[i], { scale: 1, opacity: 1, duration: eD * 0.75, ease: 'power2.out' }, es);
-        tl.to(role1Refs.current[i], { x: 0, opacity: 1, duration: eD * 0.65, ease: 'power3.out' }, es + eD * 0.12);
-        tl.to(role2Refs.current[i], { x: 0, opacity: 1, duration: eD * 0.65, ease: 'power3.out' }, es + eD * 0.30);
-        tl.to(dotRefs.current[i * 2],     { backgroundColor: pairColor, scale: 1.25, duration: eD * 0.3 }, es + eD * 0.12);
-        tl.to(dotRefs.current[i * 2 + 1], { backgroundColor: pairColor, scale: 1.25, duration: eD * 0.3 }, es + eD * 0.30);
+        tl.to(slideRefs.current[i],   { opacity: 1, duration: eD * 0.2 }, es);
+        tl.to(ghostRefs.current[i],   { scale: 1, opacity: 1, duration: eD * 0.75, ease: 'power2.out' }, es);
+        tl.to(contentRefs.current[i], { x: 0, opacity: 1, duration: eD * 0.65, ease: 'power3.out' }, es + eD * 0.12);
+        tl.to(dotRefs.current[i],     { backgroundColor: slide.color, scale: 1.25, duration: eD * 0.3 }, es + eD * 0.12);
 
-        // Exit (skip for last pair)
         if (xs < 0.97) {
-          tl.to(role1Refs.current[i], { x: -48, opacity: 0, duration: xD * 0.5, ease: 'power2.in' }, xs);
-          tl.to(role2Refs.current[i], { x:  48, opacity: 0, duration: xD * 0.5, ease: 'power2.in' }, xs + xD * 0.12);
-          tl.to(ghostRefs.current[i], { scale: 0.82, opacity: 0, duration: xD * 0.55 }, xs);
-          tl.to(pairRefs.current[i],  { opacity: 0, duration: xD * 0.12 }, xs + xD * 0.88);
-          tl.to(dotRefs.current[i * 2],     { backgroundColor: 'rgba(255,255,255,0.1)', scale: 0.65, duration: xD * 0.3 }, xs);
-          tl.to(dotRefs.current[i * 2 + 1], { backgroundColor: 'rgba(255,255,255,0.1)', scale: 0.65, duration: xD * 0.3 }, xs + xD * 0.1);
+          tl.to(contentRefs.current[i], { x: -48, opacity: 0, duration: xD * 0.5, ease: 'power2.in' }, xs);
+          tl.to(ghostRefs.current[i],   { scale: 0.82, opacity: 0, duration: xD * 0.55 }, xs);
+          tl.to(slideRefs.current[i],   { opacity: 0, duration: xD * 0.12 }, xs + xD * 0.88);
+          tl.to(dotRefs.current[i],     { backgroundColor: 'rgba(255,255,255,0.1)', scale: 0.65, duration: xD * 0.3 }, xs);
         }
       });
     }, sRef);
@@ -2652,9 +2527,9 @@ const OurPeople = () => {
   }, []);
 
   return (
-    <section id="sec-people" ref={sRef} style={{ background: C.charcoal, height: '750vh', position: 'relative' }}>
+    <section id="sec-people" ref={sRef} style={{ background: C.charcoal, height: '480vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden', display: 'flex' }}>
-        <SectionTag name="our people" />
+        <SectionTag name="demographics" />
 
         {/* Background */}
         <div ref={bgRef} style={{ position: 'absolute', inset: '-12%', zIndex: 0, pointerEvents: 'none', willChange: 'transform' }}>
@@ -2668,21 +2543,17 @@ const OurPeople = () => {
           <div ref={badgeRef}>
             <Badge n="07" label="Our People" />
           </div>
-
           <div style={{ marginTop: 32, position: 'relative' }}>
-            {/* Growing progress line */}
             <div ref={lineRef} style={{ position: 'absolute', left: 8, top: 10, bottom: 10, width: 1, background: 'rgba(255,255,255,0.12)', borderRadius: 1 }} />
-
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {PEOPLE.map((person, i) => (
-                <div key={person.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: i % 2 === 0 ? '9px 0 4px 0' : '4px 0 9px 0' }}>
-                  <div
-                    ref={el => { dotRefs.current[i] = el; }}
-                    style={{ width: 16, height: 16, borderRadius: '50%', border: `1.5px solid ${DEPT_COLORS[person.dept]}55`, flexShrink: 0, backgroundColor: 'rgba(255,255,255,0.1)' }}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {HR_SLIDES.map((slide, i) => (
+                <div key={slide.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0' }}>
+                  <div ref={el => { dotRefs.current[i] = el; }}
+                    style={{ width: 16, height: 16, borderRadius: '50%', border: `1.5px solid ${slide.color}55`, flexShrink: 0, backgroundColor: 'rgba(255,255,255,0.1)' }}
                   />
                   {!isMobile && (
-                    <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {person.role}
+                    <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {slide.heading}
                     </span>
                   )}
                 </div>
@@ -2693,38 +2564,129 @@ const OurPeople = () => {
 
         {/* ── Main stage ───────────────────────────────────────────────────── */}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', zIndex: 2 }}>
-          {/* Section heading — entry state, fades out once pairs begin */}
-          <div ref={headRef} style={{ position: 'absolute', top: '10%', left: isMobile ? 20 : 48, zIndex: 3, pointerEvents: 'none' }}>
-            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', WebkitTextStroke: `2px ${C.base}`, WebkitTextFillColor: 'transparent', display: 'block' }}>the</span>
-            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', color: C.base, display: 'block' }}>people</span>
+          <div ref={headRef} style={{ position: 'absolute', top: '10%', left: isMobile ? 20 : 48, zIndex: 3, pointerEvents: 'none', display: 'flex', alignItems: 'baseline', gap: 14 }}>
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', WebkitTextStroke: `2px ${C.base}`, WebkitTextFillColor: 'transparent' }}>our</span>
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', color: C.base }}>people</span>
           </div>
 
-          {/* ── Pair panels ──────────────────────────────────────────────── */}
-          {PAIRS.map((pair, i) => {
-            const pairColor = DEPT_COLORS[pair[0].dept];
-            return (
-              <div key={i} ref={el => { pairRefs.current[i] = el; }}
-                style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: isMobile ? '0 20px' : '0 48px', gap: 16, pointerEvents: 'none' }}
+          {HR_SLIDES.map((slide, i) => (
+            <div key={slide.id} ref={el => { slideRefs.current[i] = el; }}
+              style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: isMobile ? '0 20px' : '0 48px', pointerEvents: 'none' }}
+            >
+              {/* Ghost slide number */}
+              <div ref={el => { ghostRefs.current[i] = el; }}
+                style={{ position: 'absolute', right: '-0.04em', top: '50%', transform: 'translateY(-52%)', fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? '52vw' : '34vw', color: `${slide.color}07`, lineHeight: 1, userSelect: 'none', letterSpacing: '-0.06em', zIndex: 0, pointerEvents: 'none' }}
               >
-                {/* Ghost dept text */}
-                <div ref={el => { ghostRefs.current[i] = el; }}
-                  style={{ position: 'absolute', right: '-0.04em', top: '50%', transform: 'translateY(-52%)', fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? '52vw' : '34vw', color: `${pairColor}07`, lineHeight: 1, userSelect: 'none', letterSpacing: '-0.06em', zIndex: 0, pointerEvents: 'none' }}
-                >
-                  {pair[0].dept.toUpperCase()}
-                </div>
-
-                {/* Role cards — left / right split */}
-                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 14 : 24, alignItems: 'flex-start' }}>
-                  <div ref={el => { role1Refs.current[i] = el; }} style={{ flex: 1, minWidth: 0 }}>
-                    <RolePairCard person={pair[0]} isMobile={isMobile} />
-                  </div>
-                  <div ref={el => { role2Refs.current[i] = el; }} style={{ flex: 1, minWidth: 0 }}>
-                    <RolePairCard person={pair[1]} isMobile={isMobile} />
-                  </div>
-                </div>
+                {slide.id}
               </div>
-            );
-          })}
+
+              {/* Slide content */}
+              <div ref={el => { contentRefs.current[i] = el; }} style={{ position: 'relative', zIndex: 1, maxWidth: isMobile ? '100%' : '70vw' }}>
+                {/* Heading */}
+                <div style={{ marginBottom: 8 }}>
+                  <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: slide.color }}>{slide.id}</span>
+                </div>
+                <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? 'clamp(1.8rem, 7vw, 2.8rem)' : 'clamp(2.2rem, 4vw, 4rem)', letterSpacing: '-0.03em', color: '#fff', margin: '0 0 8px', lineHeight: 1.1, textTransform: 'lowercase' as const }}>
+                  {slide.heading}
+                </h2>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', margin: '0 0 32px', lineHeight: 1.6 }}>{slide.sub}</p>
+
+                {/* ── Schools grid ─────────────────────────────────────────── */}
+                {slide.type === 'schools' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 14 }}>
+                    {(slide.items as SchoolItem[]).map((s, idx) => (
+                      <div key={s.abbr} style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '20px 20px 16px', overflow: 'hidden' }}>
+                        {/* Subtle accent glow top-left */}
+                        <div style={{ position: 'absolute', top: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: `${slide.color}18`, filter: 'blur(20px)', pointerEvents: 'none' }} />
+                        {/* Rank badge */}
+                        <div style={{ position: 'absolute', top: 14, right: 14, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 10, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em' }}>
+                          {String(idx + 1).padStart(2, '0')}
+                        </div>
+                        {/* Logo / Abbr pill */}
+                        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: `${slide.color}22`, border: `1px solid ${slide.color}44`, borderRadius: 8, padding: '5px 12px', marginBottom: 12 }}>
+                          <img src={s.logo} alt={s.abbr} width={32} height={32} style={{ objectFit: 'contain' }} onError={(e: React.SyntheticEvent<HTMLImageElement>) => { const el = e.currentTarget; el.style.display = 'none'; el.nextElementSibling && ((el.nextElementSibling as HTMLElement).style.display = 'inline'); }} />
+                          <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: '1rem', color: slide.color, letterSpacing: '-0.01em', display: 'none' }}>{s.abbr}</span>
+                        </div>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.78rem', color: 'rgba(255,255,255,0.82)', lineHeight: 1.4, marginBottom: 8 }}>{s.name}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                          {s.note.split(' · ').map(tag => (
+                            <span key={tag} style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.6rem', color: 'rgba(255,255,255,0.38)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 100, padding: '2px 8px', letterSpacing: '0.04em' }}>{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* ── Courses bar chart ─────────────────────────────────────── */}
+                {slide.type === 'courses' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 14 : 24, alignItems: 'start' }}>
+                    {/* Bar chart column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      {(slide.items as CourseItem[]).map(c => (
+                        <div key={c.name}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', color: 'rgba(255,255,255,0.82)', fontWeight: 500 }}>{c.name}</span>
+                            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1rem', color: c.color, letterSpacing: '-0.02em' }}>{c.pct}%</span>
+                          </div>
+                          <div style={{ height: 10, borderRadius: 5, background: 'rgba(255,255,255,0.06)', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${c.pct}%`, background: `linear-gradient(90deg, ${c.color}99, ${c.color})`, borderRadius: 5, position: 'relative' }}>
+                              {/* Glow cap */}
+                              <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, borderRadius: '50%', background: c.color, boxShadow: `0 0 8px 2px ${c.color}88` }} />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Summary stat card */}
+                    {!isMobile && (
+                      <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                        <div>
+                          <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', color: slide.color, letterSpacing: '-0.04em', lineHeight: 1 }}>5+</div>
+                          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>disciplines represented</div>
+                        </div>
+                        <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.07)' }} />
+                        <div>
+                          <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', color: '#60A5FA', letterSpacing: '-0.04em', lineHeight: 1 }}>100%</div>
+                          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>equal opportunity employer</div>
+                        </div>
+                        <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.07)' }} />
+                        <div>
+                          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, fontStyle: 'italic' }}>
+                            "What matters to us is values and skills."
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── Certifications grid ───────────────────────────────────── */}
+                {slide.type === 'certs' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
+                    {(slide.items as CertItem[]).map(cert => (
+                      <div key={cert.name} style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '18px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10, overflow: 'hidden' }}>
+                        {/* Top accent line */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${slide.color}, transparent)`, borderRadius: '16px 16px 0 0' }} />
+                        {/* Icon area */}
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          {cert.logo ? (
+                            <img src={cert.logo} alt={cert.name} width={30} height={30} style={{ objectFit: 'contain' }} onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.style.display = 'none'; }} />
+                          ) : (
+                            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 14, color: slide.color }}>{cert.name.slice(0, 2)}</span>
+                          )}
+                        </div>
+                        <div>
+                          <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '0.82rem', color: '#fff', lineHeight: 1.25, marginBottom: 4 }}>{cert.name}</div>
+                          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.62rem', color: 'rgba(255,255,255,0.38)', lineHeight: 1.5 }}>{cert.sub}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -3212,10 +3174,42 @@ const Closing = () => {
   );
 };
 
+// ── SPECIAL END SLIDE — plain white with logo ─────────────────────────────────
+const SpecialEndSlide = () => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+  return (
+    <section id="sec-end" ref={ref}
+      style={{ background: '#FFFFFF', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+    >
+      <motion.img
+        src="https://phitopolis.com/img/logo/logo-blue.png"
+        alt="Phitopolis"
+        initial={{ opacity: 0, scale: 0.88 }}
+        animate={inView ? { opacity: 1, scale: 1 } : {}}
+        transition={{ duration: 1, ease: [0.21, 1.02, 0.47, 0.98] }}
+        style={{ width: 'clamp(180px, 28vw, 380px)', objectFit: 'contain' }}
+        onError={(e) => {
+          const img = e.target as HTMLImageElement;
+          img.style.display = 'none';
+          const fb = document.createElement('div');
+          fb.style.cssText = 'font-family:Outfit,sans-serif;font-weight:900;font-size:clamp(2rem,6vw,5rem);letter-spacing:-0.04em;color:#0A2A66;text-transform:lowercase';
+          fb.textContent = 'phitopolis';
+          img.parentNode?.appendChild(fb);
+        }}
+      />
+    </section>
+  );
+};
+
 // ── PAGE ──────────────────────────────────────────────────────────────────────
 export default function AIDayPage() {
   const [ready, setReady] = useState(false);
   const handlePreloaderComplete = useCallback(() => setReady(true), []);
+  const [isPathB] = useState(() =>
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('path') === 'B'
+  );
   useEffect(() => {
     document.title = 'Phitopolis | AI Day 2026';
     document.body.style.cursor = 'none';
@@ -3249,15 +3243,16 @@ export default function AIDayPage() {
         <Hero ready={ready} />
         <Statement />
         <Process />
-        <Vision />
         <MarqueeSection />
         <ServicesScrollStory />
         <TechStack />
         <Stats />
         <OurPeople />
+        <Vision />
         <ChapterGroup />
-        <Showcase />
+        {!isPathB && <Showcase />}
         <Closing />
+        <SpecialEndSlide />
       </div>
     </>
   );
