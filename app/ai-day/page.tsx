@@ -2120,13 +2120,16 @@ const SCROLL_ITEMS = [
   },
 ];
 
-// Image base: 44vw × 88vh at left: 25vw, top: 6vh (centered layout with right caption area)
-// Base image: top: 6vh, left: 25vw, width: 44vw, height: 88vh → right: 69vw, bottom: 94vh
-// Thumbnail scale 0.22 → rendered size: 9.68vw × 19.36vh
-// Left slot (prev): top-aligned with main, snug to left edge
-//   → x = (25vw - 9.68vw - 1vw) - 25vw = -10.68vw ≈ -11vw, y = 0vh
-// Right slot (next): bottom-aligned with main, snug to right edge
-//   → x = (69vw + 1vw) - 25vw = 45vw → 46vw with gap, y = (94vh - 19.36vh) - 6vh ≈ 69vh
+// Desktop layout: image at left:25vw, width:44vw, height:88vh — caption right panel 22%
+// Mobile layout:  image full-width (left:0, width:100vw, height:72vh) — caption below image
+//
+// GSAP seed/thumbnail positions derived from container origin + desired screen position:
+//   Desktop seed:      screen(48vw, 83vh) → relative(23vw, 77vh) [container origin: 25vw, 6vh]
+//   Mobile seed:       screen(50vw, 84vh) → relative(50vw, 84vh) [container origin: 0,  0 ]
+//   Desktop nextSlot:  screen(71vw, 75vh) → relative(46vw, 69vh)
+//   Mobile nextSlot:   screen(100vw,72vh) → relative(100vw,72vh) [off-screen right]
+//   Desktop leftThumb: screen(14vw,  6vh) → relative(-11vw, 0)
+//   Mobile leftThumb:  screen(-24vw, 0)   → relative(-24vw, 0)   [off-screen left]
 const ServicesScrollStory = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef   = useRef<HTMLDivElement>(null);
@@ -2136,14 +2139,23 @@ const ServicesScrollStory = () => {
   const cap1Ref      = useRef<HTMLDivElement>(null);
   const cap2Ref      = useRef<HTMLDivElement>(null);
   const cap3Ref      = useRef<HTMLDivElement>(null);
+  const isMobile     = useIsMobile();
 
   useEffect(() => {
+    // Layout-dependent GSAP values — recalculate when isMobile changes
+    const seed      = isMobile
+      ? { x: '50vw',  y: '84vh' }
+      : { x: '23vw',  y: '77vh' };
+    const nextSlot  = isMobile
+      ? { x: '100vw', y: '72vh' }
+      : { x: '46vw',  y: '69vh' };
+    const leftThumb = isMobile ? '-24vw' : '-11vw';
+
     const ctx = gsap.context(() => {
-      // Set initial states before ScrollTrigger takes over
       gsap.set(headingRef.current,  { transformOrigin: '50% 0%' });
-      gsap.set(img1Ref.current,     { scale: 0.08, x: '23vw', y: '77vh', transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.08 });
-      gsap.set(img2Ref.current,     { opacity: 0, scale: 0.22, x: '46vw', y: '69vh', transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.22 });
-      gsap.set(img3Ref.current,     { opacity: 0, scale: 0.22, x: '46vw', y: '69vh', transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.22 });
+      gsap.set(img1Ref.current,     { scale: 0.08, ...seed, transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.08 });
+      gsap.set(img2Ref.current,     { opacity: 0, scale: 0.22, ...nextSlot, transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.22 });
+      gsap.set(img3Ref.current,     { opacity: 0, scale: 0.22, ...nextSlot, transformOrigin: '0% 0%', willChange: 'transform', borderRadius: 20 / 0.22 });
       gsap.set(cap1Ref.current,     { opacity: 0 });
       gsap.set(cap2Ref.current,     { opacity: 0 });
       gsap.set(cap3Ref.current,     { opacity: 0 });
@@ -2163,7 +2175,7 @@ const ServicesScrollStory = () => {
 
       // ── Image 1: tiny → full → thumbnail → fade ───────────────────────────────
       tl.to(img1Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.22 }, 0);
-      tl.to(img1Ref.current,   { scale: 0.22, x: '-11vw', borderRadius: 20 / 0.22, duration: 0.20 }, 0.38);
+      tl.to(img1Ref.current,   { scale: 0.22, x: leftThumb, borderRadius: 20 / 0.22, duration: 0.20 }, 0.38);
       tl.to(img1Ref.current,   { opacity: 0, duration: 0.15 }, 0.75);
 
       // ── Caption 1 ─────────────────────────────────────────────────────────────
@@ -2173,7 +2185,7 @@ const ServicesScrollStory = () => {
       // ── Image 2: appears → full → thumbnail ───────────────────────────────────
       tl.to(img2Ref.current,   { opacity: 1, duration: 0.08 }, 0.33);
       tl.to(img2Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.20 }, 0.38);
-      tl.to(img2Ref.current,   { scale: 0.22, x: '-11vw', borderRadius: 20 / 0.22, duration: 0.15 }, 0.75);
+      tl.to(img2Ref.current,   { scale: 0.22, x: leftThumb, borderRadius: 20 / 0.22, duration: 0.15 }, 0.75);
 
       // ── Caption 2 ─────────────────────────────────────────────────────────────
       tl.to(cap2Ref.current,   { opacity: 1, duration: 0.08 }, 0.62);
@@ -2188,24 +2200,27 @@ const ServicesScrollStory = () => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isMobile]);
 
-  const captionStyle: React.CSSProperties = {
+  // Caption: right panel on desktop, bottom strip on mobile
+  const captionStyle: React.CSSProperties = isMobile ? {
+    position: 'absolute',
+    bottom: '6vh', left: '6vw', right: '6vw',
+    zIndex: 6, pointerEvents: 'none',
+  } : {
     position: 'absolute', right: '5%', top: '50%', transform: 'translateY(-50%)',
     zIndex: 6, maxWidth: '22%', pointerEvents: 'none',
   };
 
+  // Image container: narrower/offset on desktop, full-width on mobile
   const imgWrapStyle: React.CSSProperties = {
     position: 'absolute',
-    top: '6vh', left: '25vw',
-    width: '44vw', height: '88vh',
+    top:    isMobile ? '0'    : '6vh',
+    left:   isMobile ? '0'    : '25vw',
+    width:  isMobile ? '100vw': '44vw',
+    height: isMobile ? '72vh' : '88vh',
     willChange: 'transform',
     overflow: 'hidden', borderRadius: 20,
-  };
-
-  const imgInnerStyle: React.CSSProperties = {
-    width: '100%', height: '100%',
-    position: 'relative',
   };
 
   return (
@@ -2216,12 +2231,14 @@ const ServicesScrollStory = () => {
         {/* ── Heading ── */}
         <div ref={headingRef} style={{
           position: 'absolute', top: '8%', left: '50%', transform: 'translateX(-50%)',
-          zIndex: 10, textAlign: 'center', whiteSpace: 'nowrap', pointerEvents: 'none',
+          zIndex: 10, textAlign: 'center', pointerEvents: 'none',
+          whiteSpace: isMobile ? 'normal' : 'nowrap',
+          width: isMobile ? '80vw' : 'auto',
         }}>
-          <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2.4rem, 5vw, 5.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', WebkitTextStroke: `2px ${C.base}`, WebkitTextFillColor: 'transparent' }}>
+          <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 5vw, 5.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', WebkitTextStroke: `2px ${C.base}`, WebkitTextFillColor: 'transparent' }}>
             what we{' '}
           </span>
-          <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2.4rem, 5vw, 5.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', color: C.base }}>
+          <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 5vw, 5.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', color: C.base }}>
             do best.
           </span>
         </div>
@@ -2229,43 +2246,37 @@ const ServicesScrollStory = () => {
         {/* ── Caption 1 ── */}
         <div ref={cap1Ref} style={captionStyle}>
           <p style={{ color: C.accent, fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 10 }}>{SCROLL_ITEMS[0].label}</p>
-          <h3 style={{ color: C.base, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(1.1rem, 1.8vw, 1.9rem)', letterSpacing: '-0.02em', marginBottom: 12 }}>{SCROLL_ITEMS[0].title}</h3>
-          <p style={{ color: 'rgba(240,242,250,0.55)', fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', lineHeight: 1.75 }}>{SCROLL_ITEMS[0].desc}</p>
+          <h3 style={{ color: C.base, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(1.1rem, 1.8vw, 1.9rem)', letterSpacing: '-0.02em', marginBottom: isMobile ? 6 : 12 }}>{SCROLL_ITEMS[0].title}</h3>
+          {!isMobile && <p style={{ color: 'rgba(240,242,250,0.55)', fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', lineHeight: 1.75 }}>{SCROLL_ITEMS[0].desc}</p>}
         </div>
 
         {/* ── Caption 2 ── */}
         <div ref={cap2Ref} style={captionStyle}>
           <p style={{ color: C.accent, fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 10 }}>{SCROLL_ITEMS[1].label}</p>
-          <h3 style={{ color: C.base, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(1.1rem, 1.8vw, 1.9rem)', letterSpacing: '-0.02em', marginBottom: 12 }}>{SCROLL_ITEMS[1].title}</h3>
-          <p style={{ color: 'rgba(240,242,250,0.55)', fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', lineHeight: 1.75 }}>{SCROLL_ITEMS[1].desc}</p>
+          <h3 style={{ color: C.base, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(1.1rem, 1.8vw, 1.9rem)', letterSpacing: '-0.02em', marginBottom: isMobile ? 6 : 12 }}>{SCROLL_ITEMS[1].title}</h3>
+          {!isMobile && <p style={{ color: 'rgba(240,242,250,0.55)', fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', lineHeight: 1.75 }}>{SCROLL_ITEMS[1].desc}</p>}
         </div>
 
         {/* ── Caption 3 ── */}
         <div ref={cap3Ref} style={captionStyle}>
           <p style={{ color: C.accent, fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 10 }}>{SCROLL_ITEMS[2].label}</p>
-          <h3 style={{ color: C.base, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(1.1rem, 1.8vw, 1.9rem)', letterSpacing: '-0.02em', marginBottom: 12 }}>{SCROLL_ITEMS[2].title}</h3>
-          <p style={{ color: 'rgba(240,242,250,0.55)', fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', lineHeight: 1.75 }}>{SCROLL_ITEMS[2].desc}</p>
+          <h3 style={{ color: C.base, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(1.1rem, 1.8vw, 1.9rem)', letterSpacing: '-0.02em', marginBottom: isMobile ? 6 : 12 }}>{SCROLL_ITEMS[2].title}</h3>
+          {!isMobile && <p style={{ color: 'rgba(240,242,250,0.55)', fontFamily: 'Inter, sans-serif', fontSize: '0.83rem', lineHeight: 1.75 }}>{SCROLL_ITEMS[2].desc}</p>}
         </div>
 
         {/* ── Image 3 (lowest z) ── */}
         <div ref={img3Ref} style={{ ...imgWrapStyle, zIndex: 1 }}>
-          <div style={imgInnerStyle}>
-            <img src={SCROLL_ITEMS[2].image} alt={SCROLL_ITEMS[2].title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          </div>
+          <img src={SCROLL_ITEMS[2].image} alt={SCROLL_ITEMS[2].title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         </div>
 
         {/* ── Image 2 ── */}
         <div ref={img2Ref} style={{ ...imgWrapStyle, zIndex: 2 }}>
-          <div style={imgInnerStyle}>
-            <img src={SCROLL_ITEMS[1].image} alt={SCROLL_ITEMS[1].title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          </div>
+          <img src={SCROLL_ITEMS[1].image} alt={SCROLL_ITEMS[1].title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         </div>
 
         {/* ── Image 1 ── */}
         <div ref={img1Ref} style={{ ...imgWrapStyle, zIndex: 3 }}>
-          <div style={imgInnerStyle}>
-            <img src={SCROLL_ITEMS[0].image} alt={SCROLL_ITEMS[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          </div>
+          <img src={SCROLL_ITEMS[0].image} alt={SCROLL_ITEMS[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         </div>
 
       </div>
