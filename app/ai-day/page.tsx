@@ -2390,9 +2390,8 @@ const Process = () => {
       });
 
       // ── Entry: badge + heading slide up ─────────────────────────────────────
-      gsap.set([badgeRef.current, headRef.current], { y: 60, opacity: 0 });
+      gsap.set(badgeRef.current, { y: 60, opacity: 0 });
       tl.to(badgeRef.current, { y: 0, opacity: 1, duration: 0.06 }, 0);
-      tl.to(headRef.current,  { y: 0, opacity: 1, duration: 0.06 }, 0.02);
 
       // ── Per-phase animations ────────────────────────────────────────────────
       PHASES.forEach((ph, i) => {
@@ -2503,12 +2502,12 @@ const Process = () => {
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
 
           {/* Section heading — fades out as phases take over */}
-          <div ref={headRef} style={{ position: 'absolute', top: '10%', left: isMobile ? 24 : 48, zIndex: 3, pointerEvents: 'none' }}>
-            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', WebkitTextStroke: `2px ${C.charcoal}`, WebkitTextFillColor: 'transparent', display: 'block' }}>
-              phitopolis is
+          <div ref={headRef} style={{ position: 'absolute', top: '8%', left: '50%', transform: 'translateX(-50%)', zIndex: 3, textAlign: 'center', whiteSpace: 'nowrap', pointerEvents: 'none' }}>
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2.4rem, 5vw, 5.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', WebkitTextStroke: `2px ${C.charcoal}`, WebkitTextFillColor: 'transparent' }}>
+              phitopolis is{' '}
             </span>
-            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 4.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', color: C.charcoal, display: 'block' }}>
-              rooted in values
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 'clamp(2.4rem, 5vw, 5.5rem)', letterSpacing: '-0.03em', textTransform: 'lowercase', color: C.charcoal }}>
+              rooted in values.
             </span>
           </div>
 
