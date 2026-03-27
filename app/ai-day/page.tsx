@@ -2679,13 +2679,12 @@ const CERT_CLOUD = [
   { name: 'Azure Fundamentals',             path: 'https://learn.microsoft.com/en-us/media/learn/certification/badges/microsoft-certified-fundamentals-badge.svg' },
   { name: 'Azure Associate',                path: 'https://learn.microsoft.com/en-us/media/learn/certification/badges/microsoft-certified-associate-badge.svg' },
   { name: 'Azure Expert',                   path: 'https://learn.microsoft.com/en-us/media/learn/certification/badges/microsoft-certified-expert-badge.svg' },
-  // Local badges — SVG versions with solid colored backgrounds (no white)
-  { name: 'PMP',                            path: '/logos/certs/pmp.svg' },
-  { name: 'Red Hat (RHCSA)',                path: '/logos/certs/redhat.svg' },
-  { name: 'ITIL',                           path: '/logos/certs/itil.svg' },
-  { name: 'ISO 27001',                      path: '/logos/certs/iso27001.svg' },
-  { name: 'CFA',                            path: '/logos/certs/cfa.svg' },
-  { name: 'Six Sigma',                      path: '/logos/certs/sixsigma.svg' },
+  // Local badges already in public folder
+  { name: 'PMP',                            path: '/logos/certs/pmp.webp' },
+  { name: 'Red Hat (RHCSA)',                path: '/logos/certs/redhat.webp' },
+  { name: 'ITIL',                           path: '/logos/certs/itil.webp' },
+  { name: 'ISO 27001',                      path: '/logos/certs/iso27001.webp' },
+  { name: 'CFA',                            path: '/logos/certs/cpa.webp' },
 ];
 
 // Pre-computed scatter positions with rotation — badges cycle through all positions
@@ -2884,19 +2883,17 @@ const OurPeople = () => {
               </div>
 
               {/* Slide content */}
-              <div ref={el => { contentRefs.current[i] = el; }} style={{ position: 'relative', zIndex: 1, maxWidth: isMobile ? '100%' : (slide.type === 'certs' ? '100%' : '70vw') }}>
-                {/* Heading — hidden for certs (logo cloud is fully visual) */}
-                {slide.type !== 'certs' && (
-                  <>
-                    <div style={{ marginBottom: 8 }}>
-                      <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: slide.color }}>{slide.id}</span>
-                    </div>
-                    <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? 'clamp(1.8rem, 7vw, 2.8rem)' : 'clamp(2.2rem, 4vw, 4rem)', letterSpacing: '-0.03em', color: '#fff', margin: '0 0 8px', lineHeight: 1.1, textTransform: 'lowercase' as const }}>
-                      {slide.heading}
-                    </h2>
-                    <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', margin: '0 0 32px', lineHeight: 1.6 }}>{slide.sub}</p>
-                  </>
-                )}
+              <div ref={el => { contentRefs.current[i] = el; }} style={{ position: 'relative', zIndex: 1, maxWidth: isMobile ? '100%' : '70vw' }}>
+                {/* Heading */}
+                <>
+                  <div style={{ marginBottom: 8 }}>
+                    <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: slide.color }}>{slide.id}</span>
+                  </div>
+                  <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? 'clamp(1.8rem, 7vw, 2.8rem)' : 'clamp(2.2rem, 4vw, 4rem)', letterSpacing: '-0.03em', color: '#fff', margin: '0 0 8px', lineHeight: 1.1, textTransform: 'lowercase' as const }}>
+                    {slide.heading}
+                  </h2>
+                  <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', margin: '0 0 32px', lineHeight: 1.6 }}>{slide.sub}</p>
+                </>
 
                 {/* ── Schools grid ─────────────────────────────────────────── */}
                 {slide.type === 'schools' && (
@@ -2978,26 +2975,27 @@ const OurPeople = () => {
                   </div>
                 )}
 
-                {/* ── Certifications badge cloud — scattered local assets ── */}
+                {/* ── Certifications grid ───────────────────────────────────── */}
                 {slide.type === 'certs' && (
-                  <div style={{ position: 'relative', width: '100%', height: isMobile ? '60vw' : '62vh', marginTop: 4 }}>
-                    {CERT_SCATTER_POSITIONS.map((pos, idx) => {
-                      const cert = CERT_CLOUD[idx % CERT_CLOUD.length];
-                      return (
-                        <div key={`${cert.path}-${idx}`} style={{ position: 'absolute', top: pos.top, left: pos.left, opacity: pos.opacity }}>
-                          <img
-                            src={cert.path}
-                            alt={cert.name}
-                            width={pos.size}
-                            height={pos.size}
-                            style={{ objectFit: 'contain', display: 'block', transform: `rotate(${pos.rotate})` }}
-                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                              (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
-                            }}
-                          />
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
+                    {(slide.items as CertItem[]).map(cert => (
+                      <div key={cert.name} style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '18px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10, overflow: 'hidden' }}>
+                        {/* Top accent line */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${slide.color}, transparent)`, borderRadius: '16px 16px 0 0' }} />
+                        {/* Icon area */}
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          {cert.logo ? (
+                            <img src={cert.logo} alt={cert.name} width={30} height={30} style={{ objectFit: 'contain' }} onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.style.display = 'none'; }} />
+                          ) : (
+                            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 14, color: slide.color }}>{cert.name.slice(0, 2)}</span>
+                          )}
                         </div>
-                      );
-                    })}
+                        <div>
+                          <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '0.82rem', color: '#fff', lineHeight: 1.25, marginBottom: 4 }}>{cert.name}</div>
+                          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.62rem', color: 'rgba(255,255,255,0.38)', lineHeight: 1.5 }}>{cert.sub}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
