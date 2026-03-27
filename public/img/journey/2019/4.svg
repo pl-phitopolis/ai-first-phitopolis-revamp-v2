@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560">
+  <defs>
+    <linearGradient id="bg20194" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1f4a"/>
+      <stop offset="100%" style="stop-color:#0A2A66"/>
+    </linearGradient>
+    <filter id="glow20194"><feGaussianBlur stdDeviation="32"/></filter>
+  </defs>
+  <rect width="900" height="560" fill="url(#bg20194)"/>
+  <ellipse cx="180" cy="420" rx="260" ry="200" fill="#E879F9" opacity="0.07" filter="url(#glow20194)"/>
+  <ellipse cx="720" cy="140" rx="220" ry="180" fill="#E879F9" opacity="0.05" filter="url(#glow20194)"/>
+  <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
+    <line x1="0" y1="112" x2="900" y2="112"/><line x1="0" y1="224" x2="900" y2="224"/>
+    <line x1="0" y1="336" x2="900" y2="336"/><line x1="0" y1="448" x2="900" y2="448"/>
+    <line x1="150" y1="0" x2="150" y2="560"/><line x1="300" y1="0" x2="300" y2="560"/>
+    <line x1="450" y1="0" x2="450" y2="560"/><line x1="600" y1="0" x2="600" y2="560"/>
+    <line x1="750" y1="0" x2="750" y2="560"/>
+  </g>
+  <text x="450" y="280" font-family="Outfit, Arial, sans-serif" font-size="160" font-weight="900" fill="#E879F9" fill-opacity="0.05" text-anchor="middle" dominant-baseline="middle" letter-spacing="-8">2019</text>
+  <rect x="310" y="242" width="280" height="76" rx="10" fill="rgba(255,255,255,0.03)" stroke="#E879F9" stroke-opacity="0.18" stroke-width="1"/>
+  <text x="450" y="268" font-family="Outfit, Arial, sans-serif" font-size="10" font-weight="700" fill="#E879F9" fill-opacity="0.5" text-anchor="middle" letter-spacing="0.2em">PLACEHOLDER · SLOT 4 / 4</text>
+  <text x="450" y="293" font-family="Outfit, Arial, sans-serif" font-size="13" font-weight="600" fill="rgba(255,255,255,0.2)" text-anchor="middle">journey / 2019 / 4.jpg</text>
+  <path d="M48 48 L48 68 M48 48 L68 48" stroke="#E879F9" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+  <path d="M852 48 L852 68 M852 48 L832 48" stroke="#E879F9" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+  <path d="M48 512 L48 492 M48 512 L68 512" stroke="#E879F9" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+  <path d="M852 512 L852 492 M852 512 L832 512" stroke="#E879F9" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+</svg>

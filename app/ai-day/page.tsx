@@ -1852,7 +1852,7 @@ const Hero = ({ ready }: { ready: boolean }) => {
 // ── SCROLL-DRIVEN LETTER HEADING ─────────────────────────────────────────────
 const HEADING_FONT: React.CSSProperties = {
   fontFamily: 'Outfit, sans-serif', fontWeight: 900,
-  fontSize: 'clamp(2.4rem, 5.5vw, 5rem)', letterSpacing: '-0.03em', lineHeight: 1.15,
+  fontSize: 'clamp(3rem, 7vw, 7rem)', letterSpacing: '-0.03em', lineHeight: 1.15,
 };
 
 const ScrollLetterHeading = ({ triggerRef }: { triggerRef: React.RefObject<HTMLElement | null> }) => {
@@ -1869,7 +1869,7 @@ const ScrollLetterHeading = ({ triggerRef }: { triggerRef: React.RefObject<HTMLE
     const st1 = { trigger: triggerRef.current, start: 'top 70%', end: 'top top', scrub: 0.4 };
     const tl1 = gsap.timeline({ scrollTrigger: st1 });
     chars1.forEach((ch, i) => {
-      const pos = i / chars1.length;
+      const pos = i / Math.max(chars1.length - 1, 1);
       tl1.set(ch, { webkitTextFillColor: 'transparent' }, pos);
     });
 
@@ -1878,7 +1878,7 @@ const ScrollLetterHeading = ({ triggerRef }: { triggerRef: React.RefObject<HTMLE
     const st2 = { trigger: triggerRef.current, start: 'top 70%', end: 'top top', scrub: 0.4 };
     const tl2 = gsap.timeline({ scrollTrigger: st2 });
     chars2.forEach((ch, i) => {
-      const pos = i / chars2.length;
+      const pos = i / Math.max(chars2.length - 1, 1);
       tl2.set(ch, { webkitTextFillColor: C.charcoal }, pos);
     });
 
@@ -1894,10 +1894,10 @@ const ScrollLetterHeading = ({ triggerRef }: { triggerRef: React.RefObject<HTMLE
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1em' }}>
-      <div ref={line1Ref} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div ref={line1Ref} style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center' }}>
         {renderChars('what do you look for in')}
       </div>
-      <div ref={line2Ref} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div ref={line2Ref} style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center' }}>
         {renderChars('an ')}
         {renderChars('IT', true)}
         {renderChars(' partner?')}
@@ -1999,27 +1999,7 @@ const Statement = () => {
           Phitopolis was built in response to the demand of our partners in the Financial Investment Industry. They needed exacting and powerful technological solutions and harnessed the top talent in the Philippines via Phitopolis.
         </motion.p>
 
-        {/* Story image row */}
-        {!isMobile && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: 0.4 }}
-            style={{ display: 'flex', gap: 16, width: '100%', maxWidth: 900, marginBottom: 56 }}
-          >
-            {[
-              { src: '/img/story/team.jpg',     alt: 'Our team' },
-              { src: '/img/story/office.jpg',   alt: 'Our office' },
-              { src: '/img/story/founders.jpg', alt: 'Our founders' },
-            ].map(({ src, alt }) => (
-              <div key={src} style={{ flex: '1 1 0', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(10,42,102,0.1)', aspectRatio: '4 / 3', position: 'relative' }}>
-                <img
-                  src={src}
-                  alt={alt}
-                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.src = src.replace('.jpg', '.svg'); }}
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </div>
-            ))}
-          </motion.div>
-        )}
+        {/* Story image row — hidden for now */}
 
         {/* Large heading — scroll-driven per-letter fill↔outline */}
         <ScrollLetterHeading triggerRef={sRef} />
@@ -2230,8 +2210,8 @@ const ServicesScrollStory = () => {
       tl.to(img1Ref.current,   { opacity: 0, duration: 0.15 }, 0.75);
 
       // ── Caption 1 ─────────────────────────────────────────────────────────────
-      tl.to(cap1Ref.current,   { opacity: 1, duration: 0.08 }, 0.35);
-      tl.to(cap1Ref.current,   { opacity: 0, duration: 0.08 }, 0.50);
+      tl.to(cap1Ref.current,   { opacity: 1, duration: 0.08 }, 0.20);
+      tl.to(cap1Ref.current,   { opacity: 0, duration: 0.08 }, 0.38);
 
       // ── Image 2: appears → full → thumbnail ───────────────────────────────────
       tl.to(img2Ref.current,   { opacity: 1, duration: 0.08 }, 0.33);
@@ -2239,8 +2219,8 @@ const ServicesScrollStory = () => {
       tl.to(img2Ref.current,   { scale: 0.22, x: leftThumb, borderRadius: 20 / 0.22, duration: 0.15 }, 0.75);
 
       // ── Caption 2 ─────────────────────────────────────────────────────────────
-      tl.to(cap2Ref.current,   { opacity: 1, duration: 0.08 }, 0.62);
-      tl.to(cap2Ref.current,   { opacity: 0, duration: 0.08 }, 0.77);
+      tl.to(cap2Ref.current,   { opacity: 1, duration: 0.08 }, 0.50);
+      tl.to(cap2Ref.current,   { opacity: 0, duration: 0.08 }, 0.72);
 
       // ── Image 3: appears small → grows to full ────────────────────────────────
       tl.to(img3Ref.current,   { opacity: 1, duration: 0.08 }, 0.48);
@@ -2943,9 +2923,15 @@ const OurPeople = () => {
 
 // ── CHAPTERS ──────────────────────────────────────────────────────────────────
 const CHAPTERS = [
-  { num: '2021', id: 'sec-ch1', tag: 'The Beginning', title: '2021', sub: 'Where it all started',                color: '#FFC72C',
-    images: ['/img/journey/2021/1.jpg', '/img/journey/2021/2.jpg', '/img/journey/2021/3.jpg', '/img/journey/2021/4.jpg'],
+  { num: '2019', id: 'sec-ch0a', tag: 'The Beginning', title: '2019', sub: 'Where it all started',                 color: '#E879F9',
+    images: ['/img/journey/2019/1.jpg', '/img/journey/2019/2.jpg', '/img/journey/2019/3.svg', '/img/journey/2019/4.svg'],
     body: 'Placeholder — content covering Phitopolis\'s founding year will live here. The vision, the first team members, and the early decisions that set the direction for everything that followed.' },
+  { num: '2020', id: 'sec-ch0b', tag: 'Laying Ground', title: '2020', sub: 'Setting the stage',                   color: '#38BDF8',
+    images: ['/img/journey/2020/1.svg', '/img/journey/2020/2.svg', '/img/journey/2020/3.svg', '/img/journey/2020/4.svg'],
+    body: 'Placeholder — content covering 2020\'s groundwork will live here. Building the blueprint amid a global shift, assembling the founding pieces, and preparing to launch.' },
+  { num: '2021', id: 'sec-ch1', tag: 'Taking Off', title: '2021', sub: 'Gaining momentum',                       color: '#FFC72C',
+    images: ['/img/journey/2021/1.svg', '/img/journey/2021/2.svg', '/img/journey/2021/3.svg', '/img/journey/2021/4.svg'],
+    body: 'Placeholder — content covering 2021\'s milestones will live here. Growing the team, landing key clients, and proving the Phitopolis approach in the market.' },
   { num: '2022', id: 'sec-ch2', tag: 'Taking Shape',  title: '2022', sub: 'Building the foundation',             color: '#60A5FA',
     images: ['/img/journey/2022/1.jpg', '/img/journey/2022/2.jpg', '/img/journey/2022/3.jpg', '/img/journey/2022/4.jpg'],
     body: 'Placeholder — content covering 2022\'s milestones will live here. Early client engagements, team growth, and the first solutions that proved the model worked.' },
@@ -2966,6 +2952,20 @@ const CHAPTERS = [
 // Unique scatter layouts per year — desktop polaroid placement
 // Each array maps to images[0], [1], [2], [3] of that chapter
 const CHAPTER_SCATTER: Record<string, { top?: string; bottom?: string; left?: string; right?: string; width: string; rotate: string; zIndex: number }[]> = {
+  // 2019 — stacked column, slightly offset
+  '2019': [
+    { top: '2%',     left: '45%',   width: '28%', rotate: '-6deg',  zIndex: 2 },
+    { top: '18%',    left: '52%',   width: '26%', rotate:  '4deg',  zIndex: 3 },
+    { bottom: '18%', left: '44%',   width: '30%', rotate: '-3deg',  zIndex: 1 },
+    { bottom: '2%',  right: '6%',   width: '24%', rotate: '10deg',  zIndex: 2 },
+  ],
+  // 2020 — V-shape layout
+  '2020': [
+    { top: '2%',     left: '38%',   width: '26%', rotate: '-10deg', zIndex: 2 },
+    { top: '4%',     right: '2%',   width: '25%', rotate:  '8deg',  zIndex: 2 },
+    { bottom: '10%', left: '48%',   width: '32%', rotate: '-2deg',  zIndex: 3 },
+    { bottom: '0%',  right: '10%',  width: '22%', rotate: '14deg',  zIndex: 1 },
+  ],
   // 2021 — spread across right half (the layout the user liked)
   '2021': [
     { top: '14%',    left: '42%',   width: '30%', rotate: '-4deg',  zIndex: 2 },
@@ -2977,8 +2977,8 @@ const CHAPTER_SCATTER: Record<string, { top?: string; bottom?: string; left?: st
   '2022': [
     { top: '4%',     left: '38%',   width: '25%', rotate: '-12deg', zIndex: 1 },
     { top: '22%',    left: '52%',   width: '29%', rotate: '-1deg',  zIndex: 2 },
-    { bottom: '14%', left: '60%',   width: '26%', rotate:  '9deg',  zIndex: 3 },
-    { bottom: '1%',  right: '-1%',  width: '23%', rotate: '16deg',  zIndex: 2 },
+    { bottom: '14%', left: '56%',   width: '26%', rotate:  '9deg',  zIndex: 3 },
+    { bottom: '1%',  right: '5%',   width: '23%', rotate: '12deg',  zIndex: 2 },
   ],
   // 2023 — fan spread from a single point (like dealing cards)
   '2023': [
@@ -2997,7 +2997,7 @@ const CHAPTER_SCATTER: Record<string, { top?: string; bottom?: string; left?: st
   // 2025 — wide scatter, images pushed to the four corners of the right side
   '2025': [
     { top: '-6%',    left: '40%',   width: '27%', rotate: '-7deg',  zIndex: 2 },
-    { top: '28%',    right: '-4%',  width: '32%', rotate: '10deg',  zIndex: 1 },
+    { top: '28%',    right: '4%',   width: '32%', rotate: '10deg',  zIndex: 1 },
     { bottom: '10%', left: '43%',   width: '25%', rotate: '-11deg', zIndex: 3 },
     { bottom: '-5%', right: '14%',  width: '26%', rotate:  '3deg',  zIndex: 2 },
   ],
@@ -3506,30 +3506,278 @@ const Closing = () => {
   );
 };
 
-// ── SPECIAL END SLIDE — plain white with logo ─────────────────────────────────
+// ── END PARTICLE LOGO — idle explosions + click + cursor repulsion ────────────
+const EndParticleLogo = ({ active }: { active: boolean }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !active) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let raf: number;
+    let mounted = true;
+    const mouse = { x: -9999, y: -9999 };
+
+    type Particle = {
+      x: number; y: number;
+      tx: number; ty: number;
+      sx: number; sy: number;
+      vx: number; vy: number;
+      r: number; color: string;
+      blink: number; blinkSpeed: number;
+      delay: number;
+      sAngle: number; sDist: number;
+    };
+
+    let particles: Particle[] = [];
+    let neighborPairs: [number, number][] = [];
+    let assembled = false;
+    const ASSEMBLE_DURATION = 2200;
+    const LOGO_CONNECT_DIST = 12;
+    const LOGO_SIZE = Math.min(240, Math.max(130, window.innerWidth * 0.16));
+    const startTime = performance.now();
+
+    // Multi-click explosion support
+    const EXPLODE_DURATION = 1800;
+    const EXPLODE_HOLD = 800;
+    const REFORM_DURATION = 2000;
+    const CLUSTER_RADIUS = 50;
+    type Explosion = { indices: Set<number>; start: number; phase: 'exploding' | 'holding' | 'reforming'; phaseStart: number };
+    let explosions: Explosion[] = [];
+
+    const handleClick = (e: MouseEvent) => {
+      if (!assembled || particles.length === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+      const indices = new Set<number>();
+      for (let i = 0; i < particles.length; i++) {
+        const dx = particles[i].tx - cx, dy = particles[i].ty - cy;
+        if (dx * dx + dy * dy < CLUSTER_RADIUS * CLUSTER_RADIUS) indices.add(i);
+      }
+      if (indices.size < 5) return;
+      explosions.push({ indices, start: performance.now(), phase: 'exploding', phaseStart: performance.now() });
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    };
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    canvas.addEventListener('click', handleClick);
+    canvas.addEventListener('mousemove', handleMouseMove);
+
+    const img = new Image();
+    img.src = '/phitopolis_logo_white_vector.svg';
+    img.onload = () => {
+      if (!mounted) return;
+      const aspect = img.naturalHeight / img.naturalWidth;
+      const w = Math.round(LOGO_SIZE), h = Math.round(LOGO_SIZE * aspect);
+      const off = document.createElement('canvas');
+      off.width = w; off.height = h;
+      const oc = off.getContext('2d')!;
+      oc.drawImage(img, 0, 0, w, h);
+      const imgData = oc.getImageData(0, 0, w, h);
+      const d = imgData.data;
+
+      const step = 3;
+      const edgePixels: { x: number; y: number; isGold: boolean }[] = [];
+      for (let y = 0; y < h; y += step) {
+        for (let x = 0; x < w; x += step) {
+          const idx = (y * w + x) * 4;
+          if (d[idx + 3] < 100) continue;
+          let edge = false;
+          for (const [ex, ey] of [[-step, 0], [step, 0], [0, -step], [0, step]]) {
+            const nx = x + ex, ny = y + ey;
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h || d[(ny * w + nx) * 4 + 3] < 100) { edge = true; break; }
+          }
+          if (!edge) continue;
+          const r = d[idx], g = d[idx + 1], b = d[idx + 2];
+          edgePixels.push({ x, y, isGold: r > 180 && g > 140 && b < 100 });
+        }
+      }
+      const interiorPixels: { x: number; y: number; isGold: boolean }[] = [];
+      for (let y = 0; y < h; y += 5) {
+        for (let x = 0; x < w; x += 5) {
+          const idx = (y * w + x) * 4;
+          if (d[idx + 3] < 100) continue;
+          const r = d[idx], g = d[idx + 1], b = d[idx + 2];
+          interiorPixels.push({ x, y, isGold: r > 180 && g > 140 && b < 100 });
+        }
+      }
+
+      const shuffle = <T,>(a: T[]) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+      shuffle(edgePixels); shuffle(interiorPixels);
+      const maxParticles = 700;
+      const edgeCount = Math.min(edgePixels.length, Math.round(maxParticles * 0.7));
+      const interiorCount = Math.min(interiorPixels.length, maxParticles - edgeCount);
+      const selected = [...edgePixels.slice(0, edgeCount), ...interiorPixels.slice(0, interiorCount)];
+
+      const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+      const ox = (cw - w) / 2, oy = (ch - h) / 2;
+
+      particles = selected.map((p) => {
+        const sAngle = Math.random() * Math.PI * 2;
+        const sDist = 400 + Math.random() * 600;
+        const sx = ox + p.x + Math.cos(sAngle) * sDist;
+        const sy = oy + p.y + Math.sin(sAngle) * sDist;
+        return {
+          x: sx, y: sy, tx: ox + p.x, ty: oy + p.y, sx, sy,
+          vx: 0, vy: 0,
+          r: p.isGold ? (0.8 + Math.random() * 1.2) : (0.6 + Math.random() * 1.0),
+          color: p.isGold ? 'rgba(255,199,44,' : 'rgba(10,42,102,',
+          blink: Math.random() * Math.PI * 2, blinkSpeed: 0.6 + Math.random() * 2.0,
+          delay: Math.random() * 600, sAngle, sDist,
+        };
+      });
+
+      neighborPairs = [];
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].tx - particles[j].tx, dy = particles[i].ty - particles[j].ty;
+          if (dx * dx + dy * dy < LOGO_CONNECT_DIST * LOGO_CONNECT_DIST) neighborPairs.push([i, j]);
+        }
+      }
+      assembled = true;
+    };
+
+    const tick = (now: number) => {
+      if (!mounted) return;
+      const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+      ctx.clearRect(0, 0, cw, ch);
+
+      if (!assembled || particles.length === 0) { raf = requestAnimationFrame(tick); return; }
+
+      const elapsed = now - startTime;
+      const t = now * 0.001;
+
+      // Update explosion state machines and compute per-particle strength
+      const particleExplode = new Float32Array(particles.length); // default 0
+      for (let ei = explosions.length - 1; ei >= 0; ei--) {
+        const ex = explosions[ei];
+        let strength = 0;
+        if (ex.phase === 'exploding') {
+          const tt = (now - ex.phaseStart) / EXPLODE_DURATION;
+          if (tt >= 1) { ex.phase = 'holding'; ex.phaseStart = now; strength = 1; }
+          else strength = 1 - Math.pow(1 - tt, 3);
+        } else if (ex.phase === 'holding') {
+          strength = 1;
+          if (now - ex.phaseStart > EXPLODE_HOLD) { ex.phase = 'reforming'; ex.phaseStart = now; }
+        } else if (ex.phase === 'reforming') {
+          const tt = (now - ex.phaseStart) / REFORM_DURATION;
+          if (tt >= 1) { explosions.splice(ei, 1); continue; }
+          else strength = 1 - (tt < 0.5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2);
+        }
+        // Apply max strength per particle across all active explosions
+        for (const idx of ex.indices) {
+          if (strength > particleExplode[idx]) particleExplode[idx] = strength;
+        }
+      }
+
+      // Update particles
+      for (let pi = 0; pi < particles.length; pi++) {
+        const p = particles[pi];
+        const particleElapsed = Math.max(0, elapsed - p.delay);
+        const assembleT = Math.min(1, particleElapsed / ASSEMBLE_DURATION);
+        const ease = 1 - Math.pow(1 - assembleT, 3);
+        const pExplode = particleExplode[pi];
+
+        let goalX = p.tx, goalY = p.ty;
+        if (pExplode > 0) {
+          const dist = p.sDist * 0.45;
+          goalX = p.tx + Math.cos(p.sAngle) * pExplode * dist;
+          goalY = p.ty + Math.sin(p.sAngle) * pExplode * dist;
+        }
+
+        if (assembleT < 1) {
+          p.x = p.sx + (goalX - p.sx) * ease;
+          p.y = p.sy + (goalY - p.sy) * ease;
+        } else {
+          const springForce = 0.035 - pExplode * 0.031;
+          p.vx += (goalX - p.x) * springForce;
+          p.vy += (goalY - p.y) * springForce;
+          // Cursor repulsion
+          const dx = p.x - mouse.x, dy = p.y - mouse.y;
+          const d2 = dx * dx + dy * dy;
+          const repelRadius = 60;
+          if (d2 < repelRadius * repelRadius && d2 > 0) {
+            const dd = Math.sqrt(d2), f = (repelRadius - dd) / repelRadius;
+            p.vx += (dx / dd) * f * 3.5; p.vy += (dy / dd) * f * 3.5;
+          }
+          const damping = 0.88 - pExplode * 0.08;
+          p.vx *= damping; p.vy *= damping;
+          p.x += p.vx; p.y += p.vy;
+        }
+      }
+
+      // Logo-network connections
+      if (neighborPairs.length > 0) {
+        for (const [i, j] of neighborPairs) {
+          const pairExplode = Math.max(particleExplode[i], particleExplode[j]);
+          const logoFade = 1 - pairExplode;
+          if (logoFade < 0.01) continue;
+          const pi = particles[i], pj = particles[j];
+          const ti = Math.min(1, Math.max(0, (elapsed - pi.delay) / ASSEMBLE_DURATION));
+          const tj = Math.min(1, Math.max(0, (elapsed - pj.delay) / ASSEMBLE_DURATION));
+          const arrivalA = Math.min(ti, tj);
+          if (arrivalA < 0.02) continue;
+          const tdx = pi.tx - pj.tx, tdy = pi.ty - pj.ty;
+          const tDist = Math.sqrt(tdx * tdx + tdy * tdy);
+          const alpha = arrivalA * logoFade * (1 - tDist / LOGO_CONNECT_DIST) * 0.42;
+          if (alpha < 0.01) continue;
+          ctx.beginPath(); ctx.moveTo(pi.x, pi.y); ctx.lineTo(pj.x, pj.y);
+          ctx.strokeStyle = `rgba(10,42,102,${alpha.toFixed(3)})`; ctx.lineWidth = 0.4; ctx.stroke();
+        }
+      }
+
+      // Draw particles
+      for (const p of particles) {
+        const particleElapsed = Math.max(0, elapsed - p.delay);
+        const assembleT = Math.min(1, particleElapsed / ASSEMBLE_DURATION);
+        const fadeIn = Math.min(1, assembleT * 2);
+        const blinkAlpha = 0.3 + 0.5 * (0.5 + 0.5 * Math.sin(t * p.blinkSpeed + p.blink));
+        const alpha = fadeIn * blinkAlpha;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + alpha.toFixed(3) + ')'; ctx.fill();
+      }
+
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      mounted = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+      canvas.removeEventListener('click', handleClick);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [active]);
+
+  return (
+    <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+  );
+};
+
+// ── SPECIAL END SLIDE — white with particle logo ──────────────────────────────
 const SpecialEndSlide = () => {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
   return (
     <section id="sec-end" ref={ref}
-      style={{ background: '#FFFFFF', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+      style={{ background: '#FFFFFF', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
     >
-      <motion.img
-        src="https://phitopolis.com/img/logo/logo-blue.png"
-        alt="Phitopolis"
-        initial={{ opacity: 0, scale: 0.88 }}
-        animate={inView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 1, ease: [0.21, 1.02, 0.47, 0.98] }}
-        style={{ width: 'clamp(180px, 28vw, 380px)', objectFit: 'contain' }}
-        onError={(e) => {
-          const img = e.target as HTMLImageElement;
-          img.style.display = 'none';
-          const fb = document.createElement('div');
-          fb.style.cssText = 'font-family:Outfit,sans-serif;font-weight:900;font-size:clamp(2rem,6vw,5rem);letter-spacing:-0.04em;color:#0A2A66;text-transform:lowercase';
-          fb.textContent = 'phitopolis';
-          img.parentNode?.appendChild(fb);
-        }}
-      />
+      <EndParticleLogo active={inView} />
     </section>
   );
 };
