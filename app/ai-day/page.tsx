@@ -1031,6 +1031,36 @@ const SI: Record<string, string> = {
   'Snowflake':         'snowflake',
   'Apache Spark':      'apachespark',
   'Airflow':           'apacheairflow',
+  // Languages & Frameworks
+  'Go':            'go',
+  'Rust':          'rust',
+  'Java':          'openjdk',
+  'Vue.js':        'vuedotjs',
+  'Angular':       'angular',
+  'Svelte':        'svelte',
+  'Django':        'django',
+  'Spring Boot':   'springboot',
+  'Flutter':       'flutter',
+  'Laravel':       'laravel',
+  '.NET':          'dotnet',
+  // Additional Cloud & Infra
+  'AWS':           'amazonaws',
+  'Azure':         'microsoftazure',
+  'GitHub Actions':'githubactions',
+  'Ansible':       'ansible',
+  // Additional Data & Storage
+  'Elasticsearch': 'elasticsearch',
+  'Cassandra':     'apachecassandra',
+  'ClickHouse':    'clickhouse',
+  'dbt':           'dbt',
+  'RabbitMQ':      'rabbitmq',
+  'Supabase':      'supabase',
+  'Firebase':      'firebase',
+  'DynamoDB':      'amazondynamodb',
+  // Additional AI / ML
+  'OpenAI':        'openai',
+  'Jupyter':       'jupyter',
+  'ONNX':          'onnx',
 };
 
 const TECH_ROW1 = [
@@ -1038,7 +1068,8 @@ const TECH_ROW1 = [
   { name: 'Hugging Face', cat: 'ai' }, { name: 'PyTorch', cat: 'ai' },
   { name: 'TensorFlow', cat: 'ai' }, { name: 'Ollama', cat: 'ai' },
   { name: 'CrewAI', cat: 'ai' }, { name: 'MLflow', cat: 'ai' },
-  { name: 'Weights & Biases', cat: 'ai' },
+  { name: 'Weights & Biases', cat: 'ai' }, { name: 'OpenAI', cat: 'ai' },
+  { name: 'Jupyter', cat: 'ai' }, { name: 'ONNX', cat: 'ai' },
 ];
 
 const TECH_ROW2 = [
@@ -1046,9 +1077,17 @@ const TECH_ROW2 = [
   { name: 'Node.js', cat: 'dev' }, { name: 'React', cat: 'dev' },
   { name: 'TypeScript', cat: 'dev' }, { name: 'Next.js', cat: 'dev' },
   { name: 'GraphQL', cat: 'dev' }, { name: 'Celery', cat: 'dev' },
+  { name: 'Go', cat: 'dev' }, { name: 'Rust', cat: 'dev' },
+  { name: 'Java', cat: 'dev' }, { name: 'Vue.js', cat: 'dev' },
+  { name: 'Angular', cat: 'dev' }, { name: 'Svelte', cat: 'dev' },
+  { name: 'Django', cat: 'dev' }, { name: 'Spring Boot', cat: 'dev' },
+  { name: 'Flutter', cat: 'dev' }, { name: 'Laravel', cat: 'dev' },
+  { name: '.NET', cat: 'dev' },
   { name: 'Docker', cat: 'infra' }, { name: 'Kubernetes', cat: 'infra' },
   { name: 'Terraform', cat: 'infra' }, { name: 'GCP', cat: 'infra' },
   { name: 'Nginx', cat: 'infra' }, { name: 'Prometheus', cat: 'infra' },
+  { name: 'AWS', cat: 'infra' }, { name: 'Azure', cat: 'infra' },
+  { name: 'GitHub Actions', cat: 'infra' }, { name: 'Ansible', cat: 'infra' },
 ];
 
 const TECH_ROW3 = [
@@ -1057,6 +1096,10 @@ const TECH_ROW3 = [
   { name: 'Redis', cat: 'data' }, { name: 'MongoDB', cat: 'data' },
   { name: 'Kafka', cat: 'data' }, { name: 'Snowflake', cat: 'data' },
   { name: 'Apache Spark', cat: 'data' }, { name: 'Airflow', cat: 'data' },
+  { name: 'Elasticsearch', cat: 'data' }, { name: 'Cassandra', cat: 'data' },
+  { name: 'ClickHouse', cat: 'data' }, { name: 'dbt', cat: 'data' },
+  { name: 'RabbitMQ', cat: 'data' }, { name: 'Supabase', cat: 'data' },
+  { name: 'Firebase', cat: 'data' }, { name: 'DynamoDB', cat: 'data' },
 ];
 
 // Individual item — flat logo + text, no pill container
@@ -1971,7 +2014,7 @@ const Statement = () => {
         <img
           src="/img/story/bg.jpg"
           alt=""
-          onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.src = '/img/story/bg.svg'; }}
+          onError={(e: React.SyntheticEvent<HTMLImageElement>) => { const img = e.currentTarget; if (!img.src.endsWith('.svg')) { img.src = '/img/story/bg.svg'; } else { img.style.display = 'none'; } }}
           style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.18 }}
         />
       </motion.div>
@@ -2226,8 +2269,8 @@ const ServicesScrollStory = () => {
       tl.to(img3Ref.current,   { opacity: 1, duration: 0.08 }, 0.48);
       tl.to(img3Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.21 }, 0.75);
 
-      // ── Caption 3 ─────────────────────────────────────────────────────────────
-      tl.to(cap3Ref.current,   { opacity: 1, duration: 0.08 }, 0.88);
+      // ── Caption 3 — appears as image 3 approaches full size ──────────────────
+      tl.to(cap3Ref.current,   { opacity: 1, duration: 0.08 }, 0.85);
     }, containerRef);
 
     return () => ctx.revert();
@@ -2619,6 +2662,60 @@ const ShowCard = ({ card, index, isActive = true, fullWidth = false }: { key?: R
 };
 
 // ── OUR PEOPLE — HR Demographics ──────────────────────────────────────────────
+
+// Certification badge images — fetched from vendor CDNs, no local assets required for cloud certs
+const CERT_CLOUD = [
+  // AWS — official hexagonal badges from d1.awsstatic.com
+  { name: 'AWS AI Practitioner',            path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/aif-badge-resized.b4fb88afcfb3d7e57012aa2abe67cbcae6021315.png' },
+  { name: 'AWS Cloud Practitioner',         path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/clf-badge-resized.2fdbed6fe7b39cf6cef5063f283ddd689cc78caa.png' },
+  { name: 'AWS Solutions Architect Assoc',  path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/saa-badge-resized.c20e7aebf85d36eb5203d39969a4bca1164c47d6.png' },
+  { name: 'AWS Developer Associate',        path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/dva-badge-resized.d7d49d6e5cda74099c39ca24ef2573994f4b7955.png' },
+  { name: 'AWS Solutions Architect Pro',    path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/sap-badge-resized.5b4e271e6559dfa5a4b326685b2f00efd53420ed.png' },
+  { name: 'AWS Machine Learning Specialty', path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/mls-badge-resized.e6adaa2cb420c3214ffc9aadf87b65a46eb58c70.png' },
+  { name: 'AWS Security Specialty',         path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/scs-badge-resized.f5b59e681f95bdca2713c46d537ff6bddd6b413a.png' },
+  { name: 'AWS Data Engineer Associate',    path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/dea-badge-resized.46424d5f94ca6c466febd476c86c5d8fe437db1d.png' },
+  { name: 'AWS DevOps Engineer Pro',        path: 'https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/certification/approved/images/certification-badges/dop-badge-resized.8fb9086efd423b597d659ad63b5aa399f7c2a4ed.png' },
+  // Microsoft Azure — official SVG badges from learn.microsoft.com
+  { name: 'Azure Fundamentals',             path: 'https://learn.microsoft.com/en-us/media/learn/certification/badges/microsoft-certified-fundamentals-badge.svg' },
+  { name: 'Azure Associate',                path: 'https://learn.microsoft.com/en-us/media/learn/certification/badges/microsoft-certified-associate-badge.svg' },
+  { name: 'Azure Expert',                   path: 'https://learn.microsoft.com/en-us/media/learn/certification/badges/microsoft-certified-expert-badge.svg' },
+  // Local badges — SVG versions with solid colored backgrounds (no white)
+  { name: 'PMP',                            path: '/logos/certs/pmp.svg' },
+  { name: 'Red Hat (RHCSA)',                path: '/logos/certs/redhat.svg' },
+  { name: 'ITIL',                           path: '/logos/certs/itil.svg' },
+  { name: 'ISO 27001',                      path: '/logos/certs/iso27001.svg' },
+  { name: 'CFA',                            path: '/logos/certs/cfa.svg' },
+  { name: 'Six Sigma',                      path: '/logos/certs/sixsigma.svg' },
+];
+
+// Pre-computed scatter positions with rotation — badges cycle through all positions
+const CERT_SCATTER_POSITIONS: { top: string; left: string; size: number; opacity: number; rotate: string }[] = [
+  { top:  '3%', left: '46%', size: 110, opacity: 0.90, rotate: '-4deg' },
+  { top:  '4%', left: '68%', size:  90, opacity: 0.82, rotate:  '6deg' },
+  { top:  '2%', left: '82%', size: 100, opacity: 0.86, rotate: '-2deg' },
+  { top: '18%', left: '56%', size:  95, opacity: 0.84, rotate:  '8deg' },
+  { top: '15%', left: '74%', size: 115, opacity: 0.88, rotate: '-6deg' },
+  { top: '20%', left: '88%', size:  85, opacity: 0.78, rotate:  '3deg' },
+  { top: '32%', left:  '8%', size: 120, opacity: 0.92, rotate: '-3deg' },
+  { top: '28%', left: '32%', size: 100, opacity: 0.86, rotate:  '7deg' },
+  { top: '30%', left: '58%', size: 110, opacity: 0.88, rotate: '-5deg' },
+  { top: '35%', left: '76%', size:  90, opacity: 0.80, rotate:  '4deg' },
+  { top: '40%', left: '89%', size:  95, opacity: 0.82, rotate: '-8deg' },
+  { top: '48%', left: '18%', size: 105, opacity: 0.90, rotate:  '5deg' },
+  { top: '44%', left: '44%', size: 115, opacity: 0.85, rotate: '-4deg' },
+  { top: '50%', left: '64%', size: 100, opacity: 0.88, rotate:  '9deg' },
+  { top: '52%', left: '82%', size:  90, opacity: 0.80, rotate: '-6deg' },
+  { top: '62%', left:  '6%', size: 110, opacity: 0.87, rotate:  '3deg' },
+  { top: '65%', left: '28%', size:  95, opacity: 0.83, rotate: '-7deg' },
+  { top: '60%', left: '52%', size: 120, opacity: 0.90, rotate:  '5deg' },
+  { top: '68%', left: '72%', size: 100, opacity: 0.82, rotate: '-3deg' },
+  { top: '76%', left: '16%', size: 105, opacity: 0.88, rotate:  '8deg' },
+  { top: '78%', left: '42%', size:  90, opacity: 0.80, rotate: '-5deg' },
+  { top: '74%', left: '64%', size: 115, opacity: 0.85, rotate:  '4deg' },
+  { top: '82%', left: '85%', size:  95, opacity: 0.78, rotate: '-2deg' },
+  { top: '85%', left: '30%', size: 100, opacity: 0.83, rotate:  '6deg' },
+];
+
 type SchoolItem = { name: string; abbr: string; note: string; logo: string };
 type CourseItem = { name: string; pct: number; color: string };
 type CertItem   = { name: string; sub: string; logo: string | null };
@@ -2787,15 +2884,19 @@ const OurPeople = () => {
               </div>
 
               {/* Slide content */}
-              <div ref={el => { contentRefs.current[i] = el; }} style={{ position: 'relative', zIndex: 1, maxWidth: isMobile ? '100%' : '70vw' }}>
-                {/* Heading */}
-                <div style={{ marginBottom: 8 }}>
-                  <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: slide.color }}>{slide.id}</span>
-                </div>
-                <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? 'clamp(1.8rem, 7vw, 2.8rem)' : 'clamp(2.2rem, 4vw, 4rem)', letterSpacing: '-0.03em', color: '#fff', margin: '0 0 8px', lineHeight: 1.1, textTransform: 'lowercase' as const }}>
-                  {slide.heading}
-                </h2>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', margin: '0 0 32px', lineHeight: 1.6 }}>{slide.sub}</p>
+              <div ref={el => { contentRefs.current[i] = el; }} style={{ position: 'relative', zIndex: 1, maxWidth: isMobile ? '100%' : (slide.type === 'certs' ? '100%' : '70vw') }}>
+                {/* Heading — hidden for certs (logo cloud is fully visual) */}
+                {slide.type !== 'certs' && (
+                  <>
+                    <div style={{ marginBottom: 8 }}>
+                      <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: slide.color }}>{slide.id}</span>
+                    </div>
+                    <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: isMobile ? 'clamp(1.8rem, 7vw, 2.8rem)' : 'clamp(2.2rem, 4vw, 4rem)', letterSpacing: '-0.03em', color: '#fff', margin: '0 0 8px', lineHeight: 1.1, textTransform: 'lowercase' as const }}>
+                      {slide.heading}
+                    </h2>
+                    <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', margin: '0 0 32px', lineHeight: 1.6 }}>{slide.sub}</p>
+                  </>
+                )}
 
                 {/* ── Schools grid ─────────────────────────────────────────── */}
                 {slide.type === 'schools' && (
@@ -2877,39 +2978,26 @@ const OurPeople = () => {
                   </div>
                 )}
 
-                {/* ── Certifications grid ───────────────────────────────────── */}
+                {/* ── Certifications badge cloud — scattered local assets ── */}
                 {slide.type === 'certs' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14 }}>
-                    {(slide.items as CertItem[]).map(cert => (
-                      <div key={cert.name} style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderLeft: `3px solid ${slide.color}70`, borderRadius: 16, padding: '18px 20px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 18, overflow: 'hidden' }}>
-                        {/* Glow behind logo */}
-                        <div style={{ position: 'absolute', top: '50%', left: 16, width: 90, height: 90, borderRadius: '50%', background: `${slide.color}14`, filter: 'blur(22px)', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-                        {/* Logo */}
-                        <div style={{ width: 68, height: 68, borderRadius: 14, background: 'rgba(255,255,255,0.92)', border: `1px solid ${slide.color}28`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 10 }}>
-                          {cert.logo ? (
-                            <img src={cert.logo} alt={cert.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.style.display = 'none'; }} />
-                          ) : (
-                            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 18, color: slide.color }}>{cert.name.slice(0, 2)}</span>
-                          )}
+                  <div style={{ position: 'relative', width: '100%', height: isMobile ? '60vw' : '62vh', marginTop: 4 }}>
+                    {CERT_SCATTER_POSITIONS.map((pos, idx) => {
+                      const cert = CERT_CLOUD[idx % CERT_CLOUD.length];
+                      return (
+                        <div key={`${cert.path}-${idx}`} style={{ position: 'absolute', top: pos.top, left: pos.left, opacity: pos.opacity }}>
+                          <img
+                            src={cert.path}
+                            alt={cert.name}
+                            width={pos.size}
+                            height={pos.size}
+                            style={{ objectFit: 'contain', display: 'block', transform: `rotate(${pos.rotate})` }}
+                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                              (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
+                            }}
+                          />
                         </div>
-                        {/* Text */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '0.9rem', color: '#fff', lineHeight: 1.3, marginBottom: 6 }}>{cert.name}</div>
-                          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.68rem', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5 }}>{cert.sub}</div>
-                        </div>
-                      </div>
-                    ))}
-                    {/* ── "& many more" last block ─────────────────────────── */}
-                    <div style={{ position: 'relative', background: `${slide.color}0D`, border: `1px dashed ${slide.color}40`, borderRadius: 16, padding: '18px 20px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 18, overflow: 'hidden' }}>
-                      <div style={{ position: 'absolute', top: '50%', left: 16, width: 90, height: 90, borderRadius: '50%', background: `${slide.color}18`, filter: 'blur(22px)', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-                      <div style={{ width: 68, height: 68, borderRadius: 14, background: `${slide.color}20`, border: `1px solid ${slide.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 22, color: slide.color }}>+</span>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '0.9rem', color: slide.color, lineHeight: 1.3, marginBottom: 6 }}>& Many More</div>
-                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.68rem', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5 }}>Certifications provided across the team</div>
-                      </div>
-                    </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -3501,6 +3589,47 @@ const Closing = () => {
             </MagneticWrapper>
           </motion.div>
         </div>
+
+        {/* Technology partnerships + corporate reference strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 1.0, duration: 0.7 }}
+          style={{ marginTop: 64, borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 32 }}
+        >
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.62rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 24 }}>
+            technology partnerships
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 28, flexWrap: 'wrap', marginBottom: 28 }}>
+            {([
+              { name: 'AWS',       slug: 'amazonaws' },
+              { name: 'Google',    slug: 'googlecloud' },
+              { name: 'Anthropic', slug: 'anthropic' },
+              { name: 'Azure',     slug: 'microsoftazure' },
+              { name: 'NVIDIA',    slug: 'nvidia' },
+              { name: 'Red Hat',   slug: 'redhat' },
+            ] as { name: string; slug: string }[]).map(p => (
+              <img
+                key={p.slug}
+                src={`https://cdn.simpleicons.org/${p.slug}`}
+                alt={p.name}
+                width={28}
+                height={28}
+                style={{ objectFit: 'contain', opacity: 0.28, filter: 'brightness(10)' }}
+                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ))}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 36px', alignItems: 'center' }}>
+            {(['© 2026 Phitopolis Inc.', 'Makati, Philippines', 'Est. 2021', 'AI-First Engineering'] as string[]).map(txt => (
+              <span key={txt} style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)', letterSpacing: '0.02em' }}>
+                {txt}
+              </span>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );
