@@ -292,7 +292,6 @@ const IRIS_SECTIONS: Record<string, { n: string; title: string }> = {
 };
 
 const SectionTransition = () => {
-  // TEMPORARILY DISABLED — remove this early return to restore
   return null;
 
   const [iris, setIris] = useState<{ key: number; n: string; title: string } | null>(null);
@@ -354,7 +353,7 @@ const SectionTransition = () => {
     const TALL_SECTIONS = new Set(['sec-services', 'sec-process', 'sec-people', 'sec-timeline', 'sec-showcase']);
 
     // Sections where natural browser scroll is used to cross the boundary (both directions)
-    const FREE_SCROLL_PAIRS = new Set(['sec-hero', 'sec-vision', 'sec-services', 'sec-techstack']);
+    const FREE_SCROLL_PAIRS = new Set(['sec-hero', 'sec-services']);
     // Sections where only upward scroll is natural (preserves iris going down)
     const FREE_SCROLL_UP_SECTIONS = new Set(['sec-statement']);
 
@@ -1170,7 +1169,7 @@ const TechStack = () => {
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const [activeCat, setActiveCat] = useState<string | null>(null);
   return (
-    <section id="sec-techstack" ref={ref} style={{ background: C.base, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 0', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <section id="sec-techstack" ref={ref} style={{ background: C.base, height: '100vh', padding: 'clamp(80px, 10vw, 120px) 0', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <SectionTag name="tech stack" />
       {/* Section header */}
       <div style={{ paddingLeft: 40, paddingRight: 40, marginBottom: 64 }}>
@@ -1243,7 +1242,7 @@ const Stats = () => {
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const isMobile = useIsMobile();
   return (
-    <section id="sec-stats" ref={ref} style={{ background: C.charcoal, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', position: 'relative', display: 'flex', alignItems: 'center' }}>
+    <section id="sec-stats" ref={ref} style={{ background: C.charcoal, height: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
       <SectionTag name="stats" />
       <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%' }}>
         <motion.div initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }} style={{ marginBottom: 80 }}>
@@ -1806,7 +1805,7 @@ const Hero = ({ ready }: { ready: boolean }) => {
   }, [mouseX, mouseY]);
 
   return (
-    <section id="sec-hero" ref={containerRef} style={{ minHeight: '100vh', background: C.charcoal, position: 'relative', overflow: 'hidden' }}>
+    <section id="sec-hero" ref={containerRef} style={{ height: '100vh', background: C.charcoal, position: 'relative', overflow: 'hidden' }}>
       <SectionTag name="hero" />
 
       {/* Background video */}
@@ -2006,7 +2005,7 @@ const Statement = () => {
   };
 
   return (
-    <section id="sec-statement" ref={sRef} style={{ background: C.base, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center' }}>
+    <section id="sec-statement" ref={sRef} style={{ background: C.base, height: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center' }}>
       <SectionTag name="story" />
 
       {/* Background image — parallax, same pattern as Demographics section */}
@@ -2124,7 +2123,7 @@ const Vision = () => {
   const imgY = useTransform(scrollYProgress, [0, 1], [80, -80]);
 
   return (
-    <section id="sec-vision" ref={sRef} style={{ background: C.base, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+    <section id="sec-vision" ref={sRef} style={{ background: C.base, height: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
       <SectionTag name="vision" />
 
       {/* ── Full-bleed organic image ── */}
@@ -3072,28 +3071,28 @@ const OurPeople = () => {
 // ── CHAPTERS ──────────────────────────────────────────────────────────────────
 const CHAPTERS = [
   { num: '2019', id: 'sec-ch0a', tag: 'The Beginning', title: '2019', sub: 'Where it all started',                 color: '#E879F9',
-    images: ['/img/journey/2019/1.jpg', '/img/journey/2019/2.jpg', '/img/journey/2019/3.svg', '/img/journey/2019/4.svg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2020/06/Cheers-1024x683.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2020/06/karaoke-1024x683.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2020/06/Mgmt-1024x683.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2021/10/Image-from-iOS-4-1024x768.jpg'],
     body: 'Placeholder — content covering Phitopolis\'s founding year will live here. The vision, the first team members, and the early decisions that set the direction for everything that followed.' },
   { num: '2020', id: 'sec-ch0b', tag: 'Laying Ground', title: '2020', sub: 'Setting the stage',                   color: '#38BDF8',
-    images: ['/img/journey/2020/1.svg', '/img/journey/2020/2.svg', '/img/journey/2020/3.svg', '/img/journey/2020/4.svg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2021/10/Image-from-iOS-2-1024x768.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2021/10/Image-from-iOS-6-1024x768.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2020/06/karaoke-1024x683.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2020/06/Mgmt-1024x683.jpg'],
     body: 'Placeholder — content covering 2020\'s groundwork will live here. Building the blueprint amid a global shift, assembling the founding pieces, and preparing to launch.' },
   { num: '2021', id: 'sec-ch1', tag: 'Taking Off', title: '2021', sub: 'Gaining momentum',                       color: '#FFC72C',
-    images: ['/img/journey/2021/1.svg', '/img/journey/2021/2.svg', '/img/journey/2021/3.svg', '/img/journey/2021/4.svg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2021/10/Image-from-iOS-1024x768.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2021/10/Image-from-iOS-7-768x1024.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2021/12/DSCF0566-1024x683.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2021/12/DSCF0249-1024x683.jpg'],
     body: 'Placeholder — content covering 2021\'s milestones will live here. Growing the team, landing key clients, and proving the Phitopolis approach in the market.' },
   { num: '2022', id: 'sec-ch2', tag: 'Taking Shape',  title: '2022', sub: 'Building the foundation',             color: '#60A5FA',
-    images: ['/img/journey/2022/1.jpg', '/img/journey/2022/2.jpg', '/img/journey/2022/3.jpg', '/img/journey/2022/4.jpg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2022/03/Image-from-iOS-35-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2022/03/20220219_210659-1024x768.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2022/08/Image-from-iOS-33-1-1024x683.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2022/12/Image-from-iOS-1-1024x768.jpg'],
     body: 'Placeholder — content covering 2022\'s milestones will live here. Early client engagements, team growth, and the first solutions that proved the model worked.' },
   { num: '2023', id: 'sec-ch3', tag: 'Momentum',      title: '2023', sub: 'Accelerating the mission',            color: '#34D399',
-    images: ['/img/journey/2023/1.jpg', '/img/journey/2023/2.jpg', '/img/journey/2023/3.jpg', '/img/journey/2023/4.jpg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2023/04/IMG_9159-1-1-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2023/05/IMG_1945-1-1-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2023/04/IMG_3842-1-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2023/08/IMG_5547-2-scaled.jpg'],
     body: 'Placeholder — content covering 2023\'s growth will live here. Expanded capabilities, deeper partnerships, and the projects that put Phitopolis on the map.' },
   { num: '2024', id: 'sec-ch4', tag: 'Scaling Up',    title: '2024', sub: 'Reaching new heights',                color: '#A78BFA',
-    images: ['/img/journey/2024/1.jpg', '/img/journey/2024/2.jpg', '/img/journey/2024/3.jpg', '/img/journey/2024/4.jpg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2024/04/Summer-Outing_001.png', 'https://phitopolis.com/blog/wp-content/uploads/2024/04/Summer-Outing_002.png', 'https://phitopolis.com/blog/wp-content/uploads/2024/11/Phitopolis-5th-Year-Anniversary_001-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2024/11/IMG_3680-scaled.jpg'],
     body: 'Placeholder — content covering 2024\'s expansion will live here. Larger engagements, new service lines, and a growing team aligned around AI-first delivery.' },
   { num: '2025', id: 'sec-ch5', tag: 'Full Stride',   title: '2025', sub: 'Operating at full capacity',          color: '#F59E0B',
-    images: ['/img/journey/2025/1.jpg', '/img/journey/2025/2.jpg', '/img/journey/2025/3.jpg', '/img/journey/2025/4.jpg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2025/05/05-2025_Enrique_Summer_Outing-7049.jpeg-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2025/05/image2-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2025/08/42a0de2d-e49e-44f4-83e4-2f159ed7852f.png', 'https://phitopolis.com/blog/wp-content/uploads/2025/10/IMG20250924113010-scaled.jpg'],
     body: 'Placeholder — content covering 2025\'s achievements will live here. Flagship deployments, measurable client impact, and the refinement of what makes Phitopolis different.' },
   { num: '2026', id: 'sec-ch6', tag: 'AI Day',        title: '2026', sub: 'Five years in, the work continues',   color: '#F472B6',
-    images: ['/img/journey/2026/1.jpg', '/img/journey/2026/2.jpg', '/img/journey/2026/3.jpg', '/img/journey/2026/4.jpg'],
+    images: ['https://phitopolis.com/blog/wp-content/uploads/2026/02/5-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2026/02/1-scaled.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2026/03/Jogging-1024x719.jpg', 'https://phitopolis.com/blog/wp-content/uploads/2026/03/Painting-1024x768.jpg'],
     body: 'Placeholder — content covering where Phitopolis stands today will live here. Five years of learning, shipping, and building — and a clear view of what comes next.' },
 ];
 
@@ -3525,7 +3524,7 @@ const Showcase = () => {
 
   if (isMobile) {
     return (
-      <section id="sec-showcase" style={{ background: C.base, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 24px', position: 'relative' }}>
+      <section id="sec-showcase" style={{ background: C.base, height: '100vh', padding: 'clamp(80px, 10vw, 120px) 24px', position: 'relative', overflow: 'hidden' }}>
         <SectionTag name="showcase" />
         <div ref={leftRef}>
           <div style={{ marginBottom: 52 }}>
@@ -3616,7 +3615,7 @@ const Closing = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   return (
-    <section id="sec-closing" ref={ref} style={{ background: C.charcoal, minHeight: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+    <section id="sec-closing" ref={ref} style={{ background: C.charcoal, height: '100vh', padding: 'clamp(80px, 10vw, 120px) 40px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
       <SectionTag name="closing" />
       {/* Background accent */}
       <motion.div animate={{ scale: [1, 1.12, 1], opacity: [0.25, 0.55, 0.25] }} transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
@@ -3964,7 +3963,7 @@ const SpecialEndSlide = () => {
   const inView = useInView(ref, { once: true, margin: '-60px' });
   return (
     <section id="sec-end" ref={ref}
-      style={{ background: '#FFFFFF', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
+      style={{ background: '#FFFFFF', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
     >
       <EndParticleLogo active={inView} />
     </section>
@@ -3984,12 +3983,13 @@ export default function AIDayPage() {
     document.body.style.cursor = 'none';
     document.body.style.backgroundColor = C.charcoal;
 
-    // Hide scrollbar — navigation is handled via wheel interceptor
+    // Hide scrollbar + CSS scroll snap for section navigation
     const style = document.createElement('style');
     style.id = 'ai-day-scroll';
     style.textContent = `
       html::-webkit-scrollbar { display: none; }
-      html { scrollbar-width: none; -ms-overflow-style: none; }
+      html { scrollbar-width: none; -ms-overflow-style: none; scroll-snap-type: y proximity; }
+      [id^="sec-"] { scroll-snap-align: start; }
     `;
     document.head.appendChild(style);
 
