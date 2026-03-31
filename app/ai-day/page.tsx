@@ -3962,14 +3962,27 @@ const EndParticleLogo = ({ active }: { active: boolean }) => {
   }, [active]);
 
   return (
-    <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+    <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
   );
 };
 
 // ── SPECIAL END SLIDE — white with particle logo ──────────────────────────────
 const SpecialEndSlide = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => {
+      if (inView) return;
+      const rect = el.getBoundingClientRect();
+      // Trigger when the section's top is at or above the viewport midpoint
+      if (rect.top <= window.innerHeight / 2) setInView(true);
+    };
+    window.addEventListener('scroll', check, { passive: true });
+    check();
+    return () => window.removeEventListener('scroll', check);
+  }, [inView]);
   return (
     <section id="sec-end" ref={ref}
       style={{ background: '#FFFFFF', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
