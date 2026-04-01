@@ -4007,7 +4007,7 @@ export default function AIDayPage() {
     style.textContent = `
       html::-webkit-scrollbar { display: none; }
       html { scrollbar-width: none; -ms-overflow-style: none; scroll-snap-type: y proximity; }
-      [id^="sec-"] { scroll-snap-align: start; }
+      #sec-hero, #sec-statement, #sec-vision, #sec-techstack, #sec-stats, #sec-closing, #sec-end { scroll-snap-align: start; }
     `;
     document.head.appendChild(style);
 
