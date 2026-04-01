@@ -2647,13 +2647,24 @@ const HR_SLIDES: HRSlide[] = [
     heading: 'Certifications',
     sub: 'Certified across the stack. Upskilling never stops.',
     items: [
-      { name: 'AWS Certified',       sub: 'Solutions Architect · ML Specialty', logo: '/logos/certs/aws.webp' },
-      { name: 'Red Hat (RHCSA)',    sub: 'Linux System Administrator',          logo: '/logos/certs/redhat.webp' },
-      { name: 'ITIL',               sub: 'Foundation & Practitioner',           logo: '/logos/certs/itil.webp' },
-      { name: 'PMP',                sub: 'Project Management Professional',     logo: '/logos/certs/pmp.webp' },
-      { name: 'AWS AI Practitioner', sub: 'Certified AI Practitioner',          logo: '/logos/certs/aipractitioner.webp' },
-      { name: 'ISO 27001',          sub: 'Lead Implementer & Internal Auditor', logo: '/logos/certs/iso27001.webp' },
-      { name: 'CFA / CPA',          sub: 'Finance & Accounting Professionals',  logo: '/logos/certs/cpa.webp' },
+      { name: 'AWS Solutions Architect',     sub: 'Associate',                        logo: '/logos/certs/aws-certs/solutions-architect.png' },
+      { name: 'AWS Developer',              sub: 'Associate',                        logo: '/logos/certs/aws-certs/developer.png' },
+      { name: 'Red Hat (RHCSA)',            sub: 'Linux System Administrator',        logo: '/logos/certs/redhat.webp' },
+      { name: 'AWS DevOps Engineer',        sub: 'Professional',                     logo: '/logos/certs/aws-certs/dev-ops-engineer-pro.png' },
+      { name: 'AWS Cloud Ops Engineer',     sub: 'Associate',                        logo: '/logos/certs/aws-certs/cloud-ops-engineer.png' },
+      { name: 'PMP',                        sub: 'Project Management Professional',   logo: '/logos/certs/pmp.webp' },
+      { name: 'AWS Cloud Practitioner',     sub: 'Foundational',                     logo: '/logos/certs/aws-certs/cloud-practitioner.png' },
+      { name: 'AWS AI Practitioner',        sub: 'Foundational',                     logo: '/logos/certs/aws-certs/ai-practitioner.png' },
+      { name: 'ITIL',                       sub: 'Foundation & Practitioner',         logo: '/logos/certs/itil.webp' },
+      { name: 'AWS Solutions Architect',     sub: 'Professional',                     logo: '/logos/certs/aws-certs/solutions-architect-pro.png' },
+      { name: 'AWS Data Engineer',          sub: 'Associate',                        logo: '/logos/certs/aws-certs/data-engineer.png' },
+      { name: 'ISO 27001',                  sub: 'Lead Implementer & Internal Auditor', logo: '/logos/certs/iso27001.webp' },
+      { name: 'AWS Machine Learning',       sub: 'Specialty',                        logo: '/logos/certs/aws-certs/machine-learning.png' },
+      { name: 'AWS ML Engineer',            sub: 'Associate',                        logo: '/logos/certs/aws-certs/machine-learning-engineer.png' },
+      { name: 'CFA / CPA',                  sub: 'Finance & Accounting Professionals', logo: '/logos/certs/cpa.webp' },
+      { name: 'AWS Gen AI Developer',       sub: 'Associate',                        logo: '/logos/certs/aws-certs/generative-ai-developer.png' },
+      { name: 'AWS Security',              sub: 'Specialty',                        logo: '/logos/certs/aws-certs/security.png' },
+      { name: 'AWS Advanced Networking',    sub: 'Specialty',                        logo: '/logos/certs/aws-certs/advanced-networking.png' },
     ],
   },
 ];
@@ -2953,15 +2964,15 @@ const OurPeople = () => {
 
                 {/* ── Certifications grid ───────────────────────────────────── */}
                 {slide.type === 'certs' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
-                    {(slide.items as CertItem[]).map(cert => (
-                      <div key={cert.name} style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '18px 16px 16px', display: 'flex', flexDirection: 'column', gap: 10, overflow: 'hidden' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(6, 1fr)', gap: 10 }}>
+                    {(slide.items as CertItem[]).map((cert, idx) => (
+                      <div key={`${cert.name}-${idx}`} style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '14px 12px 12px', display: 'flex', flexDirection: 'column', gap: 8, overflow: 'hidden' }}>
                         {/* Top accent line */}
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${slide.color}, transparent)`, borderRadius: '16px 16px 0 0' }} />
                         {/* Icon area */}
-                        <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                        <div style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', flexShrink: 0 }}>
                           {cert.logo ? (
-                            <img src={cert.logo} alt={cert.name} width={30} height={30} style={{ objectFit: 'contain' }} onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.style.display = 'none'; }} />
+                            <img src={cert.logo} alt={cert.name} width={60} height={60} style={{ objectFit: 'contain', display: 'block' }} onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.style.display = 'none'; }} />
                           ) : (
                             <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 900, fontSize: 14, color: slide.color }}>{cert.name.slice(0, 2)}</span>
                           )}
