@@ -273,8 +273,6 @@ const CustomCursor = () => {
 
 // ── SUB-SECTION SNAP — wheel/touch/key snapping within Values & Services ──────
 const SUB_SNAP_SECTIONS: Record<string, number[]> = {
-  'sec-services': [0, 0.20, 0.55, 1.00],
-  'sec-process':  [0, 0.15, 0.43, 0.68, 0.92],
 };
 
 const SubSectionSnap = () => {
@@ -2127,7 +2125,7 @@ const ServicesScrollStory = () => {
       tl.to(img2Ref.current,   { scale: 0.22, x: leftThumb, borderRadius: 20 / 0.22, duration: 0.12 }, 0.60);
 
       // ── Caption 2 ─────────────────────────────────────────────────────────────
-      tl.to(cap2Ref.current,   { opacity: 1, duration: 0.07 }, 0.40);
+      tl.to(cap2Ref.current,   { opacity: 1, duration: 0.07 }, 0.45);
       tl.to(cap2Ref.current,   { opacity: 0, duration: 0.07 }, 0.58);
 
       // ── Image 3: appears small → grows to full ────────────────────────────────
@@ -2135,7 +2133,7 @@ const ServicesScrollStory = () => {
       tl.to(img3Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.18 }, 0.60);
 
       // ── Caption 3 — appears as image 3 reaches full size; hold through end ───
-      tl.to(cap3Ref.current,   { opacity: 1, duration: 0.07 }, 0.68);
+      tl.to(cap3Ref.current,   { opacity: 1, duration: 0.07 }, 0.76);
     }, containerRef);
 
     return () => ctx.revert();
@@ -2231,7 +2229,7 @@ const PHASES = [
     definition: 'We operate with unwavering honesty and transparency in every interaction, ensuring our word is our bond.',
     valueToClient: 'Builds a foundation of trust and predictability — clients can rely on truthful reporting and ethical decision-making, reducing risk and ensuring long-term partnership stability.',
     color: C.accent, glow: '#FFC72C',
-    image: 'https://phitopolis.com/img/core-competencies/proactive-communication.jpg',
+    image: '/values/integrity.png',
     imagePos: 'center 40%',
   },
   {
@@ -2239,18 +2237,15 @@ const PHASES = [
     definition: 'We take full ownership of our commitments and results, standing behind the quality of our output without excuses.',
     valueToClient: 'Ensures reliability and peace of mind — by owning both successes and challenges, we provide a dependable partner who proactively manages outcomes to meet project milestones.',
     color: '#4A90D9', glow: '#4A90D9',
-    image: 'https://phitopolis.com/blog/wp-content/uploads/2025/11/Ateneo-Career-Talk-2025_002.png',
+    image: '/values/accountability.png',
     imagePos: 'center top',
-    imageHeight: 'clamp(300px, 46vh, 500px)',
-    imageFit: 'contain' as const,
-    imageBg: 'rgba(10,42,102,0.08)',
   },
   {
     num: '03', label: 'Forward Thinking',
     definition: 'We don\'t just solve today\'s problems; we anticipate tomorrow\'s challenges through innovation and strategic planning.',
     valueToClient: 'Clients gain a competitive edge by leveraging our proactive approach to technology and market trends, ensuring their business remains resilient and scalable.',
     color: '#A78BFA', glow: '#A78BFA',
-    image: 'https://phitopolis.com/blog/wp-content/uploads/2025/03/AI-Engineering_001.png',
+    image: '/values/forward-thinking.png',
     imagePos: 'center top',
   },
   {
@@ -2258,7 +2253,7 @@ const PHASES = [
     definition: 'In everything we do — we set the highest standards for performance, continuously refining our processes to deliver superior quality.',
     valueToClient: 'Our commitment to excellence translates to reduced errors, higher efficiency, and a final product that exceeds expectations, maximizing the client\'s return on investment.',
     color: '#2ECC71', glow: '#2ECC71',
-    image: 'https://phitopolis.com/img/core-competencies/technical-excellence.jpg',
+    image: '/values/excelence.png',
     imagePos: 'center 35%',
   },
 ];
