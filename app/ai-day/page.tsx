@@ -2124,7 +2124,7 @@ const ServicesScrollStory = () => {
       // ── Image 2: appears → full → thumbnail ───────────────────────────────────
       tl.to(img2Ref.current,   { opacity: 1, duration: 0.07 }, 0.26);
       tl.to(img2Ref.current,   { scale: 1, x: '0vw', y: '0vh', borderRadius: 20, duration: 0.18 }, 0.30);
-      tl.to(img2Ref.current,   { scale: 0.22, x: leftThumb, borderRadius: 20 / 0.22, duration: 0.12 }, 0.60);
+      tl.to(img2Ref.current,   { scale: 0.22, x: leftThumb, borderRadius: 20 / 0.22, duration: 0.18 }, 0.60);
 
       // ── Caption 2 ─────────────────────────────────────────────────────────────
       tl.to(cap2Ref.current,   { opacity: 1, duration: 0.07 }, 0.45);
