@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Pages
 import Home from './app/page.tsx';
 import Services from './app/services/page.tsx';
-import About from './app/about/page.tsx';
 import Careers from './app/careers/page.tsx';
 import Blog from './app/blog/page.tsx';
 import Contact from './app/contact/page.tsx';
@@ -103,14 +102,14 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-md border-b border-primary-light group/header">
-      <nav className="container mx-auto px-6 py-4 flex items-center justify-between">
+      <nav className="container mx-auto px-6 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-3 group/brand">
           <Image
             src="/phitopolis_logo_white.svg"
             alt="Phitopolis Logo"
-            width={40}
-            height={40}
-            className="h-10 w-auto object-contain"
+            width={48}
+            height={48}
+            className="h-12 w-auto object-contain"
             priority={true}
           />
           <span className="text-2xl font-display font-bold tracking-tight text-white transition-colors uppercase">
@@ -232,7 +231,7 @@ const AppRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/services" element={<PageTransition><Services /></PageTransition>} />
-        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/about" element={<AIDayPage isAbout={true} />} />
         <Route path="/careers" element={<PageTransition><Careers /></PageTransition>} />
         <Route path="/careers/:slug" element={<PageTransition><JobDetail /></PageTransition>} />
         <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
@@ -245,18 +244,19 @@ const AppRoutes = () => {
   );
 };
 
-// Conditionally renders Header/Footer — bypassed for /ai-day
+// Conditionally renders Header/Footer — bypassed for /ai-day; footer skipped for /about
 const AppLayout = () => {
   const location = useLocation();
   const isAIDay = location.pathname === '/ai-day';
+  const isAbout = location.pathname === '/about';
 
   return (
-    <div className={isAIDay ? '' : 'min-h-screen flex flex-col bg-white'}>
+    <div className={isAIDay ? '' : (isAbout ? '' : 'min-h-screen flex flex-col bg-white')}>
       {!isAIDay && <Header />}
       <main className={isAIDay ? '' : 'flex-grow pt-16'}>
         <AppRoutes />
       </main>
-      {!isAIDay && <Footer />}
+      {!isAIDay && !isAbout && <Footer />}
       {!isAIDay && <MobileNavigation />}
     </div>
   );

@@ -3970,13 +3970,145 @@ const SpecialEndSlide = () => {
   );
 };
 
+// ── ENGINEERING IN MOTION — video section for /about ─────────────────────────
+const EngineeringInMotion = () => {
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  return (
+    <section style={{ background: C.base, padding: '96px 0', position: 'relative', overflow: 'hidden' }}>
+      {/* Subtle grid texture */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.03,
+        backgroundImage: 'linear-gradient(to right,#0A2A66 1px,transparent 1px),linear-gradient(to bottom,#0A2A66 1px,transparent 1px)',
+        backgroundSize: '40px 40px',
+      }} />
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          style={{ textAlign: 'center', marginBottom: '48px' }}
+        >
+          <span style={{ color: C.charcoal, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
+            Visual Story
+          </span>
+          <h2 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: C.charcoal, marginTop: '8px', letterSpacing: '-0.02em' }}>
+            Engineering in Motion
+          </h2>
+          <div style={{ width: '48px', height: '3px', background: C.accent, margin: '16px auto 0', borderRadius: '2px' }} />
+        </motion.div>
+
+        {/* Video thumbnail */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+          onClick={() => setIsVideoOpen(true)}
+          style={{
+            position: 'relative', maxWidth: '900px', margin: '0 auto',
+            aspectRatio: '16/9', borderRadius: '20px', overflow: 'hidden',
+            boxShadow: '0 40px 80px -20px rgba(10,42,102,0.25)', cursor: 'pointer',
+          }}
+          whileHover={{ scale: 1.01 }}
+        >
+          <img
+            src="https://phitopolis.com/img/core-competencies/teamwork-and-leadership.jpg"
+            alt="Phitopolis Team — Engineering in Motion"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          {/* Overlay */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to top, rgba(10,42,102,0.6) 0%, rgba(10,42,102,0.2) 60%, transparent 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {/* Play button */}
+            <motion.div
+              whileHover={{ scale: 1.12 }}
+              style={{
+                width: '80px', height: '80px', borderRadius: '50%',
+                background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: `0 0 0 0 ${C.accent}66`,
+              }}
+              animate={{ boxShadow: [`0 0 0 0 ${C.accent}66`, `0 0 0 18px ${C.accent}00`] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
+            >
+              {/* Play SVG */}
+              <svg width="28" height="28" viewBox="0 0 24 24" fill={C.charcoal} style={{ marginLeft: '4px' }}>
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+            </motion.div>
+          </div>
+          {/* Label */}
+          <div style={{ position: 'absolute', bottom: '24px', left: '28px', color: '#fff', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.05em', textTransform: 'uppercase', opacity: 0.85 }}>
+            Watch the story
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Video Modal */}
+      <AnimatePresence>
+        {isVideoOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => setIsVideoOpen(false)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 10000,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
+              background: 'rgba(10,42,102,0.96)', backdropFilter: 'blur(8px)',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'relative', width: '100%', maxWidth: '1000px',
+                aspectRatio: '16/9', background: '#000', borderRadius: '16px', overflow: 'hidden',
+                boxShadow: '0 40px 80px rgba(0,0,0,0.6)',
+              }}
+            >
+              <button
+                onClick={() => setIsVideoOpen(false)}
+                style={{
+                  position: 'absolute', top: '12px', right: '12px', zIndex: 10,
+                  width: '40px', height: '40px', borderRadius: '50%', border: 'none', cursor: 'pointer',
+                  background: 'rgba(255,255,255,0.12)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                {/* Close SVG */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+              <iframe
+                src="https://player.vimeo.com/video/799777608?autoplay=1"
+                style={{ width: '100%', height: '100%', border: 'none' }}
+                allow="autoplay; fullscreen"
+                allowFullScreen
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+};
+
 // ── PAGE ──────────────────────────────────────────────────────────────────────
-export default function AIDayPage() {
-  const [ready, setReady] = useState(false);
+export default function AIDayPage({ isAbout = false }: { isAbout?: boolean }) {
+  const [ready, setReady] = useState(isAbout);
   const handlePreloaderComplete = useCallback(() => setReady(true), []);
   useEffect(() => {
-    document.title = 'Phitopolis | AI Day 2026';
-    document.body.style.cursor = 'none';
+    document.title = isAbout ? 'About Us | Phitopolis' : 'Phitopolis | AI Day 2026';
+    if (!isAbout) {
+      document.body.style.cursor = 'none';
+    }
     document.body.style.backgroundColor = C.charcoal;
 
     // Hide scrollbar + CSS scroll snap for section navigation
@@ -3999,24 +4131,25 @@ export default function AIDayPage() {
   return (
     <>
       <GrainOverlay />
-      <Preloader onComplete={handlePreloaderComplete} />
-      <div>
+      {!isAbout && <Preloader onComplete={handlePreloaderComplete} />}
+      <div style={isAbout ? { paddingTop: '64px' } : {}}>
         <ScrollProgressBar />
-        <CustomCursor />
+        {!isAbout && <CustomCursor />}
         <SubSectionSnap />
         <FloatNav />
-        <Hero ready={ready} />
+        {!isAbout && <Hero ready={ready} />}
         <Statement />
+        {isAbout && <EngineeringInMotion />}
         <Process />
         <MarqueeSection />
         <ServicesScrollStory />
         <TechStack />
-        <div style={{ display: 'none' }}><Stats /></div>
+        {isAbout ? <Stats /> : <div style={{ display: 'none' }}><Stats /></div>}
         <OurPeople />
         <Vision />
         <ChapterGroup />
-        {false && <Showcase />}
-        {false && <Closing />}
+        {isAbout && <Showcase />}
+        {isAbout && <Closing />}
         <SpecialEndSlide />
       </div>
     </>

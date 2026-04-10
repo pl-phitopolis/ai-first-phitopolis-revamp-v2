@@ -3,7 +3,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import MagneticWrapper from '../components/MagneticWrapper';
-import TextScramble from '../components/TextScramble';
 import { ArrowRight, ChevronRight, Zap, Shield, TrendingUp, Hexagon, Circle, Triangle } from 'lucide-react';
 import { SERVICES } from '../constants.tsx';
 import { apolloClient } from '../lib/apollo-client';
@@ -300,6 +299,63 @@ const CredentialCard = ({
   );
 };
 
+// Terminal typing overlay — shown on service card image hover
+function DataStreamOverlay({ story, isVisible }: { story: string; isVisible: boolean }) {
+  const [displayedText, setDisplayedText] = useState('');
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setDisplayedText('');
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+    setDisplayedText('');
+    let index = 0;
+    intervalRef.current = window.setInterval(() => {
+      index++;
+      if (index <= story.length) {
+        setDisplayedText(story.slice(0, index));
+      } else {
+        if (intervalRef.current !== null) {
+          window.clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      }
+    }, 25);
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isVisible, story]);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="absolute inset-0 flex flex-col justify-center overflow-hidden" style={{ backgroundColor: 'rgba(10, 42, 102, 0.92)' }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ opacity: 0.04, backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)' }} />
+      <div className="relative z-10 px-5 py-4 overflow-y-auto max-h-full">
+        <div className="flex items-center gap-2 mb-3" style={{ opacity: 0.5 }}>
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#f87171' }} />
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#facc15' }} />
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#4ade80' }} />
+          <span className="text-xs ml-2" style={{ color: '#94a3b8', fontFamily: 'monospace' }}>phitopolis://expertise</span>
+        </div>
+        <p style={{ color: '#6ee7b7', fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: '1.6' }}>
+          <span style={{ color: '#FFC72C', fontWeight: 700 }}>$ </span>
+          {displayedText}
+          <span className="inline-block ml-0.5 align-middle" style={{ width: '7px', height: '14px', backgroundColor: '#6ee7b7', animation: 'cursor-blink 0.8s steps(2) infinite' }} />
+        </p>
+      </div>
+    </div>
+  );
+}
+
 interface HomeSvcCardProps {
   service: typeof SERVICES[number];
   i: number;
@@ -308,6 +364,7 @@ interface HomeSvcCardProps {
 
 function HomeSvcCard({ service, i }: HomeSvcCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [isImageHovered, setIsImageHovered] = useState(false);
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
   const rX = useSpring(rotateX, { stiffness: 280, damping: 28 });
@@ -325,6 +382,7 @@ function HomeSvcCard({ service, i }: HomeSvcCardProps) {
   const handleMouseLeave = () => {
     rotateX.set(0);
     rotateY.set(0);
+    setIsImageHovered(false);
   };
 
   const images = [
@@ -364,12 +422,17 @@ function HomeSvcCard({ service, i }: HomeSvcCardProps) {
               </li>
             ))}
           </ul>
-          <div className="relative mt-auto -mx-8 -mb-8 overflow-hidden h-48">
+          <div
+            className="relative mt-auto -mx-8 -mb-8 overflow-hidden h-48 cursor-pointer"
+            onMouseEnter={() => setIsImageHovered(true)}
+            onMouseLeave={() => setIsImageHovered(false)}
+          >
             <img
               src={images[i % 3]}
               alt={service.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className={`w-full h-full object-cover transition-all duration-700 ${isImageHovered ? 'scale-110 grayscale' : 'scale-100 group-hover:scale-110'}`}
             />
+            <DataStreamOverlay story={service.story} isVisible={isImageHovered} />
           </div>
         </div>
       </motion.div>
@@ -521,7 +584,7 @@ export default function Home() {
           className="container mx-auto px-6 text-center relative z-10"
         >
           <h1 className="text-5xl md:text-8xl font-display font-bold mb-6 tracking-tight leading-none text-white">
-            <TextScramble text="Make tomorrow's technology with us!" />
+            Make tomorrow's technology with us!
           </h1>
           <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
             Founded by veterans in finance, we build the data systems of tomorrow.

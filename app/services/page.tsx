@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { SERVICES } from '../../constants';
 import { CheckCircle2 } from 'lucide-react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import TextScramble from '../../components/TextScramble';
 
 // Terminal typing overlay component
 function DataStreamOverlay({ story, isVisible }: { story: string; isVisible: boolean }) {
@@ -153,7 +152,7 @@ export default function ServicesPage() {
         <div className="max-w-3xl mb-24">
           <span className="text-accent font-bold tracking-widest uppercase text-xs">Capabilities</span>
           <h1 className="text-5xl md:text-7xl font-display font-bold mt-4 mb-8 text-primary">
-            <TextScramble text="Technical excellence at every layer." />
+            Technical excellence at every layer.
           </h1>
           <p className="text-xl text-slate-600 leading-relaxed font-light">
             Phitopolis combines deep domain knowledge in finance and technology with modern engineering practices
