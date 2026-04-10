@@ -91,9 +91,18 @@ const Image = ({ src, alt, width, height, className, priority, style }: {
 
 const Header = () => {
   const location = useLocation();
+  const [atTop, setAtTop] = useState(true);
+
+  useEffect(() => {
+    const onScroll = () => setAtTop(window.scrollY < window.innerHeight);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const isHome = location.pathname === '/';
+  const transparent = isHome && atTop;
 
   const navLinks = [
-    { name: 'Services', href: '/services' },
     { name: 'About', href: '/about' },
     { name: 'Careers', href: '/careers' },
     { name: 'Blog', href: '/blog' },
@@ -101,7 +110,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-md border-b border-primary-light group/header">
+    <header className={`fixed top-0 left-0 right-0 z-50 group/header transition-all duration-300 ${transparent ? 'bg-transparent border-b border-transparent' : 'bg-primary/95 backdrop-blur-md border-b border-primary-light'}`}>
       <nav className="container mx-auto px-6 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-3 group/brand">
           <Image
@@ -174,16 +183,6 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-accent font-bold mb-6">Services</h4>
-            <ul className="space-y-3 text-slate-100 text-sm">
-              <li><Link to="/services" className="hover:text-accent transition-colors">R&D Consulting</Link></li>
-              <li><Link to="/services" className="hover:text-accent transition-colors">Data Science</Link></li>
-              <li><Link to="/services" className="hover:text-accent transition-colors">Full-Stack Dev</Link></li>
-              <li><Link to="/services" className="hover:text-accent transition-colors">FinTech Strategy</Link></li>
-            </ul>
-          </div>
-
-          <div>
             <h4 className="text-accent font-bold mb-6">Company</h4>
             <ul className="space-y-3 text-slate-100 text-sm">
               <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
@@ -249,11 +248,12 @@ const AppLayout = () => {
   const location = useLocation();
   const isAIDay = location.pathname === '/ai-day';
   const isAbout = location.pathname === '/about';
+  const isHome = location.pathname === '/';
 
   return (
     <div className={isAIDay ? '' : (isAbout ? '' : 'min-h-screen flex flex-col bg-white')}>
       {!isAIDay && <Header />}
-      <main className={isAIDay ? '' : 'flex-grow pt-16'}>
+      <main className={isAIDay ? '' : `flex-grow ${isHome ? '' : 'pt-16'}`}>
         <AppRoutes />
       </main>
       {!isAIDay && !isAbout && <Footer />}

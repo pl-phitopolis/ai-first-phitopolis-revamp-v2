@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Briefcase, Users, Mail, Menu, X } from 'lucide-react';
+import { Home, Users, Mail, Menu, X } from 'lucide-react';
 import { useScrollDirection } from '../lib/hooks/useScrollDirection';
 import { hapticTick } from '../lib/haptics';
 
 const primaryLinks = [
   { icon: Home, to: '/', label: 'Home' },
-  { icon: Briefcase, to: '/services', label: 'Services' },
   { icon: Users, to: '/about', label: 'About' },
   { icon: Mail, to: '/contact', label: 'Contact' },
 ];
 
 const allLinks = [
   { name: 'Home', to: '/' },
-  { name: 'Services', to: '/services' },
   { name: 'About', to: '/about' },
   { name: 'Careers', to: '/careers' },
   { name: 'Blog', to: '/blog' },

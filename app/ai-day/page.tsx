@@ -1666,7 +1666,7 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
 };
 
 // ── HERO ──────────────────────────────────────────────────────────────────────
-const Hero = ({ ready }: { ready: boolean }) => {
+export const Hero = ({ ready, hideDecorations }: { ready: boolean; hideDecorations?: boolean }) => {
   const containerRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
@@ -1691,7 +1691,7 @@ const Hero = ({ ready }: { ready: boolean }) => {
 
   return (
     <section id="sec-hero" ref={containerRef} style={{ height: '100vh', background: C.charcoal, position: 'relative', overflow: 'hidden' }}>
-      <SectionTag name="hero" />
+      {!hideDecorations && <SectionTag name="hero" />}
 
       {/* Background video */}
       <motion.div style={{ position: 'absolute', inset: 0, y: bgY, zIndex: 1, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -1719,18 +1719,22 @@ const Hero = ({ ready }: { ready: boolean }) => {
       />
 
       {/* Top-left label */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.8 }}
-        style={{ position: 'absolute', top: 44, left: 44, color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif', fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', zIndex: 10 }}
-      >
-        about us
-      </motion.div>
+      {!hideDecorations && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.8 }}
+          style={{ position: 'absolute', top: 44, left: 44, color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif', fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', zIndex: 10 }}
+        >
+          about us
+        </motion.div>
+      )}
 
       {/* Top-right label */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.8 }}
-        style={{ position: 'absolute', top: 44, right: 44, color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif', fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', zIndex: 10 }}
-      >
-        phitopolis
-      </motion.div>
+      {!hideDecorations && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.8 }}
+          style={{ position: 'absolute', top: 44, right: 44, color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif', fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', zIndex: 10 }}
+        >
+          phitopolis
+        </motion.div>
+      )}
 
       {/* Narrator AI placeholder — lower left */}
       {/* Scroll cue — bottom right */}

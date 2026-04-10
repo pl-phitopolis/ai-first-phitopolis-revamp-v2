@@ -7,6 +7,7 @@ import { ArrowRight, ChevronRight, Zap, Shield, TrendingUp, Hexagon, Circle, Tri
 import { SERVICES } from '../constants.tsx';
 import { apolloClient } from '../lib/apollo-client';
 import { GET_CAREERS } from '../lib/graphql/queries';
+import { Hero } from './ai-day/page.tsx';
 
 // Floating shapes for the practitioners section
 const PractitionersFloatingShapes = () => {
@@ -529,13 +530,15 @@ export default function Home() {
 
   return (
     <div className="space-y-0">
-      {/* Hero Section */}
-      <section 
+      {/* Hero Section (AI Day particle hero) */}
+      <Hero ready={true} hideDecorations />
+
+      {/* === OLD HERO — commented out for potential restoration ===
+      <section
         ref={sectionRef}
         onMouseMove={handleMouseMove}
         className="relative h-[95vh] flex items-center justify-center overflow-hidden bg-primary group"
       >
-        {/* Background Video */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden bg-primary">
           <video
             ref={videoRef}
@@ -549,15 +552,11 @@ export default function Home() {
           >
             <source src="/hi-tech_blue_digital_connectivity_abstract_video.mp4" type="video/mp4" />
           </video>
-          
-          {/* Static & Animated Background Layers */}
           <div className="absolute inset-0">
             <motion.div className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[160px] animate-bg-drift-1" style={{ x: gyroX, y: gyroY }} />
             <motion.div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-accent/10 rounded-full blur-[140px] animate-bg-drift-2" style={{ x: gyroX, y: gyroY }} />
             <motion.div className="absolute top-[20%] right-[10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[180px] animate-bg-drift-3" style={{ x: gyroX, y: gyroY }} />
-            
-            {/* NEW: Interactive Spotlight Blob */}
-            <motion.div 
+            <motion.div
               className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
               style={{
                 left: spotlightX,
@@ -571,13 +570,11 @@ export default function Home() {
                 zIndex: 1
               }}
             />
-
             <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
           </div>
         </div>
-        
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -591,21 +588,17 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <MagneticWrapper>
-              <Link to="/services" className="relative overflow-hidden px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center group shadow-lg shadow-accent/30 transition-colors hover:scale-105 active:scale-95">
+              <Link to="/careers" className="relative overflow-hidden px-8 py-4 bg-accent hover:bg-accent-hover text-primary rounded-full font-bold flex items-center group shadow-lg shadow-accent/30 transition-colors hover:scale-105 active:scale-95">
                 <span className="shimmer-sweep" aria-hidden="true" />
                 <span className="relative z-10 flex items-center">
-                  Explore Services
+                  Join the Team
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
             </MagneticWrapper>
-            <Link to="/careers" className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full font-bold border border-white/30 transition-all hover:scale-105 active:scale-95">
-              Join the Team
-            </Link>
           </div>
         </motion.div>
-
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.4 }}
           transition={{ delay: 1, duration: 1 }}
@@ -614,6 +607,7 @@ export default function Home() {
            <div className="w-1 h-12 bg-gradient-to-b from-accent to-transparent rounded-full"></div>
         </motion.div>
       </section>
+      === END OLD HERO === */}
 
       {/* Services Summary */}
       <section className="py-24 bg-white relative">
@@ -629,9 +623,6 @@ export default function Home() {
               <span className="text-primary font-bold tracking-widest uppercase text-xs">Our Expertise</span>
               <h2 className="text-4xl md:text-5xl font-display font-bold mt-2 text-primary">Services we offer</h2>
             </div>
-            <Link to="/services" className="text-slate-500 hover:text-primary flex items-center text-sm font-medium transition-colors group">
-              View all services <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
-            </Link>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
