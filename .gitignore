@@ -16,6 +16,9 @@ dist-ssr
 .env
 .env.local
 
+# Windows Zone.Identifier (NTFS alternate data streams, auto-created on downloaded files)
+*:Zone.Identifier
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

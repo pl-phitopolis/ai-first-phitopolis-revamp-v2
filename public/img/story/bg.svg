@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" width="1600" height="700">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1f4a"/>
+      <stop offset="100%" style="stop-color:#0A2A66"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="48"/></filter>
+  </defs>
+  <rect width="1600" height="700" fill="url(#bg)"/>
+  <ellipse cx="300"  cy="600" rx="480" ry="340" fill="#FFC72C" opacity="0.05" filter="url(#glow)"/>
+  <ellipse cx="1300" cy="100" rx="400" ry="300" fill="#FFC72C" opacity="0.04" filter="url(#glow)"/>
+  <ellipse cx="800"  cy="350" rx="600" ry="400" fill="#FFC72C" opacity="0.03" filter="url(#glow)"/>
+  <!-- Grid -->
+  <g stroke="rgba(255,255,255,0.025)" stroke-width="1">
+    <line x1="0"    y1="140" x2="1600" y2="140"/>
+    <line x1="0"    y1="280" x2="1600" y2="280"/>
+    <line x1="0"    y1="420" x2="1600" y2="420"/>
+    <line x1="0"    y1="560" x2="1600" y2="560"/>
+    <line x1="200"  y1="0"   x2="200"  y2="700"/>
+    <line x1="400"  y1="0"   x2="400"  y2="700"/>
+    <line x1="600"  y1="0"   x2="600"  y2="700"/>
+    <line x1="800"  y1="0"   x2="800"  y2="700"/>
+    <line x1="1000" y1="0"   x2="1000" y2="700"/>
+    <line x1="1200" y1="0"   x2="1200" y2="700"/>
+    <line x1="1400" y1="0"   x2="1400" y2="700"/>
+  </g>
+  <!-- Center label -->
+  <rect x="630" y="304" width="340" height="76" rx="10" fill="rgba(255,199,44,0.05)" stroke="rgba(255,199,44,0.15)" stroke-width="1"/>
+  <text x="800" y="334" font-family="Outfit, Arial, sans-serif" font-size="10" font-weight="700" fill="#FFC72C" fill-opacity="0.4" text-anchor="middle" letter-spacing="0.2em">PLACEHOLDER</text>
+  <text x="800" y="358" font-family="Outfit, Arial, sans-serif" font-size="13" font-weight="600" fill="rgba(255,255,255,0.18)" text-anchor="middle">story / bg.jpg</text>
+  <!-- Corner marks -->
+  <path d="M48 48 L48 80 M48 48 L80 48" stroke="#FFC72C" stroke-opacity="0.25" stroke-width="1.5" fill="none"/>
+  <path d="M1552 48 L1552 80 M1552 48 L1520 48" stroke="#FFC72C" stroke-opacity="0.25" stroke-width="1.5" fill="none"/>
+  <path d="M48 652 L48 620 M48 652 L80 652" stroke="#FFC72C" stroke-opacity="0.25" stroke-width="1.5" fill="none"/>
+  <path d="M1552 652 L1552 620 M1552 652 L1520 652" stroke="#FFC72C" stroke-opacity="0.25" stroke-width="1.5" fill="none"/>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1f4a"/>
+      <stop offset="100%" style="stop-color:#0A2A66"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="32"/></filter>
+  </defs>
+  <rect width="900" height="560" fill="url(#bg)"/>
+  <ellipse cx="180" cy="420" rx="260" ry="200" fill="#FFC72C" opacity="0.08" filter="url(#glow)"/>
+  <ellipse cx="720" cy="140" rx="220" ry="180" fill="#FFC72C" opacity="0.06" filter="url(#glow)"/>
+  <!-- Grid -->
+  <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
+    <line x1="0" y1="112" x2="900" y2="112"/><line x1="0" y1="224" x2="900" y2="224"/>
+    <line x1="0" y1="336" x2="900" y2="336"/><line x1="0" y1="448" x2="900" y2="448"/>
+    <line x1="150" y1="0" x2="150" y2="560"/><line x1="300" y1="0" x2="300" y2="560"/>
+    <line x1="450" y1="0" x2="450" y2="560"/><line x1="600" y1="0" x2="600" y2="560"/>
+    <line x1="750" y1="0" x2="750" y2="560"/>
+  </g>
+  <!-- Label watermark -->
+  <text x="450" y="300" font-family="Outfit, Arial, sans-serif" font-size="88" font-weight="900" fill="#FFC72C" fill-opacity="0.07" text-anchor="middle" dominant-baseline="middle" letter-spacing="-4">INTEGRITY</text>
+  <!-- Center label -->
+  <rect x="295" y="242" width="310" height="76" rx="10" fill="rgba(255,199,44,0.06)" stroke="rgba(255,199,44,0.18)" stroke-width="1"/>
+  <text x="450" y="273" font-family="Outfit, Arial, sans-serif" font-size="10" font-weight="700" fill="#FFC72C" fill-opacity="0.5" text-anchor="middle" letter-spacing="0.2em">PLACEHOLDER</text>
+  <text x="450" y="296" font-family="Outfit, Arial, sans-serif" font-size="13" font-weight="600" fill="rgba(255,255,255,0.2)" text-anchor="middle">values / integrity.jpg</text>
+  <!-- Corner marks -->
+  <path d="M48 48 L48 68 M48 48 L68 48" stroke="#FFC72C" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+  <path d="M852 48 L852 68 M852 48 L832 48" stroke="#FFC72C" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+  <path d="M48 512 L48 492 M48 512 L68 512" stroke="#FFC72C" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+  <path d="M852 512 L852 492 M852 512 L832 512" stroke="#FFC72C" stroke-opacity="0.3" stroke-width="2" fill="none"/>
+</svg>
