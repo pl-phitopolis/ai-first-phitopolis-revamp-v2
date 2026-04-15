@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import MagneticWrapper from '../components/MagneticWrapper';
@@ -506,6 +506,132 @@ function StitchedVideoBackground() {
   );
 }
 
+// ── Scroll-to-play sequence ──────────────────────────────────────────────────
+const TOTAL_FRAMES = 151;
+const getFrameUrl = (n: number) =>
+  `/seq/ezgif-frame-${String(n).padStart(3, '0')}.png`;
+
+const ScrollSequenceSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const headingRef   = useRef<HTMLHeadingElement>(null);
+  const imagesRef    = useRef<HTMLImageElement[]>([]);
+  const frameRef     = useRef(0);
+  const rafRef       = useRef<number>(0);
+
+  // Draw frame with cover crop
+  const drawFrame = useCallback((index: number) => {
+    const canvas = canvasRef.current;
+    const img    = imagesRef.current[index];
+    if (!canvas || !img?.complete || !img.naturalWidth) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const cw = canvas.width, ch = canvas.height;
+    const ir = img.naturalWidth / img.naturalHeight;
+    const cr = cw / ch;
+
+    let sx: number, sy: number, sw: number, sh: number;
+    if (ir > cr) {
+      sh = img.naturalHeight;
+      sw = sh * cr;
+      sx = (img.naturalWidth - sw) / 2;
+      sy = 0;
+    } else {
+      sw = img.naturalWidth;
+      sh = sw / cr;
+      sx = 0;
+      sy = (img.naturalHeight - sh) / 2;
+    }
+
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+  }, []);
+
+  // Sync canvas pixel size to display size
+  useEffect(() => {
+    const resize = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width  = canvas.offsetWidth  * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      drawFrame(frameRef.current);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, [drawFrame]);
+
+  // Preload all frames; render frame 0 as soon as it's ready
+  useEffect(() => {
+    const images: HTMLImageElement[] = [];
+    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+      const img = new Image();
+      img.src = getFrameUrl(i);
+      if (i === 1) {
+        img.onload = () => drawFrame(0);
+      }
+      images.push(img);
+    }
+    imagesRef.current = images;
+  }, [drawFrame]);
+
+  // Advance frame based on scroll position
+  useEffect(() => {
+    const onScroll = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      const rect      = container.getBoundingClientRect();
+      const scrollable = container.offsetHeight - window.innerHeight;
+      const progress  = Math.max(0, Math.min(1, -rect.top / scrollable));
+      const next      = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * TOTAL_FRAMES));
+      if (next !== frameRef.current) {
+        frameRef.current = next;
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => drawFrame(next));
+      }
+
+      // Fade heading in from 75 % → 100 % progress
+      if (headingRef.current) {
+        const headingOpacity = Math.max(0, Math.min(1, (progress - 0.75) / 0.25));
+        headingRef.current.style.opacity = String(headingOpacity);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [drawFrame]);
+
+  return (
+    // 350 vh of scroll space for 151 frames ≈ comfortable pacing
+    <div ref={containerRef} style={{ height: '350vh' }} className="relative">
+      <div className="sticky top-0 h-screen bg-black overflow-hidden">
+        <canvas ref={canvasRef} className="w-full h-full" />
+        <h2
+          ref={headingRef}
+          className="absolute inset-0 flex items-center justify-center text-center pointer-events-none"
+          style={{
+            opacity: 0,
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 'clamp(1.75rem, 4vw, 3.5rem)',
+            fontWeight: 700,
+            color: '#ffffff',
+            textShadow: '0 2px 32px rgba(0,0,0,0.6)',
+            padding: '0 1.5rem',
+            display: 'flex',
+          }}
+        >
+          Making tomorrow&apos;s technology available today.
+        </h2>
+      </div>
+    </div>
+  );
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function Home() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -583,6 +709,9 @@ export default function Home() {
     <div className="space-y-0">
       {/* Hero Section (AI Day particle hero) */}
       <Hero ready={true} hideDecorations />
+
+      {/* Scroll-to-play sequence */}
+      <ScrollSequenceSection />
 
       {/* Video Stitches Section */}
       <section className="relative overflow-hidden bg-primary" style={{ height: '100vh' }}>
