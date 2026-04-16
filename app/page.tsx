@@ -512,12 +512,13 @@ const getFrameUrl = (n: number) =>
   `/seq/ezgif-frame-${String(n).padStart(3, '0')}.png`;
 
 const ScrollSequenceSection = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
-  const headingRef   = useRef<HTMLHeadingElement>(null);
-  const imagesRef    = useRef<HTMLImageElement[]>([]);
-  const frameRef     = useRef(0);
-  const rafRef       = useRef<number>(0);
+  const containerRef    = useRef<HTMLDivElement>(null);
+  const frameWrapperRef = useRef<HTMLDivElement>(null);
+  const canvasRef       = useRef<HTMLCanvasElement>(null);
+  const headingRef      = useRef<HTMLHeadingElement>(null);
+  const imagesRef       = useRef<HTMLImageElement[]>([]);
+  const frameRef        = useRef(0);
+  const rafRef          = useRef<number>(0);
 
   // Draw frame with cover crop
   const drawFrame = useCallback((index: number) => {
@@ -582,14 +583,34 @@ const ScrollSequenceSection = () => {
     const onScroll = () => {
       const container = containerRef.current;
       if (!container) return;
-      const rect      = container.getBoundingClientRect();
-      const scrollable = container.offsetHeight - window.innerHeight;
-      const progress  = Math.max(0, Math.min(1, -rect.top / scrollable));
-      const next      = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * TOTAL_FRAMES));
+      const rect       = container.getBoundingClientRect();
+      const vh         = window.innerHeight;
+      const scrollable = container.offsetHeight - vh;
+      const progress   = Math.max(0, Math.min(1, -rect.top / scrollable));
+      // Release phase = how far the sticky has scrolled OUT after its pinned
+      // run ended. 0 while pinned; 0 → 1 as the sticky slides off the top.
+      const releaseP   = Math.max(0, Math.min(1, (-rect.top - scrollable) / vh));
+
+      const next = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * TOTAL_FRAMES));
       if (next !== frameRef.current) {
         frameRef.current = next;
         cancelAnimationFrame(rafRef.current);
         rafRef.current = requestAnimationFrame(() => drawFrame(next));
+      }
+
+      // Expand frame from bottom, then drop the radius once it's full-screen:
+      //   0 %  →  40 %  → scale 0.75 → 1   (radius stays at 48)
+      //  40 %  →  50 %  → radius 48 → 0    (scale stays at 1)
+      // Parallax: during the release phase, translate the frame DOWN so it
+      // scrolls out slower than the heading (~0.7× speed).
+      if (frameWrapperRef.current) {
+        const expandP   = Math.max(0, Math.min(1, progress / 0.4));
+        const scale     = 0.75 + 0.25 * expandP;
+        const radiusP   = Math.max(0, Math.min(1, (progress - 0.4) / 0.1));
+        const radius    = 48 * (1 - radiusP);
+        const parallaxY = releaseP * vh * 0.3;
+        frameWrapperRef.current.style.transform    = `translateY(${parallaxY}px) scale(${scale})`;
+        frameWrapperRef.current.style.borderRadius = `${radius}px ${radius}px 0 0`;
       }
 
       // Fade heading in from 75 % → 100 % progress
@@ -607,9 +628,21 @@ const ScrollSequenceSection = () => {
 
   return (
     // 350 vh of scroll space for 151 frames ≈ comfortable pacing
-    <div ref={containerRef} style={{ height: '350vh' }} className="relative">
-      <div className="sticky top-0 h-screen bg-black overflow-hidden">
-        <canvas ref={canvasRef} className="w-full h-full" />
+    <div id="scroll-sequence-section" ref={containerRef} style={{ height: '350vh' }} className="relative">
+      <div className="sticky top-0 h-screen bg-white overflow-hidden flex items-center justify-center">
+        {/* Anchored at bottom-center, 75 % scale with top-rounded corners; expands upward to fill the screen */}
+        <div
+          ref={frameWrapperRef}
+          className="absolute inset-0 overflow-hidden"
+          style={{
+            transform: 'scale(0.75)',
+            transformOrigin: 'bottom center',
+            borderRadius: '48px 48px 0 0',
+            willChange: 'transform, border-radius',
+          }}
+        >
+          <canvas ref={canvasRef} className="w-full h-full" />
+        </div>
         <h2
           ref={headingRef}
           className="absolute inset-0 flex items-center justify-center text-center pointer-events-none"
@@ -708,7 +741,9 @@ export default function Home() {
   return (
     <div className="space-y-0">
       {/* Hero Section (AI Day particle hero) */}
-      <Hero ready={true} hideDecorations />
+      <div className="mb-32">
+        <Hero ready={true} hideDecorations />
+      </div>
 
       {/* Scroll-to-play sequence */}
       <ScrollSequenceSection />

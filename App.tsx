@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ArrowRight, Github, Linkedin, Twitter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,7 @@ import JobDetail from './app/careers/[slug]/page.tsx';
 import BlogPostDetail from './app/blog/[slug]/page.tsx';
 import NotFound from './app/not-found/page.tsx';
 import MobileNavigation from './components/MobileNavigation.tsx';
+import PhitopolisLogo from './components/PhitopolisLogo.tsx';
 import AIDayPage from './app/ai-day/page.tsx';
 
 // Updated to use the requested external logo image
@@ -91,17 +92,55 @@ const Image = ({ src, alt, width, height, className, priority, style }: {
 
 const Header = () => {
   const location = useLocation();
-  const [atTop, setAtTop] = useState(true);
-
-  useEffect(() => {
-    const onScroll = () => setAtTop(window.scrollY < window.innerHeight * 1.5);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
+  const bgRef = useRef<HTMLDivElement>(null);
   const isHome = location.pathname === '/';
-  const transparent = isHome && atTop;
+  // True when the nav sits over the light (white) scroll-sequence area and
+  // the nav background itself is still mostly transparent → use dark text.
+  const [darkText, setDarkText] = useState(false);
+
+  // On the home page, fade the nav background in as the user scrolls past the
+  // scroll-sequence section (#scroll-sequence-section). Off-home: always opaque.
+  useEffect(() => {
+    const bg = bgRef.current;
+    if (!bg) return;
+
+    if (!isHome) {
+      bg.style.opacity = '1';
+      setDarkText(false);
+      return;
+    }
+
+    const update = () => {
+      const section = document.getElementById('scroll-sequence-section');
+      if (!section) {
+        bg.style.opacity = '0';
+        setDarkText(false);
+        return;
+      }
+      const rect = section.getBoundingClientRect();
+      const vh   = window.innerHeight;
+      // rect.bottom travels from ~vh (section bottom entering from below) to 0
+      // (section fully scrolled past). Fade 0 → 1 as it approaches 0.
+      const t = Math.max(0, Math.min(1, 1 - rect.bottom / vh));
+      bg.style.opacity = String(t);
+
+      // Dark text when: nav sits over the light sequence section AND the nav
+      // background is still largely transparent (t < 0.5). Outside of that
+      // window, the content behind the nav is dark (hero above, primary bg
+      // below), so light text reads better.
+      const overLightArea = rect.top <= 0 && rect.bottom > 0;
+      const next = overLightArea && t < 0.5;
+      setDarkText(prev => (prev !== next ? next : prev));
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [isHome]);
 
   const navLinks = [
     { name: 'About', href: '/about' },
@@ -111,18 +150,22 @@ const Header = () => {
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 group/header transition-colors duration-150 ${transparent ? 'bg-transparent border-b border-transparent' : 'bg-primary/95 backdrop-blur-md border-b border-primary-light'}`}>
-      <nav className="container mx-auto px-6 py-3 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 group/header">
+      {/* Background layer — opacity driven by scroll on the home page */}
+      <div
+        ref={bgRef}
+        aria-hidden
+        className="absolute inset-0 bg-primary/95 backdrop-blur-md border-b border-primary-light"
+        style={{ opacity: isHome ? 0 : 1 }}
+      />
+      <nav className="relative container mx-auto px-6 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-3 group/brand">
-          <Image
-            src="/phitopolis_logo_white.svg"
-            alt="Phitopolis Logo"
-            width={48}
-            height={48}
-            className="h-12 w-auto object-contain"
-            priority={true}
+          <PhitopolisLogo
+            className="h-12 w-auto"
+            color={darkText ? '#0A2A66' : '#FFFFFF'}
+            accentColor="#FFC72C"
           />
-          <span className="text-2xl font-display font-bold tracking-tight text-white transition-colors uppercase">
+          <span className={`text-2xl font-display font-bold tracking-tight transition-colors duration-300 uppercase ${darkText ? 'text-primary' : 'text-white'}`}>
             PH<span className="transition-colors duration-500 group-hover/header:text-accent">IT</span>OPOLIS
           </span>
         </Link>
@@ -132,8 +175,13 @@ const Header = () => {
             <Link
               key={link.name}
               to={link.href}
-              className={`relative text-sm font-medium transition-colors hover:text-accent pb-1 ${location.pathname === link.href ? 'text-accent' : 'text-slate-100'
-                }`}
+              className={`relative text-sm font-medium transition-colors duration-300 hover:text-accent pb-1 ${
+                location.pathname === link.href
+                  ? 'text-accent'
+                  : darkText
+                    ? 'text-primary'
+                    : 'text-slate-100'
+              }`}
             >
               {link.name}
               {location.pathname === link.href && (
