@@ -33,7 +33,7 @@ export const SERVICES: Service[] = [
   },
   {
     type: ServiceType.FULL_STACK,
-    title: "Full-Stack Engineering",
+    title: "Support and Operations",
     description: "Building resilient, scalable, and high-performance applications for the modern web.",
     icon: <Layout className="w-8 h-8 text-primary" />,
     features: ["High-Frequency Systems", "Cloud-Native Architecture", "Real-time Dashboards"],

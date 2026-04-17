@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import MagneticWrapper from '../components/MagneticWrapper';
 import { ArrowRight, ChevronRight, Zap, Shield, TrendingUp, Hexagon, Circle, Triangle } from 'lucide-react';
 import { SERVICES } from '../constants.tsx';
@@ -506,6 +506,258 @@ function StitchedVideoBackground() {
   );
 }
 
+// ── Sticky Services Section (alternative layout) ─────────────────────────────
+const SERVICE_VIDEOS = [
+  '/expertise/research-and-development.mp4',
+  '/expertise/data-science.mp4',
+  '/expertise/support-and-operations.mp4',
+];
+
+// Navbar is fixed at ~72px. Box fills viewport below nav with py-4 breathing room.
+// Nav (4.5rem) + top padding (1rem) + bottom padding (1rem) = 6.5rem
+const NAV_H  = '4.5rem';   // ~72px fixed header
+const VPAD   = '1rem';     // padding above and below the box
+const BOX_H  = `calc(100vh - ${NAV_H} - ${VPAD} * 2)`;
+
+function StickyServicesSection() {
+  const [activeService, setActiveService] = useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Page-scroll driven service index
+  useEffect(() => {
+    const onScroll = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const scrollable = el.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return;
+      const progress = Math.max(0, Math.min(1, -rect.top / scrollable));
+      const idx = Math.min(SERVICES.length - 1, Math.floor(progress * SERVICES.length));
+      setActiveService(idx);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Slow-motion playback
+  useEffect(() => {
+    videoRefs.current.forEach(v => { if (v) v.playbackRate = 0.35; });
+  }, []);
+
+  // Pause inactive, play active
+  useEffect(() => {
+    videoRefs.current.forEach((v, i) => {
+      if (!v) return;
+      i === activeService ? v.play().catch(() => {}) : v.pause();
+    });
+  }, [activeService]);
+
+  const service = SERVICES[activeService];
+
+  return (
+    <>
+      {/* ── Section 1: Header ─────────────────────────────────────────── */}
+      <section
+        className="h-screen bg-white flex flex-col justify-center px-6"
+        style={{ paddingTop: NAV_H }}
+      >
+        <div className="container mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: [0.21, 1.02, 0.47, 0.98] }}
+          >
+            <span className="text-accent font-bold tracking-widest uppercase text-xs">Our Expertise</span>
+            <h2 className="text-6xl md:text-8xl font-display font-bold mt-4 text-primary leading-none">
+              Services<br />we offer
+            </h2>
+            <p className="mt-6 text-slate-400 text-base max-w-xs leading-relaxed">
+              Scroll to explore how we deliver results for our clients.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Section 2: tall scroll space + sticky viewer ───────────────── */}
+      {/* Outer: SERVICES.length * 100vh gives scroll room per service */}
+      <div
+        ref={sectionRef}
+        style={{ height: `${SERVICES.length * 100}vh` }}
+        className="relative bg-white"
+      >
+        {/* Inner: sticks to viewport while outer scrolls */}
+        <div
+          className="sticky top-0 h-screen flex items-center px-6"
+          style={{ paddingTop: `calc(${NAV_H} + ${VPAD})`, paddingBottom: VPAD }}
+        >
+          <div className="container mx-auto">
+            <div className="flex gap-8 md:gap-12" style={{ height: BOX_H }}>
+
+              {/* ── Left: rounded video card ── */}
+              <div
+                className="hidden md:block w-2/5 flex-shrink-0 rounded-3xl overflow-hidden relative"
+                style={{ boxShadow: '0 24px 64px -12px rgba(10,42,102,0.18), 0 8px 24px -4px rgba(0,0,0,0.10)' }}
+              >
+                {SERVICE_VIDEOS.map((src, i) => (
+                  <motion.video
+                    key={src}
+                    ref={el => { videoRefs.current[i] = el; }}
+                    autoPlay={i === 0}
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                    animate={{ opacity: activeService === i ? 1 : 0 }}
+                    transition={{ duration: 0.9, ease: 'easeInOut' }}
+                  >
+                    <source src={src} type="video/mp4" />
+                  </motion.video>
+                ))}
+                <div className="absolute inset-0 bg-black/15" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                {/* Ghost number */}
+                <div className="absolute bottom-4 left-6 pointer-events-none select-none overflow-hidden">
+                  <motion.span
+                    key={activeService}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="block font-display font-bold leading-none"
+                    style={{ fontSize: 'clamp(5rem,10vw,9rem)', color: 'rgba(255,199,44,0.07)', WebkitTextStroke: '1.5px rgba(255,199,44,0.22)' }}
+                  >
+                    0{activeService + 1}
+                  </motion.span>
+                </div>
+
+                {/* Label + progress */}
+                <div className="absolute bottom-7 left-7 z-10">
+                  <motion.p
+                    key={`lbl-${activeService}`}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35 }}
+                    className="text-[11px] uppercase tracking-[0.18em] text-accent font-bold mb-2.5"
+                  >
+                    {service.title}
+                  </motion.p>
+                  <div className="flex gap-1.5 items-center">
+                    {SERVICES.map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="rounded-full"
+                        animate={{
+                          width: activeService === i ? 24 : 6,
+                          height: 4,
+                          backgroundColor: activeService === i ? '#FFC72C' : 'rgba(255,255,255,0.3)',
+                        }}
+                        transition={{ duration: 0.4 }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Right: animated service content ── */}
+              <div className="flex-1 flex flex-col justify-between py-10 overflow-hidden">
+
+                {/* Top: counter */}
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[11px] text-slate-300 tracking-widest select-none">
+                    0{activeService + 1}
+                  </span>
+                  <div className="flex-1 h-px bg-slate-100" />
+                  <span className="font-mono text-[11px] text-slate-300 tracking-widest select-none">
+                    0{SERVICES.length}
+                  </span>
+                </div>
+
+                {/* Middle: animated content block */}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeService}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.45, ease: [0.21, 1.02, 0.47, 0.98] }}
+                    className="space-y-6"
+                  >
+                    {/* Icon + rule */}
+                    <div className="flex items-center gap-3">
+                      {React.cloneElement(service.icon as React.ReactElement<any>, { className: 'w-7 h-7 text-accent flex-shrink-0' })}
+                      <div className="h-px flex-1 bg-slate-100" />
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-4xl md:text-5xl font-display font-bold text-primary leading-tight">
+                      {service.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-slate-500 text-lg leading-relaxed">
+                      {service.description}
+                    </p>
+
+                    {/* Feature list — clean, informational */}
+                    <div className="grid grid-cols-3 gap-x-8 gap-y-5 pt-2">
+                      {service.features.map((f, j) => (
+                        <motion.div
+                          key={j}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: j * 0.07 + 0.12, duration: 0.35 }}
+                          className="flex flex-col gap-2"
+                        >
+                          <div className="w-5 h-0.5 rounded-full bg-accent" />
+                          <span className="text-slate-600 text-sm leading-snug">{f}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Bottom: progress + hint */}
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1.5">
+                    {SERVICES.map((_, j) => (
+                      <div
+                        key={j}
+                        className="h-1 rounded-full transition-all duration-500"
+                        style={{
+                          width: j === activeService ? 28 : 8,
+                          backgroundColor: j === activeService ? '#0A2A66' : '#e2e8f0',
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <AnimatePresence mode="wait">
+                    {activeService < SERVICES.length - 1 && (
+                      <motion.span
+                        key="hint"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-[11px] text-slate-300 tracking-widest uppercase font-medium ml-1"
+                      >
+                        Scroll for next
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── Scroll-to-play sequence ──────────────────────────────────────────────────
 const TOTAL_FRAMES = 151;
 const getFrameUrl = (n: number) =>
@@ -882,6 +1134,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Sticky Services Alternative Layout */}
+      <StickyServicesSection />
 
       {/* Trust / Credentials Section */}
       <section className="py-24 bg-primary relative overflow-hidden text-white">
