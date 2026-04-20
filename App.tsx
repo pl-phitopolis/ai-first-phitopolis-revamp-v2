@@ -16,6 +16,7 @@ import NotFound from './app/not-found/page.tsx';
 import MobileNavigation from './components/MobileNavigation.tsx';
 import PhitopolisLogo from './components/PhitopolisLogo.tsx';
 import AIDayPage from './app/ai-day/page.tsx';
+import PlaygroundPage from './app/playground/page.tsx';
 
 // Updated to use the requested external logo image
 const LOGO_PATH = 'https://phitopolis.com/img/phitopolis-logo.png';
@@ -327,6 +328,7 @@ const AppRoutes = () => {
         <Route path="/blog/:slug" element={<PageTransition><BlogPostDetail /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/ai-day" element={<AIDayPage />} />
+        <Route path="/playground" element={<PlaygroundPage />} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
@@ -337,28 +339,29 @@ const AppRoutes = () => {
 const AppLayout = () => {
   const location = useLocation();
   const isAIDay = location.pathname === '/ai-day';
+  const isPlayground = location.pathname === '/playground';
   const isAbout = location.pathname === '/about';
   const isHome = location.pathname === '/';
 
   return (
-    <div className={isAIDay ? '' : (isAbout ? '' : 'min-h-screen flex flex-col bg-white')}>
-      {!isAIDay && <Header />}
-      <main className={isAIDay ? '' : `flex-grow ${isHome ? '' : 'pt-16'}`}>
+    <div className={(isAIDay || isPlayground) ? '' : (isAbout ? '' : 'min-h-screen flex flex-col bg-white')}>
+      {!isAIDay && !isPlayground && <Header />}
+      <main className={(isAIDay || isPlayground) ? '' : `flex-grow ${isHome ? '' : 'pt-16'}`}>
         <AppRoutes />
       </main>
-      {!isAIDay && !isAbout && <Footer />}
-      {!isAIDay && <MobileNavigation />}
+      {!isAIDay && !isAbout && !isPlayground && <Footer />}
+      {!isAIDay && !isPlayground && <MobileNavigation />}
     </div>
   );
 };
 
 export default function App() {
-  // Skip the global preloader on /ai-day — that page has its own.
-  const isAIDayRoute = window.location.pathname === '/ai-day';
-  const [isLoading, setIsLoading] = useState(!isAIDayRoute);
+  // Skip the global preloader on /ai-day and /playground.
+  const isSkipPreloader = window.location.pathname === '/ai-day' || window.location.pathname === '/playground';
+  const [isLoading, setIsLoading] = useState(!isSkipPreloader);
 
   useEffect(() => {
-    if (isAIDayRoute) return;
+    if (isSkipPreloader) return;
     const isHome = window.location.pathname === '/';
     // Non-home routes: short splash then show page
     if (!isHome) {

@@ -1203,13 +1203,21 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
     const EXPLODE_HOLD = 1200;          // ms to hold scattered
     const REFORM_DURATION = 2000;       // ms for particles to reform
     const REFORM_COOLDOWN = 3000;       // ms to stay assembled before next cycle
-    let idlePhase: 'assembled' | 'exploding' | 'holding' | 'reforming' = 'assembled';
-    let idlePhaseStart = 0;
     let prevMouseX = -9999;
     let prevMouseY = -9999;
-    let idleCluster = new Set<number>();   // indices of particles in current explosion cluster
+    type IdleCluster = { indices: Set<number>; delay: number };
     const CLUSTER_RADIUS = 80;            // px radius around random center to select particles
-    let clickTriggered = false;           // true when explosion was triggered by click (don't cancel on mouse move)
+    type Explosion = {
+      clusters: IdleCluster[];
+      allIndices: Set<number>;
+      phase: 'exploding' | 'holding' | 'reforming';
+      phaseStart: number;
+      fromClick: boolean;
+    };
+    let explosions: Explosion[] = [];
+    let scrollScattered = false;          // whether scroll has triggered the explosion
+    let scrollScatterStart = 0;          // when the scroll scatter transition began
+    const SCROLL_SCATTER_DURATION = 800; // ms for consistent scatter/reform animation
 
     // Build a cluster of particles near a given target position
     const buildClusterAt = (cx: number, cy: number, radius: number) => {
@@ -1224,14 +1232,34 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
       return cluster;
     };
 
-    // Build a cluster around a random particle
-    const buildRandomCluster = () => {
-      if (particles.length === 0) return new Set<number>();
-      const seed = particles[Math.floor(Math.random() * particles.length)];
-      return buildClusterAt(seed.tx, seed.ty, CLUSTER_RADIUS);
+    // Build 1 or 2 clusters around random particles (with staggered delays when 2)
+    const buildRandomClusters = (): IdleCluster[] => {
+      if (particles.length === 0) return [];
+      const count = Math.random() < 0.5 ? 1 : 2;
+      const clusters: IdleCluster[] = [];
+      const seeds: { tx: number; ty: number }[] = [];
+      for (let c = 0; c < count; c++) {
+        // Pick a seed that's not too close to previous seeds
+        for (let attempts = 0; attempts < 20; attempts++) {
+          const s = particles[Math.floor(Math.random() * particles.length)];
+          const tooClose = seeds.some(prev => {
+            const dx = prev.tx - s.tx; const dy = prev.ty - s.ty;
+            return dx * dx + dy * dy < (CLUSTER_RADIUS * 1.5) ** 2;
+          });
+          if (!tooClose || attempts === 19) {
+            seeds.push(s);
+            const indices = buildClusterAt(s.tx, s.ty, CLUSTER_RADIUS);
+            // First cluster explodes immediately; second has a staggered delay
+            const delay = c === 0 ? 0 : 300 + Math.random() * 400;
+            clusters.push({ indices, delay });
+            break;
+          }
+        }
+      }
+      return clusters;
     };
 
-    // Click handler: explode cluster at click position
+    // Click handler: explode cluster at click position (concurrent with existing explosions)
     const handleClick = (e: MouseEvent) => {
       if (!assembled || particles.length === 0) return;
       const rect = canvas.getBoundingClientRect();
@@ -1239,10 +1267,13 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
       const cy = e.clientY - rect.top;
       const cluster = buildClusterAt(cx, cy, CLUSTER_RADIUS);
       if (cluster.size < 5) return; // ignore clicks far from logo
-      idleCluster = cluster;
-      idlePhase = 'exploding';
-      idlePhaseStart = performance.now();
-      clickTriggered = true;
+      explosions.push({
+        clusters: [{ indices: cluster, delay: 0 }],
+        allIndices: cluster,
+        phase: 'exploding',
+        phaseStart: performance.now(),
+        fromClick: true,
+      });
     };
 
     // Load SVG and sample edge points
@@ -1357,7 +1388,7 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
     let bgDots: BgDot[] = [];
     const initBgDots = () => {
       const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
-      bgDots = Array.from({ length: 200 }, () => ({
+      bgDots = Array.from({ length: 120 }, () => ({
         x: Math.random() * cw,
         y: Math.random() * ch,
         vx: (Math.random() - 0.5) * 0.25,
@@ -1404,69 +1435,95 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
       }
 
       // ── Idle explosion detection ──
-      // Detect mouse movement (don't cancel click-triggered explosions)
+      // Detect mouse movement — cancel non-click explosions
       if (Math.abs(mouse.x - prevMouseX) > 2 || Math.abs(mouse.y - prevMouseY) > 2 || scroll > 0.01) {
         lastInteractionRef.current = now;
-        if (idlePhase !== 'assembled' && !clickTriggered) {
-          idlePhase = 'assembled';
-        }
+        explosions = explosions.filter(ex => ex.fromClick);
       }
       prevMouseX = mouse.x;
       prevMouseY = mouse.y;
 
-      // Idle explosion state machine (only when scroll is near top and assembly is complete)
-      let idleExplodeStrength = 0;
-      const timeSinceInteraction = now - lastInteractionRef.current;
-      const assemblyDone = elapsed > ASSEMBLE_DURATION + 600; // all particles arrived
-
-      if (assemblyDone && scroll < 0.01 && lastInteractionRef.current > 0) {
-        if (idlePhase === 'assembled' && timeSinceInteraction > IDLE_TIMEOUT) {
-          idlePhase = 'exploding';
-          idlePhaseStart = now;
-          clickTriggered = false;
-          idleCluster = buildRandomCluster();
-        } else if (idlePhase === 'exploding') {
-          const t = (now - idlePhaseStart) / EXPLODE_DURATION;
-          if (t >= 1) {
-            idlePhase = 'holding';
-            idlePhaseStart = now;
-            idleExplodeStrength = 1;
-          } else {
-            // Ease-out cubic for smooth explosion
-            idleExplodeStrength = 1 - Math.pow(1 - t, 3);
+      // Advance each explosion's state machine independently
+      for (const ex of explosions) {
+        if (ex.phase === 'exploding') {
+          const maxDelay = ex.clusters.reduce((m, c) => Math.max(m, c.delay), 0);
+          if (now - ex.phaseStart >= EXPLODE_DURATION + maxDelay) {
+            ex.phase = 'holding';
+            ex.phaseStart = now;
           }
-        } else if (idlePhase === 'holding') {
-          idleExplodeStrength = 1;
-          if (now - idlePhaseStart > EXPLODE_HOLD) {
-            idlePhase = 'reforming';
-            idlePhaseStart = now;
-          }
-        } else if (idlePhase === 'reforming') {
-          const t = (now - idlePhaseStart) / REFORM_DURATION;
-          if (t >= 1) {
-            idlePhase = 'assembled';
-            clickTriggered = false;
-            // Push interaction time forward so cooldown applies before next cycle
-            lastInteractionRef.current = now - IDLE_TIMEOUT + REFORM_COOLDOWN;
-            idleExplodeStrength = 0;
-          } else {
-            // Ease-in-out for smooth reformation
-            idleExplodeStrength = 1 - (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+        } else if (ex.phase === 'holding') {
+          if (now - ex.phaseStart > EXPLODE_HOLD) {
+            ex.phase = 'reforming';
+            ex.phaseStart = now;
           }
         }
       }
 
-      // Scroll scatter — stronger as we scroll down
-      const scatterStrength = Math.min(scroll * 3, 1); // reaches full scatter at 33% scroll
+      // Remove finished explosions and reset idle cooldown
+      const beforeCount = explosions.length;
+      explosions = explosions.filter(ex => {
+        if (ex.phase === 'reforming' && (now - ex.phaseStart) / REFORM_DURATION >= 1) return false;
+        return true;
+      });
+      if (explosions.length < beforeCount) {
+        lastInteractionRef.current = now - IDLE_TIMEOUT + REFORM_COOLDOWN;
+      }
 
-      // Load-time scatter visibility: full during hold, fades out as logo forms
-      const tSinceLoad = now - svgLoadedAtRef.current; // ms since SVG loaded
+      // Spawn idle explosion when nothing is active and idle timeout passed
+      const assemblyDone = elapsed > ASSEMBLE_DURATION + 600;
+      if (assemblyDone && scroll < 0.01 && explosions.length === 0 && lastInteractionRef.current > 0 && now - lastInteractionRef.current > IDLE_TIMEOUT) {
+        const clusters = buildRandomClusters();
+        const allIndices = new Set<number>();
+        for (const c of clusters) for (const idx of c.indices) allIndices.add(idx);
+        explosions.push({ clusters, allIndices, phase: 'exploding', phaseStart: now, fromClick: false });
+      }
+
+      // Compute per-particle explosion strength across all active explosions
+      const particleStrength = new Float32Array(particles.length);
+      let allActiveIndices = new Set<number>();
+      let maxExplodeStrength = 0;
+
+      for (const ex of explosions) {
+        const cStrengths: number[] = [];
+        if (ex.phase === 'exploding') {
+          for (const cluster of ex.clusters) {
+            const ct = Math.max(0, now - ex.phaseStart - cluster.delay) / EXPLODE_DURATION;
+            cStrengths.push(ct >= 1 ? 1 : (ct <= 0 ? 0 : 1 - Math.pow(1 - ct, 3)));
+          }
+        } else if (ex.phase === 'holding') {
+          for (let i = 0; i < ex.clusters.length; i++) cStrengths.push(1);
+        } else if (ex.phase === 'reforming') {
+          const t = (now - ex.phaseStart) / REFORM_DURATION;
+          const s = t >= 1 ? 0 : 1 - (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+          for (let i = 0; i < ex.clusters.length; i++) cStrengths.push(s);
+        }
+        const exMax = cStrengths.length > 0 ? Math.max(...cStrengths) : 0;
+        if (exMax > maxExplodeStrength) maxExplodeStrength = exMax;
+        for (const idx of ex.allIndices) allActiveIndices.add(idx);
+        for (let ci = 0; ci < ex.clusters.length; ci++) {
+          for (const idx of ex.clusters[ci].indices) {
+            if (cStrengths[ci] > particleStrength[idx]) particleStrength[idx] = cStrengths[ci];
+          }
+        }
+      }
+
+      // Scroll scatter — trigger-based with fixed-duration transition
+      const shouldScatter = scroll > 0.02;
+      if (shouldScatter !== scrollScattered) {
+        scrollScattered = shouldScatter;
+        scrollScatterStart = now;
+      }
+      const scatterT = Math.min(1, (now - scrollScatterStart) / SCROLL_SCATTER_DURATION);
+      const scatterEase = scatterT < 0.5 ? 2 * scatterT * scatterT : 1 - Math.pow(-2 * scatterT + 2, 2) / 2;
+      const scatterStrength = scrollScattered ? scatterEase : 1 - scatterEase;
+
+      // Load-time scatter visibility
+      const tSinceLoad = now - svgLoadedAtRef.current;
       const loadFadeIn = Math.min(1, Math.max(0, tSinceLoad / 400));
       const assemblyProgress = Math.min(1, Math.max(0, elapsed / ASSEMBLE_DURATION));
       const loadScatter = loadFadeIn * (1 - assemblyProgress);
-      // Scale idle contribution to bg by cluster fraction (partial explosion shouldn't light up all bg dots)
-      const clusterFraction = particles.length > 0 ? idleCluster.size / particles.length : 0;
-      const bgVisibility = Math.max(scatterStrength, loadScatter, idleExplodeStrength * clusterFraction);
+      const clusterFraction = particles.length > 0 ? allActiveIndices.size / particles.length : 0;
+      const bgVisibility = Math.max(scatterStrength, loadScatter, maxExplodeStrength * clusterFraction);
 
       // Update background ambient dots
       for (const b of bgDots) {
@@ -1479,52 +1536,45 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
         const p = particles[pi];
         const particleElapsed = Math.max(0, elapsed - p.delay);
         const assembleT = Math.min(1, particleElapsed / ASSEMBLE_DURATION);
-        // Smooth ease-out cubic
         const ease = 1 - Math.pow(1 - assembleT, 3);
 
-        // Per-particle idle strength: only particles in the cluster are affected
-        const pIdleStrength = idleCluster.has(pi) ? idleExplodeStrength : 0;
+        const pIdleStrength = particleStrength[pi];
 
-        // Target is the logo position
         let goalX = p.tx;
         let goalY = p.ty;
 
         // Combined scatter: scroll OR idle explosion (take the stronger one)
         const combinedScatter = Math.max(scatterStrength, pIdleStrength);
 
-        // On scroll or idle, scatter in each particle's own random direction — chaotic explosion
         if (combinedScatter > 0) {
-          // Idle explosion uses a shorter scatter distance for a gentler burst
           const dist = pIdleStrength > scatterStrength ? p.sDist * 0.45 : p.sDist;
           goalX = p.tx + Math.cos(p.sAngle) * combinedScatter * dist;
           goalY = p.ty + Math.sin(p.sAngle) * combinedScatter * dist;
         }
 
-        // During assembly, interpolate from start to goal
         if (assembleT < 1) {
           p.x = p.sx + (goalX - p.sx) * ease;
           p.y = p.sy + (goalY - p.sy) * ease;
         } else {
-          // After assembly, use spring physics toward goal
-          // Spring force weakens during scatter for a slow drift outward
-          const springForce = 0.035 - combinedScatter * 0.031; // 0.035 at rest → 0.004 at full scatter
+          const springForce = 0.035 - combinedScatter * 0.031;
           p.vx += (goalX - p.x) * springForce;
           p.vy += (goalY - p.y) * springForce;
 
-          // Cursor repulsion
-          const dx = p.x - mouse.x;
-          const dy = p.y - mouse.y;
-          const d2 = dx * dx + dy * dy;
-          const repelRadius = 80;
-          if (d2 < repelRadius * repelRadius && d2 > 0) {
-            const d = Math.sqrt(d2);
-            const f = (repelRadius - d) / repelRadius;
-            p.vx += (dx / d) * f * 3.5;
-            p.vy += (dy / d) * f * 3.5;
+          // Cursor attraction (magnet) — disabled while any explosion is active
+          if (explosions.length === 0) {
+            const dx = mouse.x - p.x;
+            const dy = mouse.y - p.y;
+            const d2 = dx * dx + dy * dy;
+            const magnetRadius = 120;
+            if (d2 < magnetRadius * magnetRadius && d2 > 0) {
+              const d = Math.sqrt(d2);
+              const f = (magnetRadius - d) / magnetRadius;
+              p.vx += (dx / d) * f * 3.5;
+              p.vy += (dy / d) * f * 3.5;
+            }
           }
 
-          // Lower damping during scatter = more friction = slower movement
-          const damping = 0.88 - combinedScatter * 0.08; // 0.88 at rest → 0.80 at full scatter
+          const damping = 0.88 - combinedScatter * 0.08;
           p.vx *= damping;
           p.vy *= damping;
           p.x += p.vx;
@@ -1532,13 +1582,12 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
         }
       }
 
-      // Logo-network connections: fade in as each pair of neighbors arrives at the logo
+      // Logo-network connections
       const logoFadeScroll = 1 - scatterStrength;
       if (logoFadeScroll > 0.01 && neighborPairs.length > 0) {
         for (const [i, j] of neighborPairs) {
-          // Per-pair fade: if either particle is in idle cluster, fade that connection
-          const pairIdleStrength = (idleCluster.has(i) || idleCluster.has(j)) ? idleExplodeStrength : 0;
-          const logoFade = 1 - Math.max(scatterStrength, pairIdleStrength);
+          const pairStrength = Math.max(particleStrength[i], particleStrength[j]);
+          const logoFade = 1 - Math.max(scatterStrength, pairStrength);
           if (logoFade < 0.01) continue;
           const pi = particles[i], pj = particles[j];
           const ti = Math.min(1, Math.max(0, (elapsed - pi.delay) / ASSEMBLE_DURATION));
@@ -1558,44 +1607,16 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
         }
       }
 
-      // Scatter connections: expand and brighten as particles explode on scroll or idle
-      // For idle, only draw connections between cluster particles
-      const hasScrollScatter = scatterStrength > 0.05;
-      const hasIdleScatter = idleExplodeStrength > 0.05 && idleCluster.size > 0;
-      if (hasScrollScatter || hasIdleScatter) {
-        const scatterVisibility = Math.max(scatterStrength, idleExplodeStrength);
-        const connectDist = 28 + scatterVisibility * 80;
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            // During idle (no scroll), only connect cluster particles to each other
-            if (!hasScrollScatter && !(idleCluster.has(i) && idleCluster.has(j))) continue;
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const d2 = dx * dx + dy * dy;
-            if (d2 < connectDist * connectDist) {
-              const pairStrength = hasScrollScatter ? scatterVisibility : idleExplodeStrength;
-              const alpha = (1 - Math.sqrt(d2) / connectDist) * pairStrength * 0.35;
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.strokeStyle = `rgba(255,199,44,${alpha.toFixed(3)})`;
-              ctx.lineWidth = 0.4;
-              ctx.stroke();
-            }
-          }
-        }
-      }
-
       // Draw connections: P particles ↔ background dots (on scroll AND during initial load)
       if (bgVisibility > 0.05) {
-        const bgConnectDist = 160;
+        const bgConnectDist = 110;
         for (const p of particles) {
           for (const b of bgDots) {
             const dx = p.x - b.x, dy = p.y - b.y;
             const d2 = dx * dx + dy * dy;
             if (d2 < bgConnectDist * bgConnectDist) {
               const dist = Math.sqrt(d2);
-              const alpha = (1 - dist / bgConnectDist) * bgVisibility * 0.28;
+              const alpha = (1 - dist / bgConnectDist) * bgVisibility * 0.2;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(b.x, b.y);
@@ -1620,11 +1641,10 @@ const ParticleLogo = ({ scrollProgress, mouseX, mouseY, containerRef, ready }: {
         }
       }
 
-      // Draw P particles — visible at scatter positions during hold, fade in during assembly
+      // Draw P particles
       for (const p of particles) {
         const particleElapsed = Math.max(0, elapsed - p.delay);
         const assembleT = Math.min(1, particleElapsed / ASSEMBLE_DURATION);
-        // Before assembleStart: show at full opacity; during assembly: fade in with assembleT
         const fadeIn = elapsed < 0 ? loadFadeIn : Math.min(1, assembleT * 2);
         const blinkAlpha = 0.3 + 0.5 * (0.5 + 0.5 * Math.sin(t * p.blinkSpeed + p.blink));
         const alpha = fadeIn * blinkAlpha;
