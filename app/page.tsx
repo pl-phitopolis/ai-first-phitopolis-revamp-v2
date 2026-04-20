@@ -678,8 +678,8 @@ function StickyServicesSection({ onReady }: { onReady?: () => void }) {
                 <div className="space-y-4">
                   <div>
                     <span className="text-accent font-bold tracking-widest uppercase text-xs">Our Expertise</span>
-                    <h2 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold mt-2 text-primary leading-none">
-                      Services<br />we offer
+                    <h2 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold mt-2 text-primary leading-none whitespace-nowrap">
+                      Services we offer
                     </h2>
                   </div>
                   <div className="flex items-center gap-3 pt-1">
