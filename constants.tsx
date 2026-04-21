@@ -1,14 +1,21 @@
 
 import React from 'react';
-import { 
-  Cpu, 
-  Database, 
-  Layout, 
-  LineChart, 
-  Search, 
+import {
+  Cpu,
+  Database,
+  Layout,
+  LineChart,
+  Search,
   Code,
   Globe,
-  Users
+  Users,
+  Zap,
+  Cloud,
+  Monitor,
+  Lightbulb,
+  Gauge,
+  MessageSquare,
+  TrendingUp,
 } from 'lucide-react';
 import { ServiceType, Job, BlogPost, Service, TeamMember } from './types';
 
@@ -18,7 +25,23 @@ export const SERVICES: Service[] = [
     title: "Research & Development",
     description: "Pioneering new technologies and frameworks to solve complex enterprise problems.",
     icon: <Cpu className="w-8 h-8 text-primary" />,
-    features: ["Custom Algorithm Design", "Proof of Concept Building", "Performance Optimization"],
+    features: [
+      {
+        title: "Custom Algorithm Design",
+        description: "Tailored mathematical models and data structures engineered for precision and throughput.",
+        icon: <Code />,
+      },
+      {
+        title: "Proof of Concept Building",
+        description: "Rapid prototyping that validates ideas before committing to full-scale development.",
+        icon: <Lightbulb />,
+      },
+      {
+        title: "Performance Optimization",
+        description: "Deep profiling and tuning to extract maximum efficiency at every layer of the stack.",
+        icon: <Gauge />,
+      },
+    ],
     image: "https://phitopolis.com/img/core-competencies/innovation.jpg",
     story: "DPDK kernel-bypass + lock-free SPSC ring buffer in C++ + NUMA-aware allocation. Result: 18μs median latency, P99 <40μs — 100× improvement."
   },
@@ -27,7 +50,23 @@ export const SERVICES: Service[] = [
     title: "Data Science",
     description: "Extracting actionable insights from vast datasets through ML and statistical modeling.",
     icon: <Database className="w-8 h-8 text-primary" />,
-    features: ["Predictive Analytics", "Natural Language Processing", "Quant Strategy Dev"],
+    features: [
+      {
+        title: "Predictive Analytics",
+        description: "ML models that forecast market trends and surface data-backed decisions in real time.",
+        icon: <TrendingUp />,
+      },
+      {
+        title: "Natural Language Processing",
+        description: "Domain-tuned transformer pipelines that extract alpha signals from unstructured text at scale.",
+        icon: <MessageSquare />,
+      },
+      {
+        title: "Quant Strategy Dev",
+        description: "Rigorous design and backtesting of quantitative strategies grounded in statistical methods.",
+        icon: <LineChart />,
+      },
+    ],
     image: "https://phitopolis.com/img/core-competencies/technical-excellence.jpg",
     story: "Fine-tuned transformer pipeline with domain embeddings over 50K+ papers/quarter. Auto-classifies and surfaces alpha signals in real time. Analyst throughput ↑8×."
   },
@@ -36,7 +75,23 @@ export const SERVICES: Service[] = [
     title: "Support and Operations",
     description: "Building resilient, scalable, and high-performance applications for the modern web.",
     icon: <Layout className="w-8 h-8 text-primary" />,
-    features: ["High-Frequency Systems", "Cloud-Native Architecture", "Real-time Dashboards"],
+    features: [
+      {
+        title: "High-Frequency Systems",
+        description: "Sub-millisecond order-processing pipelines engineered to handle millions of events per second.",
+        icon: <Zap />,
+      },
+      {
+        title: "Cloud-Native Architecture",
+        description: "Containerized microservices built for zero-downtime deployment across multi-cloud environments.",
+        icon: <Cloud />,
+      },
+      {
+        title: "Real-time Dashboards",
+        description: "Live operational views powered by streaming data with sub-50 ms UI latency.",
+        icon: <Monitor />,
+      },
+    ],
     image: "https://phitopolis.com/img/core-competencies/proactive-communication.jpg",
     story: "Kafka event bus → Flink processor → Redis CRDT → React + binary WebSocket. Sub-50ms UI at 4M+ tx/sec. Operational incidents ↓90%."
   }

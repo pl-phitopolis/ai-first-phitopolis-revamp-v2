@@ -7,12 +7,18 @@ export enum ServiceType {
   FULL_STACK = 'Full-Stack Development'
 }
 
+export interface ServiceFeature {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+}
+
 export interface Service {
   type: ServiceType;
   title: string;
   description: string;
   icon: React.ReactNode;
-  features: string[];
+  features: ServiceFeature[];
   image: string;
   story: string;
 }

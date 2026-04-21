@@ -428,7 +428,7 @@ function HomeSvcCard({ service, i }: HomeSvcCardProps) {
             {service.features.map((f, j) => (
               <li key={j} className="text-xs text-slate-500 flex items-center">
                 <div className="w-1.5 h-1.5 bg-accent rounded-full mr-2" />
-                {f}
+                {f.title}
               </li>
             ))}
           </ul>
@@ -708,18 +708,32 @@ function StickyServicesSection({ onReady }: { onReady?: () => void }) {
                       {service.description}
                     </p>
 
-                    {/* Feature list — clean, informational */}
-                    <div className="grid grid-cols-3 gap-x-8 gap-y-5 pt-2">
+                    {/* Feature list — icon + title + description */}
+                    <div className="grid grid-cols-3 gap-x-6 gap-y-4 pt-2">
                       {service.features.map((f, j) => (
                         <motion.div
                           key={j}
-                          initial={{ opacity: 0, y: 8 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: j * 0.07 + 0.12, duration: 0.35 }}
-                          className="flex flex-col gap-2"
+                          transition={{ delay: j * 0.08 + 0.12, duration: 0.35 }}
+                          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                          className="flex flex-col gap-2.5 p-3.5 rounded-xl border border-transparent hover:border-accent/20 hover:bg-slate-50 transition-colors duration-200 cursor-default"
                         >
-                          <div className="w-5 h-0.5 rounded-full bg-accent" />
-                          <span className="text-slate-600 text-sm leading-snug">{f}</span>
+                          <motion.div
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-accent/10"
+                            whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,199,44,0.18)' }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            {React.cloneElement(f.icon as React.ReactElement<any>, {
+                              className: 'w-4 h-4 text-accent',
+                              strokeWidth: 1.75,
+                            })}
+                          </motion.div>
+                          <div>
+                            <div className="w-4 h-0.5 rounded-full bg-accent mb-1.5" />
+                            <span className="text-slate-700 text-sm font-semibold leading-snug block">{f.title}</span>
+                            <span className="text-slate-400 text-xs leading-relaxed mt-1 block">{f.description}</span>
+                          </div>
                         </motion.div>
                       ))}
                     </div>
