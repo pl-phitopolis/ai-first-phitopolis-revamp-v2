@@ -1784,7 +1784,18 @@ export const Hero = ({ ready, hideDecorations, onReady }: { ready: boolean; hide
         </motion.div>
       )}
 
-      {/* Narrator AI placeholder — lower left */}
+      {/* Slogan — directly below P logo */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7, duration: 0.8 }}
+        style={{ position: 'absolute', top: '72%', left: '50%', transform: 'translateX(-50%)', zIndex: 10, textAlign: 'center' }}
+      >
+        <p style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', fontWeight: 500, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+          Making tomorrow&apos;s technology, available today.
+        </p>
+      </motion.div>
+
       {/* Scroll cue — bottom right */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -1792,7 +1803,7 @@ export const Hero = ({ ready, hideDecorations, onReady }: { ready: boolean; hide
         transition={{ delay: 0.85, duration: 0.7 }}
         style={{ position: 'absolute', bottom: 'clamp(32px, 5vh, 48px)', right: 56, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, zIndex: 10 }}
       >
-        <span style={{ color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif', fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase' }}>scroll</span>
+        <span style={{ color: C.accent, fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.35em', textTransform: 'uppercase' }}>scroll</span>
         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}>
           <div style={{ width: 1, height: 48, background: `linear-gradient(to bottom, ${C.accent}, transparent)` }} />
         </motion.div>
@@ -3497,6 +3508,14 @@ export const Showcase = () => {
   const leftRef = useRef(null);
   const inView = useInView(leftRef, { once: true, margin: '-60px' });
   const isMobile = useIsMobile();
+  // Treat tablets (< 1024px) the same as mobile — stacked scrollable layout
+  const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => {
+    const check = () => setIsNarrow(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
   const x = useMotionValue(0);
   const xSpring = useSpring(x, { stiffness: 180, damping: 28, mass: 0.8 });
@@ -3559,18 +3578,60 @@ export const Showcase = () => {
     return () => window.removeEventListener('wheel', onWheel, { capture: true });
   }, []);
 
+  // Touch swipe support for the desktop sticky layout (large tablets, etc.)
+  useEffect(() => {
+    if (isNarrow) return;
+    let touchStartY = 0;
+    const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+    const onTouchEnd = (e: TouchEvent) => {
+      const sec = sectionRef.current;
+      if (!sec) return;
+      const rect = sec.getBoundingClientRect();
+      if (rect.top > 2 || rect.bottom < window.innerHeight - 2) return;
+      const deltaY = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(deltaY) < 40) return;
+      const dir = Math.sign(deltaY);
+      const cur = activeIdxRef.current;
+      if (dir > 0 && cur < CARDS.length - 1) {
+        if (isAdvancingRef.current) return;
+        isAdvancingRef.current = true;
+        const next = cur + 1;
+        activeIdxRef.current = next;
+        setActiveIdx(next);
+        const scrollable = sec.offsetHeight - window.innerHeight;
+        window.scrollTo({ top: sec.offsetTop + (next / (CARDS.length - 1)) * scrollable, behavior: 'smooth' });
+        setTimeout(() => { isAdvancingRef.current = false; }, 700);
+      } else if (dir < 0 && cur > 0) {
+        if (isAdvancingRef.current) return;
+        isAdvancingRef.current = true;
+        const prev = cur - 1;
+        activeIdxRef.current = prev;
+        setActiveIdx(prev);
+        const scrollable = sec.offsetHeight - window.innerHeight;
+        window.scrollTo({ top: sec.offsetTop + (prev / (CARDS.length - 1)) * scrollable, behavior: 'smooth' });
+        setTimeout(() => { isAdvancingRef.current = false; }, 700);
+      }
+    };
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [isNarrow]);
+
   const activeCard = CARDS[activeIdx];
 
-  if (isMobile) {
+  if (isNarrow) {
     return (
-      <section id="sec-showcase" style={{ background: C.charcoal, height: '100vh', padding: 'clamp(80px, 10vw, 120px) 24px', position: 'relative', overflow: 'hidden' }}>
+      <section id="sec-showcase" style={{ background: C.charcoal, minHeight: '100vh', padding: 'clamp(100px, 12vw, 140px) 24px 80px', position: 'relative', overflowY: 'auto' }}>
         <SectionTag name="showcase" />
         <div ref={leftRef}>
-          <div style={{ marginBottom: 52 }}>
+          <div style={{ marginBottom: 40 }}>
             <Badge n="06" label="Innovation Hub" />
-            <SplitHeading outline="ai projects" solid="at work" inView={inView} color="#ffffff" fontSize="clamp(2.8rem, 8vw, 4.5rem)" />
+            <SplitHeading outline="ai projects" solid="at work" inView={inView} color="#ffffff" fontSize="clamp(2rem, 6vw, 3.5rem)" />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {CARDS.map((card, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.75, delay: i * 0.08 }}>
                 <ShowCard card={card} index={i} fullWidth />

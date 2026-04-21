@@ -674,26 +674,16 @@ function StickyServicesSection({ onReady }: { onReady?: () => void }) {
               {/* ── Right: animated service content ── */}
               <div className="flex-1 flex flex-col justify-between py-10 overflow-hidden">
 
-                {/* Top: section heading + counter */}
-                <div className="space-y-4">
+                {/* Top: section heading + service content grouped */}
+                <div className="space-y-8">
                   <div>
                     <span className="text-accent font-bold tracking-widest uppercase text-xs">Our Expertise</span>
                     <h2 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold mt-2 text-primary leading-none whitespace-nowrap">
                       Services we offer
                     </h2>
                   </div>
-                  <div className="flex items-center gap-3 pt-1">
-                    <span className="font-mono text-[11px] text-slate-300 tracking-widest select-none">
-                      0{activeService + 1}
-                    </span>
-                    <div className="flex-1 h-px bg-slate-100" />
-                    <span className="font-mono text-[11px] text-slate-300 tracking-widest select-none">
-                      0{SERVICES.length}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Middle: animated content block */}
+                {/* Animated content block */}
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeService}
@@ -703,10 +693,9 @@ function StickyServicesSection({ onReady }: { onReady?: () => void }) {
                     transition={{ duration: 0.45, ease: [0.21, 1.02, 0.47, 0.98] }}
                     className="space-y-6"
                   >
-                    {/* Icon + rule */}
-                    <div className="flex items-center gap-3">
+                    {/* Icon */}
+                    <div>
                       {React.cloneElement(service.icon as React.ReactElement<any>, { className: 'w-7 h-7 text-accent flex-shrink-0' })}
-                      <div className="h-px flex-1 bg-slate-100" />
                     </div>
 
                     {/* Title */}
@@ -736,6 +725,7 @@ function StickyServicesSection({ onReady }: { onReady?: () => void }) {
                     </div>
                   </motion.div>
                 </AnimatePresence>
+                </div>
 
                 {/* Bottom: progress + hint */}
                 <div className="flex items-center gap-3">
@@ -979,7 +969,7 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
               textShadow: '0 2px 32px rgba(0,0,0,0.6)',
             }}
           >
-            Making tomorrow&apos;s technology<br />available today.
+            Building the Future, Today.
           </h2>
           <div className="mt-6 w-12 h-0.5 bg-accent rounded-full" />
         </div>
@@ -1097,9 +1087,6 @@ export default function Home() {
     <div className="space-y-0">
       {/* Hero Section (AI Day particle hero) */}
       <HeroWithRadius onReady={reportAssetLoaded} ready={loadingDone} />
-
-      {/* Parallax heading */}
-      <ParallaxHeading />
 
       {/* Scroll-to-play sequence */}
       <ScrollSequenceSection onReady={reportAssetLoaded} />
