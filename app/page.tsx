@@ -781,9 +781,7 @@ function StickyServicesSection({ onReady }: { onReady?: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── Scroll-to-play sequence ──────────────────────────────────────────────────
-const TOTAL_FRAMES = 151;
-const getFrameUrl = (n: number) =>
-  `/seq/ezgif-frame-${String(n).padStart(3, '0')}.png`;
+const SEQ_VIDEO_SRC = '/we-build-the-future.mp4';
 
 const ParallaxHeading = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -841,38 +839,51 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
   const containerRef    = useRef<HTMLDivElement>(null);
   const frameWrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef       = useRef<HTMLCanvasElement>(null);
+  const videoRef        = useRef<HTMLVideoElement>(null);
   const headingRef      = useRef<HTMLHeadingElement>(null);
-  const imagesRef       = useRef<HTMLImageElement[]>([]);
-  const frameRef        = useRef(0);
-  const rafRef          = useRef<number>(0);
+  const seekingRef      = useRef(false);
+  const pendingTimeRef  = useRef<number | null>(null);
 
-  // Draw frame with cover crop
-  const drawFrame = useCallback((index: number) => {
+  // Draw current video frame to canvas with cover-crop
+  const drawFrame = useCallback(() => {
     const canvas = canvasRef.current;
-    const img    = imagesRef.current[index];
-    if (!canvas || !img?.complete || !img.naturalWidth) return;
+    const video  = videoRef.current;
+    if (!canvas || !video || !video.videoWidth) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const cw = canvas.width, ch = canvas.height;
-    const ir = img.naturalWidth / img.naturalHeight;
+    const vr = video.videoWidth / video.videoHeight;
     const cr = cw / ch;
 
     let sx: number, sy: number, sw: number, sh: number;
-    if (ir > cr) {
-      sh = img.naturalHeight;
+    if (vr > cr) {
+      sh = video.videoHeight;
       sw = sh * cr;
-      sx = (img.naturalWidth - sw) / 2;
+      sx = (video.videoWidth - sw) / 2;
       sy = 0;
     } else {
-      sw = img.naturalWidth;
+      sw = video.videoWidth;
       sh = sw / cr;
       sx = 0;
-      sy = (img.naturalHeight - sh) / 2;
+      sy = (video.videoHeight - sh) / 2;
     }
 
     ctx.clearRect(0, 0, cw, ch);
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+  }, []);
+
+  // Seek to a time, serialising requests so they don't pile up
+  const seekTo = useCallback((time: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (seekingRef.current) {
+      // Already mid-seek — stash the latest requested time
+      pendingTimeRef.current = time;
+      return;
+    }
+    seekingRef.current = true;
+    video.currentTime = time;
   }, []);
 
   // Sync canvas pixel size to display size
@@ -883,58 +894,61 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
       const dpr = window.devicePixelRatio || 1;
       canvas.width  = canvas.offsetWidth  * dpr;
       canvas.height = canvas.offsetHeight * dpr;
-      drawFrame(frameRef.current);
+      drawFrame();
     };
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
   }, [drawFrame]);
 
-  // Preload all frames; render frame 0 as soon as it's ready
+  // Wire up video events: draw on seeked, then flush any pending seek
   useEffect(() => {
-    let stale = false;
-    const images: HTMLImageElement[] = [];
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
-      const img = new Image();
-      img.src = getFrameUrl(i);
-      const onLoad = () => {
-        if (stale) return;
-        if (i === 1) drawFrame(0);
-        if (onReady) onReady();
-      };
-      img.onload = onLoad;
-      img.onerror = onLoad;
-      images.push(img);
-    }
-    imagesRef.current = images;
-    return () => { stale = true; };
-  }, [drawFrame, onReady]);
+    const video = videoRef.current;
+    if (!video) return;
 
-  // Advance frame based on scroll position
+    const onSeeked = () => {
+      drawFrame();
+      seekingRef.current = false;
+      if (pendingTimeRef.current !== null) {
+        const next = pendingTimeRef.current;
+        pendingTimeRef.current = null;
+        seekTo(next);
+      }
+    };
+
+    const onReady_ = () => {
+      drawFrame();
+      if (onReady) onReady();
+    };
+
+    video.addEventListener('seeked', onSeeked);
+    if (video.readyState >= 2) {
+      onReady_();
+    } else {
+      video.addEventListener('loadeddata', onReady_, { once: true });
+    }
+    return () => {
+      video.removeEventListener('seeked', onSeeked);
+      video.removeEventListener('loadeddata', onReady_);
+    };
+  }, [drawFrame, seekTo, onReady]);
+
+  // Advance video based on scroll position
   useEffect(() => {
     const onScroll = () => {
       const container = containerRef.current;
-      if (!container) return;
+      const video     = videoRef.current;
+      if (!container || !video || !video.duration) return;
+
       const rect       = container.getBoundingClientRect();
       const vh         = window.innerHeight;
       const scrollable = container.offsetHeight - vh;
       const progress   = Math.max(0, Math.min(1, -rect.top / scrollable));
-      // Release phase = how far the sticky has scrolled OUT after its pinned
-      // run ended. 0 while pinned; 0 → 1 as the sticky slides off the top.
       const releaseP   = Math.max(0, Math.min(1, (-rect.top - scrollable) / vh));
 
-      const next = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * TOTAL_FRAMES));
-      if (next !== frameRef.current) {
-        frameRef.current = next;
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = requestAnimationFrame(() => drawFrame(next));
-      }
+      seekTo(progress * video.duration);
 
-      // Expand frame from bottom, then drop the radius once it's full-screen:
-      //   0 %  →  40 %  → scale 0.75 → 1   (radius stays at 48)
-      //  40 %  →  50 %  → radius 48 → 0    (scale stays at 1)
-      // Parallax: during the release phase, translate the frame DOWN so it
-      // scrolls out slower than the heading (~0.7× speed).
+      // Expand frame from bottom, then drop the radius once it's full-screen
       if (frameWrapperRef.current) {
         const expandP   = Math.max(0, Math.min(1, progress / 0.4));
         const scale     = 0.75 + 0.25 * expandP;
@@ -952,17 +966,21 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, [drawFrame]);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [seekTo]);
 
   return (
-    // 350 vh of scroll space for 151 frames ≈ comfortable pacing
     <div id="scroll-sequence-section" ref={containerRef} style={{ height: '350vh' }} className="relative">
+      {/* Hidden video element used as frame source */}
+      <video
+        ref={videoRef}
+        src={SEQ_VIDEO_SRC}
+        muted
+        playsInline
+        preload="auto"
+        style={{ display: 'none' }}
+      />
       <div className="sticky top-0 h-screen bg-white overflow-hidden flex items-center justify-center">
-        {/* Anchored at bottom-center, 75 % scale with top-rounded corners; expands upward to fill the screen */}
         <div
           ref={frameWrapperRef}
           className="absolute inset-0 overflow-hidden"
@@ -970,9 +988,6 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
             transform: 'scale(0.75)',
             transformOrigin: 'bottom center',
             borderRadius: '144px 144px 0 0',
-            // Squircle / superellipse corners (Chrome 139+). Falls back to
-            // regular circular corners on browsers that don't support
-            // corner-shape yet — same border-radius, just sharper-looking.
             ['cornerShape' as any]: 'squircle',
             willChange: 'transform, border-radius',
           }}
@@ -1019,8 +1034,8 @@ export default function Home() {
   }, []);
 
   // Track asset loading — report progress and dispatch event when all ready
-  // 1 hero video + 151 seq frames + 3 service videos = 155 total
-  const TOTAL_ASSETS = 1 + TOTAL_FRAMES + SERVICE_VIDEOS.length;
+  // 1 hero video + 1 seq video + 3 service videos = 5 total
+  const TOTAL_ASSETS = 1 + 1 + SERVICE_VIDEOS.length;
   const loadedRef = useRef(0);
   const firedRef = useRef(false);
   // Reset on mount (handles Strict Mode remount and route re-entry)
