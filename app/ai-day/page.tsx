@@ -2550,14 +2550,14 @@ const Process = () => {
 
 // ── 06 HORIZONTAL SHOWCASE ────────────────────────────────────────────────────
 const CARDS = [
-  { label: 'LLM Orchestration Engine', tag: 'Generative AI', desc: 'a production-grade multi-agent framework that routes complex tasks across specialized AI models with sub-second latency.', color: '#FFC72C' },
-  { label: 'Real-Time Risk Dashboard', tag: 'FinTech', desc: 'live risk visualization for institutional portfolios, processing 1M+ events/sec with intelligent anomaly detection.', color: '#4A90D9' },
-  { label: 'Predictive Analytics Platform', tag: 'Data Science', desc: 'end-to-end ML pipeline for customer churn prediction, driving 40% reduction in attrition for enterprise clients.', color: '#6C63FF' },
-  { label: 'Agentic Research Assistant', tag: 'AI Agents', desc: 'autonomous research agent that synthesizes market intelligence from 500+ sources with human-in-the-loop validation.', color: '#2ECC71' },
-  { label: 'Automated Trading Signal System', tag: 'Quantitative Finance', desc: 'ML-driven alpha signal generator processing tick-level market data, delivering sub-millisecond trade recommendations.', color: '#E91E8C' },
-  { label: 'RAG Knowledge Base', tag: 'Enterprise AI', desc: 'retrieval-augmented generation system indexing 10M+ internal documents, enabling natural language querying across an entire organization.', color: '#F59E0B' },
-  { label: 'Computer Vision QA Pipeline', tag: 'Vision AI', desc: 'real-time defect detection system trained on manufacturing imagery, achieving 99.4% accuracy and reducing inspection costs by 60%.', color: '#06B6D4' },
-  { label: 'AI-Powered Compliance Monitor', tag: 'RegTech', desc: 'NLP-based regulatory compliance engine that continuously scans communications and flags violations before they become liabilities.', color: '#A78BFA' },
+  { label: 'Low-Latency Trading Engine', tag: 'High-Frequency Systems', desc: 'C++ order-routing engine built on DPDK kernel-bypass and lock-free ring buffers. Delivers 18μs median latency at P99 under 40μs, processing 10M+ order events per second with zero packet loss.', color: '#FFC72C' },
+  { label: 'Alpha Signal Intelligence', tag: 'Quantitative Finance', desc: 'domain-tuned transformer pipeline scanning 50,000+ research papers and live market feeds per quarter. Surfaces actionable trade signals in real time, multiplying analyst throughput by 8x.', color: '#4A90D9' },
+  { label: 'Streaming Risk Monitor', tag: 'Real-Time Analytics', desc: 'Kafka-to-Flink event pipeline backed by Redis CRDT state and binary WebSocket delivery. Handles 4M+ transactions per second with sub-50ms dashboard refresh for institutional risk teams.', color: '#6C63FF' },
+  { label: 'Agentic Research Platform', tag: 'AI Agents', desc: 'multi-agent orchestration system that autonomously synthesizes regulatory filings, earnings transcripts, and alternative datasets into structured investment theses with human-in-the-loop review.', color: '#2ECC71' },
+  { label: 'NLP Compliance Engine', tag: 'RegTech', desc: 'fine-tuned language model scanning internal communications and trade records in real time to flag regulatory violations before they escalate into material risk or reportable incidents.', color: '#E91E8C' },
+  { label: 'Cloud-Native Market Infrastructure', tag: 'Cloud Engineering', desc: 'Kubernetes-native microservices deployed across multi-cloud environments. GitOps-driven pipelines enforce zero-downtime blue-green releases at every cycle, with full observability baked in.', color: '#F59E0B' },
+  { label: 'Predictive Attrition Model', tag: 'Data Science', desc: 'end-to-end ML pipeline combining behavioral signals and transaction history to forecast client attrition 90 days ahead, enabling targeted intervention before churn becomes a revenue event.', color: '#06B6D4' },
+  { label: 'Enterprise Knowledge Retrieval', tag: 'Enterprise AI', desc: 'retrieval-augmented generation layer over 10M+ internal documents, trade records, and research notes—giving teams natural language access to institutional knowledge at query time.', color: '#A78BFA' },
 ];
 const CARD_W = 480;
 const GAP = 28;
@@ -3616,7 +3616,6 @@ export const Showcase = () => {
         <SectionTag name="showcase" />
         <div ref={leftRef}>
           <div style={{ marginBottom: 40 }}>
-            <Badge n="06" label="Innovation Hub" />
             <SplitHeading outline="ai projects" solid="at work" inView={inView} color="#ffffff" fontSize="clamp(2rem, 6vw, 3.5rem)" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -3633,65 +3632,45 @@ export const Showcase = () => {
 
   return (
     <section id="sec-showcase" ref={sectionRef} style={{ background: C.charcoal, height: `${(CARDS.length + 1.5) * 100}vh`, position: 'relative' }}>
-      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden', display: 'flex' }}>
+      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <SectionTag name="showcase" />
 
-        {/* ── Left panel: heading + card meta + progress ── */}
+        {/* ── Heading ── */}
         <motion.div ref={leftRef}
-          initial={{ opacity: 0, x: -24 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.7 }}
-          style={{ width: 'clamp(280px, 34vw, 440px)', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 48px', borderRight: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 2 }}
+          initial={{ opacity: 0, y: -16 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }}
+          style={{ padding: '0 clamp(32px, 6vw, 80px)', marginBottom: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
         >
-          <Badge n="06" label="Innovation Hub" />
           <SplitHeading outline="ai projects" solid="at work" inView={inView} color="#ffffff" fontSize="clamp(1.9rem, 2.8vw, 3rem)" />
-
-          {/* Current card details */}
-          <AnimatePresence mode="wait">
-            <motion.div key={activeIdx}
-              initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }}
-              transition={{ duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
-              style={{ marginTop: 32 }}
-            >
-              <span style={{ display: 'inline-block', padding: '5px 14px', borderRadius: 100, background: `${activeCard.color}18`, color: activeCard.color, fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
-                {activeCard.tag}
-              </span>
-              <h3 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 'clamp(1rem, 1.5vw, 1.45rem)', color: '#ffffff', lineHeight: 1.2, marginBottom: 12, letterSpacing: '-0.015em' }}>
-                {activeCard.label}
-              </h3>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'Inter, sans-serif', fontSize: '0.8rem', lineHeight: 1.75 }}>
-                {activeCard.desc}
-              </p>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Counter + dots + scroll bar */}
-          <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '2rem', color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1 }}>
-                {String(activeIdx + 1).padStart(2, '0')}
-              </span>
-              <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 400, fontSize: '1rem', color: 'rgba(255,255,255,0.4)' }}>
-                / {String(CARDS.length).padStart(2, '0')}
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-              {CARDS.map((_, i) => (
-                <div key={i} style={{ height: 4, borderRadius: 2, background: i === activeIdx ? activeCard.color : 'rgba(255,255,255,0.15)', transition: 'width 0.35s ease, background 0.35s ease', width: i === activeIdx ? 28 : 6 }} />
-              ))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>scroll to explore</span>
-              <div style={{ flex: 1, height: 1.5, background: 'rgba(255,255,255,0.1)', borderRadius: 1, overflow: 'hidden' }}>
-                <motion.div style={{ height: '100%', background: C.accent, scaleX: scrollYProgress, transformOrigin: 'left' }} />
-              </div>
-            </div>
-          </div>
         </motion.div>
 
-        {/* ── Right panel: card track ── */}
-        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center', padding: '0 40px 0 52px' }}>
-          <motion.div style={{ x: xSpring, display: 'flex', gap: GAP, willChange: 'transform' }}>
+        {/* ── Centered card queue ── */}
+        <div style={{ overflow: 'hidden', position: 'relative' }}>
+          <motion.div style={{ x: xSpring, display: 'flex', gap: GAP, paddingLeft: `calc(50vw - ${CARD_W / 2}px)`, willChange: 'transform' }}>
             {CARDS.map((card, i) => <ShowCard key={String(i)} card={card} index={i} isActive={i === activeIdx} />)}
           </motion.div>
+        </div>
+
+        {/* ── Progress: counter + dots + scroll hint ── */}
+        <div style={{ padding: '24px clamp(32px, 6vw, 80px) 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '2rem', color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1 }}>
+              {String(activeIdx + 1).padStart(2, '0')}
+            </span>
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 400, fontSize: '1rem', color: 'rgba(255,255,255,0.4)' }}>
+              / {String(CARDS.length).padStart(2, '0')}
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+            {CARDS.map((_, i) => (
+              <div key={i} style={{ height: 4, borderRadius: 2, background: i === activeIdx ? activeCard.color : 'rgba(255,255,255,0.15)', transition: 'width 0.35s ease, background 0.35s ease', width: i === activeIdx ? 28 : 6 }} />
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>scroll to explore</span>
+            <div style={{ width: 80, height: 1.5, background: 'rgba(255,255,255,0.1)', borderRadius: 1, overflow: 'hidden' }}>
+              <motion.div style={{ height: '100%', background: C.accent, scaleX: scrollYProgress, transformOrigin: 'left' }} />
+            </div>
+          </div>
         </div>
       </div>
     </section>

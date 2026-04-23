@@ -41,13 +41,28 @@ export const SERVICES: Service[] = [
         description: "Deep profiling and tuning to extract maximum efficiency at every layer of the stack.",
         icon: <Gauge />,
       },
+      {
+        title: "Technology Scouting",
+        description: "Continuously scanning the frontier of emerging technologies to identify high-leverage opportunities before they reach mainstream adoption.",
+        icon: <Search />,
+      },
+      {
+        title: "Systems Architecture",
+        description: "Designing robust, fault-tolerant systems from the ground up with scalability and long-term maintainability baked in from day one.",
+        icon: <Globe />,
+      },
+      {
+        title: "Knowledge Transfer",
+        description: "Embedding institutional knowledge through structured documentation, internal training, and collaborative engineering that scales expertise across teams.",
+        icon: <Users />,
+      },
     ],
     image: "https://phitopolis.com/img/core-competencies/innovation.jpg",
     story: "DPDK kernel-bypass + lock-free SPSC ring buffer in C++ + NUMA-aware allocation. Result: 18μs median latency, P99 <40μs — 100× improvement."
   },
   {
     type: ServiceType.DATA_SCIENCE,
-    title: "Data Science",
+    title: "Data Science and Software Engineering",
     description: "Extracting actionable insights from vast datasets through ML and statistical modeling.",
     icon: <Database className="w-8 h-8 text-primary" />,
     features: [
@@ -65,6 +80,21 @@ export const SERVICES: Service[] = [
         title: "Quant Strategy Dev",
         description: "Rigorous design and backtesting of quantitative strategies grounded in statistical methods.",
         icon: <LineChart />,
+      },
+      {
+        title: "Data Pipeline Engineering",
+        description: "End-to-end ETL and streaming pipelines that deliver clean, validated data at the speed the business demands.",
+        icon: <Database />,
+      },
+      {
+        title: "Model Observability",
+        description: "Automated monitoring, drift detection, and retraining pipelines that keep production models accurate and production-ready.",
+        icon: <Monitor />,
+      },
+      {
+        title: "Alternative Data Integration",
+        description: "Sourcing and normalizing non-traditional datasets — from web scrapes to satellite imagery — to uncover signals hidden from conventional analysis.",
+        icon: <Globe />,
       },
     ],
     image: "https://phitopolis.com/img/core-competencies/technical-excellence.jpg",
@@ -90,6 +120,21 @@ export const SERVICES: Service[] = [
         title: "Real-time Dashboards",
         description: "Live operational views powered by streaming data with sub-50 ms UI latency.",
         icon: <Monitor />,
+      },
+      {
+        title: "Infrastructure Automation",
+        description: "Declarative IaC and GitOps workflows that eliminate manual provisioning, enforce consistency, and accelerate every deployment cycle.",
+        icon: <Cpu />,
+      },
+      {
+        title: "On-Demand Engineering Support",
+        description: "Augment your existing team with senior engineers who embed quickly, tackle critical work, and ramp down cleanly when the mission is done.",
+        icon: <Users />,
+      },
+      {
+        title: "Proactive Monitoring",
+        description: "Intelligent observability stacks with anomaly detection and auto-remediation that surface issues before end users ever notice them.",
+        icon: <Search />,
       },
     ],
     image: "https://phitopolis.com/img/core-competencies/proactive-communication.jpg",

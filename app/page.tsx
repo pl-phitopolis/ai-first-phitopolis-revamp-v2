@@ -526,8 +526,8 @@ function StitchedVideoBackground() {
 // ── Sticky Services Section (alternative layout) ─────────────────────────────
 const SERVICE_VIDEOS = [
   '/expertise/research-and-development.mp4',
-  '/expertise/data-science.mp4',
   '/expertise/support-and-operations.mp4',
+  '/expertise/data-science.mp4',
 ];
 
 // Navbar is fixed at ~72px. Box fills viewport below nav with py-4 breathing room.
@@ -951,7 +951,7 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
       // Expand frame from bottom, then drop the radius once it's full-screen
       if (frameWrapperRef.current) {
         const expandP   = Math.max(0, Math.min(1, progress / 0.4));
-        const scale     = 0.75 + 0.25 * expandP;
+        const scale     = 0.88 + 0.12 * expandP;
         const radiusP   = Math.max(0, Math.min(1, (progress - 0.4) / 0.1));
         const radius    = 144 * (1 - radiusP);
         const parallaxY = releaseP * vh * 0.3;
@@ -985,7 +985,7 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
           ref={frameWrapperRef}
           className="absolute inset-0 overflow-hidden"
           style={{
-            transform: 'scale(0.75)',
+            transform: 'scale(0.88)',
             transformOrigin: 'bottom center',
             borderRadius: '144px 144px 0 0',
             ['cornerShape' as any]: 'squircle',
@@ -1008,7 +1008,7 @@ const ScrollSequenceSection = ({ onReady }: { onReady?: () => void }) => {
               textShadow: '0 2px 32px rgba(0,0,0,0.6)',
             }}
           >
-            Building the Future, Today.
+            Let&apos;s build the future today.
           </h2>
           <div className="mt-6 w-12 h-0.5 bg-accent rounded-full" />
         </div>
@@ -1126,6 +1126,39 @@ export default function Home() {
     <div className="space-y-0">
       {/* Hero Section (AI Day particle hero) */}
       <HeroWithRadius onReady={reportAssetLoaded} ready={loadingDone} />
+
+      {/* "Brightest Minds" Quote */}
+      <section className="relative bg-white pt-16 pb-4 px-6 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute left-0 top-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute right-0 bottom-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="container mx-auto max-w-4xl text-center relative z-10"
+        >
+          <div className="w-10 h-0.5 bg-accent rounded-full mx-auto mb-4" />
+          <blockquote
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
+              fontWeight: 600,
+              color: '#0A2A66',
+              lineHeight: 1.35,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Work with the brightest minds, engineers and scientists who push the boundaries of what&apos;s possible to bring your most ambitious technology products to life.
+          </blockquote>
+          <div className="w-10 h-0.5 bg-accent rounded-full mx-auto mt-4" />
+          <p className="mt-3 text-slate-400 text-sm tracking-widest uppercase font-medium">
+            Phitopolis Built for what&apos;s next
+          </p>
+        </motion.div>
+      </section>
 
       {/* Scroll-to-play sequence */}
       <ScrollSequenceSection onReady={reportAssetLoaded} />
