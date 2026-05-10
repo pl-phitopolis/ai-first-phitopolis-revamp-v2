@@ -788,7 +788,8 @@ function StickyServicesSection({ onReady }: { onReady?: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── Scroll-to-play sequence ──────────────────────────────────────────────────
-const SEQ_VIDEO_SRC = '/we-build-the-future.mp4';
+const SEQ_VIDEO_SRC        = '/we-build-the-future.mp4';
+const OFFICE_VIDEO_SRC     = '/phitopolis-office.mp4';
 
 const ParallaxHeading = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -839,6 +840,151 @@ const HeroWithRadius = ({ onReady, ready }: { onReady?: () => void; ready?: bool
         Making tomorrow&apos;s technology<br /><span style={{ color: '#FFC72C' }}>available today.</span>
       </motion.h1>
     </motion.div>
+  );
+};
+
+const OfficeScrollSection = ({ careers }: { careers: Career[] }) => {
+  const containerRef   = useRef<HTMLDivElement>(null);
+  const canvasWrapRef  = useRef<HTMLDivElement>(null);
+  const canvasRef      = useRef<HTMLCanvasElement>(null);
+  const videoRef       = useRef<HTMLVideoElement>(null);
+  const panelRef       = useRef<HTMLDivElement>(null);
+  const seekingRef     = useRef(false);
+  const pendingTimeRef = useRef<number | null>(null);
+
+  const drawFrame = useCallback(() => {
+    const canvas = canvasRef.current;
+    const video  = videoRef.current;
+    if (!canvas || !video || !video.videoWidth) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const cw = canvas.width, ch = canvas.height;
+    const vr = video.videoWidth / video.videoHeight;
+    const cr = cw / ch;
+    let sx: number, sy: number, sw: number, sh: number;
+    if (vr > cr) {
+      sh = video.videoHeight; sw = sh * cr; sx = (video.videoWidth - sw) / 2; sy = 0;
+    } else {
+      sw = video.videoWidth; sh = sw / cr; sx = 0; sy = (video.videoHeight - sh) / 2;
+    }
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+  }, []);
+
+  const seekTo = useCallback((time: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (seekingRef.current) { pendingTimeRef.current = time; return; }
+    seekingRef.current = true;
+    video.currentTime = time;
+  }, []);
+
+  useEffect(() => {
+    const resize = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width  = canvas.offsetWidth  * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      drawFrame();
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, [drawFrame]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const onSeeked = () => {
+      drawFrame();
+      seekingRef.current = false;
+      if (pendingTimeRef.current !== null) {
+        const next = pendingTimeRef.current;
+        pendingTimeRef.current = null;
+        seekTo(next);
+      }
+    };
+    video.addEventListener('seeked', onSeeked);
+    if (video.readyState >= 2) drawFrame();
+    else video.addEventListener('loadeddata', drawFrame, { once: true });
+    return () => {
+      video.removeEventListener('seeked', onSeeked);
+      video.removeEventListener('loadeddata', drawFrame);
+    };
+  }, [drawFrame, seekTo]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const container = containerRef.current;
+      const video     = videoRef.current;
+      if (!container || !video || !video.duration) return;
+      const rect       = container.getBoundingClientRect();
+      const vh         = window.innerHeight;
+      const scrollable = container.offsetHeight - vh;
+      const progress   = Math.max(0, Math.min(1, -rect.top / scrollable));
+
+      // 0–65%: scrub video
+      seekTo(Math.min(1, progress / 0.65) * video.duration);
+
+      // 60–85%: panel slides up from bottom, canvas dims behind it
+      const panelP = Math.max(0, Math.min(1, (progress - 0.60) / 0.25));
+      // ease-out cubic
+      const eased  = 1 - Math.pow(1 - panelP, 3);
+      if (panelRef.current)  panelRef.current.style.transform  = `translateY(${(1 - eased) * 100}%)`;
+      if (canvasWrapRef.current) canvasWrapRef.current.style.opacity = String(1 - panelP * 0.35);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [seekTo]);
+
+  return (
+    <div id="home-office" ref={containerRef} style={{ height: '500vh' }} className="relative">
+      <video ref={videoRef} src={OFFICE_VIDEO_SRC} muted playsInline preload="auto" style={{ display: 'none' }} />
+      <div className="sticky top-0 h-screen overflow-hidden">
+
+        {/* Video canvas */}
+        <div ref={canvasWrapRef} className="absolute inset-0">
+          <canvas ref={canvasRef} className="w-full h-full" />
+        </div>
+
+        {/* Jobs panel — slides up from bottom */}
+        <div ref={panelRef} id="home-jobs" className="absolute inset-x-0 bottom-0 h-full bg-slate-50 overflow-y-auto" style={{ transform: 'translateY(100%)' }}>
+          <div className="w-full max-w-4xl mx-auto px-6 py-20 text-center">
+            <h2 className="text-3xl md:text-5xl font-display font-bold mb-4 text-primary">Work with the best.</h2>
+            <p className="text-slate-600 mb-12 max-w-xl mx-auto">
+              We're looking for world-class engineers and data scientists to solve impossible problems.
+            </p>
+            <div className="space-y-4 text-left">
+              {careers.slice(0, 5).map((job: Career) => (
+                <Link
+                  key={job.id}
+                  to={`/careers/${job.slug}`}
+                  className="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-accent hover:shadow-lg transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                >
+                  <div>
+                    <h3 className="font-bold text-xl text-primary">{job.job_title}</h3>
+                    <p className="text-sm text-slate-500">{job.department} • {job.location}</p>
+                  </div>
+                  <div className="px-4 py-2 bg-slate-100 text-primary text-sm font-bold rounded-full group-hover:bg-accent group-hover:text-primary transition-all group-hover:scale-105 active:scale-95 shrink-0">
+                    View Position
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-12">
+              <Link to="/careers" className="text-primary hover:text-accent font-bold transition-all underline decoration-accent underline-offset-4">
+                {careers.length > 0
+                  ? `View all ${careers.length} opening${careers.length !== 1 ? 's' : ''}`
+                  : 'View careers page'}
+              </Link>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   );
 };
 
@@ -1043,7 +1189,7 @@ const HOME_SECTIONS = [
   { id: 'home-sequence', label: 'Story' },
   { id: 'home-services', label: 'Services' },
   { id: 'sec-showcase',  label: 'Showcase' },
-  { id: 'home-jobs',     label: 'Careers' },
+  { id: 'home-office',   label: 'Office' },
 ];
 
 const HomeFloatNav = () => {
@@ -1434,53 +1580,8 @@ export default function Home() {
       {/* Innovation Hub */}
       <Showcase />
 
-      {/* Featured Jobs */}
-      <section id="home-jobs" className="py-24 bg-slate-50">
-        <div className="container mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-5xl font-display font-bold mb-4 text-primary">Work with the best.</h2>
-            <p className="text-slate-600 mb-12 max-w-xl mx-auto">
-              We're looking for world-class engineers and data scientists to solve impossible problems.
-            </p>
-          </motion.div>
-          <div className="max-w-4xl mx-auto space-y-4 text-left">
-            {careers.slice(0, 5).map((job: Career, idx: number) => (
-              <motion.div
-                key={job.id}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1, duration: 0.5 }}
-              >
-                <Link
-                  to={`/careers/${job.slug}`}
-                  className="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-accent hover:shadow-lg transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div>
-                    <h3 className="font-bold text-xl text-primary group-hover:text-primary transition-colors">{job.job_title}</h3>
-                    <p className="text-sm text-slate-500">{job.department} • {job.location}</p>
-                  </div>
-                  <div className="px-4 py-2 bg-slate-100 text-primary text-sm font-bold rounded-full group-hover:bg-accent group-hover:text-primary transition-all group-hover:scale-105 active:scale-95">
-                    View Position
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-          <div className="mt-12">
-            <Link to="/careers" className="text-primary hover:text-accent font-bold transition-all underline decoration-accent underline-offset-4">
-              {careers.length > 0
-                ? `View all ${careers.length} opening${careers.length !== 1 ? 's' : ''}`
-                : 'View careers page'}
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Office scroll-to-play + careers reveal */}
+      <OfficeScrollSection careers={careers} />
     </div>
   );
 }
