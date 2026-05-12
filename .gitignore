@@ -19,6 +19,10 @@ dist-ssr
 # Windows Zone.Identifier (NTFS alternate data streams, auto-created on downloaded files)
 *:Zone.Identifier
 
+# Claude Code
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
