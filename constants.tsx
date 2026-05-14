@@ -47,9 +47,9 @@ export const SERVICES: Service[] = [
         icon: <Search />,
       },
       {
-        title: "Systems Architecture",
-        description: "Designing robust, fault-tolerant systems from the ground up with scalability and long-term maintainability baked in from day one.",
-        icon: <Globe />,
+        title: "Quant Strategy Dev",
+        description: "Rigorous design and backtesting of quantitative strategies grounded in statistical methods.",
+        icon: <LineChart />,
       },
       {
         title: "Knowledge Transfer",
@@ -77,9 +77,9 @@ export const SERVICES: Service[] = [
         icon: <MessageSquare />,
       },
       {
-        title: "Quant Strategy Dev",
-        description: "Rigorous design and backtesting of quantitative strategies grounded in statistical methods.",
-        icon: <LineChart />,
+        title: "Systems Architecture",
+        description: "Designing robust, fault-tolerant systems from the ground up with scalability and long-term maintainability baked in from day one.",
+        icon: <Globe />,
       },
       {
         title: "Data Pipeline Engineering",

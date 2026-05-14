@@ -167,6 +167,23 @@ const Header = () => {
     };
 
     const update = () => {
+      const navH = 72;
+      const officeSection = document.getElementById('home-office');
+      if (officeSection) {
+        const officeRect = officeSection.getBoundingClientRect();
+        if (officeRect.top <= navH && officeRect.bottom > navH) {
+          const scrollable = officeSection.offsetHeight - window.innerHeight;
+          const progress = scrollable > 0
+            ? Math.max(0, Math.min(1, -officeRect.top / scrollable))
+            : 0;
+          // Mirror the careers panel reveal (0.60 → 0.85): nav bg fades in as panel slides up.
+          const panelP = Math.max(0, Math.min(1, (progress - 0.60) / 0.25));
+          bg.style.opacity = String(panelP);
+          setDarkText(false);
+          return;
+        }
+      }
+
       const seqSection = document.getElementById('scroll-sequence-section');
       if (!seqSection) {
         bg.style.opacity = '0';
@@ -178,7 +195,6 @@ const Header = () => {
       const t = Math.max(0, Math.min(1, 1 - seqRect.bottom / vh));
       bg.style.opacity = String(t);
 
-      const navH = 72;
       const next = isLightUnderNav(navH) && t < 0.5;
       setDarkText(prev => (prev !== next ? next : prev));
     };
